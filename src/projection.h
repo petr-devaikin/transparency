@@ -9,11 +9,18 @@
 #define projection_hpp
 
 #include "ofMain.h"
+#include "touchArea.h"
+#include "ofxCv.h"
 
 class projection {
 private:
     ofVec2f position;
     ofVec2f size;
+    
+    touchArea touch;
+    ofImage alpha;
+    
+    cv::Mat homography;
     
 public:
     
@@ -28,6 +35,9 @@ public:
     
     ofVec2f getPosition();
     ofVec2f getSize();
+    
+    void setTouchArea(touchArea t);
+    void updateMapping();
     
     void drawBorder();
 };

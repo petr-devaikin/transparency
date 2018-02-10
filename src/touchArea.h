@@ -13,11 +13,19 @@
 class touchArea {
 private:
     vector<ofVec2f> borderPoints;
+    ofImage depthImage;
     
 public:
     touchArea();
     
+    vector<ofVec2f> getBorderPoints();
+    ofImage getDepthImage();
+    
     void drawBorder();
+    void draw();
+    
+    void imitateTouch(int x, int y);
+    void imitateRelease();
 };
 
 #endif /* touchArea_hpp */
