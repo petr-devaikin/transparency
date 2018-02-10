@@ -1,0 +1,165 @@
+Skip to content
+This repository
+Search
+Pull requests
+Issues
+Marketplace
+Explore
+ @petr-devaikin
+ Sign out
+ Watch 486
+  Star 5,842  Fork 2,006 openframeworks/openFrameworks
+ Code  Issues 730  Pull requests 104  Projects 0  Wiki  Insights
+Branch: master Find file Copy pathopenFrameworks/.gitignore
+fc10044  on 6 Oct 2016
+@arturoc arturoc gitignore compiled libraries
+13 contributors @arturoc @bilderbuchi @ofTheo @fred-dev @danomatika @LeoColomb @bakercp @kylemcdonald @jvcleave @j3ffgray @danoli3 @nneonneo @nanu-c
+RawBlameHistory     
+136 lines (111 sloc)  1.74 KB
+#########################
+# openFrameworks patterns
+#########################
+
+# build files
+openFrameworks.a
+openFrameworksDebug.a
+openFrameworksUniversal.a
+libs/openFrameworksCompiled/lib/*/*
+!libs/openFrameworksCompiled/lib/*/.gitkeep
+
+# apothecary
+scripts/apothecary
+
+# rule to avoid non-official addons going into git
+# see addons/.gitignore
+addons/*
+
+# rule to avoid non-official apps going into git
+# see apps/.gitignore
+apps/*
+
+# rule to ignore compiled / downloaded libs
+/libs/*
+!/libs/openFrameworks
+!/libs/openFrameworksCompiled
+
+# also, see examples/.gitignore
+
+#########################
+# general
+#########################
+
+[Bb]uild/
+[Oo]bj/
+*.o
+examples/**/[Dd]ebug*/
+examples/**/[Rr]elease*/
+examples/**/gcc-debug/
+examples/**/gcc-release/
+tests/**/[Dd]ebug*/
+tests/**/[Rr]elease*/
+tests/**/gcc-debug/
+tests/**/gcc-release/
+*.mode*
+*.app/
+*.pyc
+.svn/
+*.log
+*.cpp.eep
+*.cpp.elf
+*.cpp.hex
+
+#########################
+# IDE
+#########################
+
+# XCode
+*.pbxuser
+*.perspective
+*.perspectivev3
+*.mode1v3
+*.mode2v3
+# XCode 4
+xcuserdata
+*.xcworkspace
+
+# Code::Blocks
+*.depend
+*.layout
+
+# Visual Studio
+*.sdf
+*.opensdf
+*.suo
+*.pdb
+*.ilk
+*.aps
+ipch/
+
+# Eclipse
+.metadata
+local.properties
+.externalToolBuilders
+
+# Android Studio
+.idea
+.gradle
+gradle
+gradlew
+gradlew.bat
+
+# QtCreator
+*.qbs.user
+*.pro.user
+*.pri
+
+
+#########################
+# operating system
+#########################
+
+# Linux
+*~
+# KDE
+.directory
+.AppleDouble
+
+# OSX
+.DS_Store
+*.swp
+*~.nib
+# Thumbnails
+._*
+examples/ios/**/mediaAssets
+
+# Windows
+# Windows image file caches
+Thumbs.db
+# Folder config file
+Desktop.ini
+
+# Android
+.csettings
+/libs/openFrameworksCompiled/project/android/paths.make
+
+# Android Studio
+*.iml
+
+#########################
+# miscellaneous
+#########################
+
+.mailmap
+/apps*/
+© 2018 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+API
+Training
+Shop
+Blog
+About
