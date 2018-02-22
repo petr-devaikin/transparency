@@ -17,13 +17,12 @@ private:
     ofVec2f position;
     ofVec2f size;
     
-    touchArea touch;
-    ofImage alpha;
+    touchArea * touch;
+    ofPixels alpha;
     
     cv::Mat homography;
     
 public:
-    
     projection();
     
     void setPosition(int x, int y);
@@ -36,10 +35,11 @@ public:
     ofVec2f getPosition();
     ofVec2f getSize();
     
-    void setTouchArea(touchArea t);
+    void setTouchArea(touchArea * t);
     void updateMapping();
     
     void drawBorder();
+    void draw();
 };
 
 #endif /* projection_hpp */

@@ -13,13 +13,16 @@
 class touchArea {
 private:
     vector<ofVec2f> borderPoints;
-    ofImage depthImage;
+    ofPixels depthImage;
     
 public:
+    const int WIDTH = 300;
+    const int HEIGHT = 600;
+    
     touchArea();
     
     vector<ofVec2f> getBorderPoints();
-    ofImage getDepthImage();
+    ofPixels & getDepthImage();
     
     void drawBorder();
     void draw();

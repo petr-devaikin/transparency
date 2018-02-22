@@ -10,6 +10,8 @@ void ofApp::setup(){
     gui.add(projectionHeight.set("Projection height", 300, 0, 1000));
     
     gui.loadFromFile("settings.xml");
+    
+    proj.setTouchArea(&touch);
 }
 
 //--------------------------------------------------------------
@@ -18,15 +20,16 @@ void ofApp::update(){
     proj.setY(projectionY);
     proj.setWidth(projectionWidth);
     proj.setHeight(projectionHeight);
+    
+    proj.updateMapping();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
     ofBackground(ofColor::black);
-    proj.drawBorder();
-    touch.draw();
     
-    proj.updateMapping();
+    touch.draw();
+    proj.draw();
     
     gui.draw();
 }

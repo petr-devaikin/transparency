@@ -13,7 +13,7 @@ touchArea::touchArea() {
     borderPoints.push_back(ofVec2f(220, 500));
     borderPoints.push_back(ofVec2f(80, 540));
     
-    depthImage.allocate(300, 600, OF_IMAGE_COLOR);
+    depthImage.allocate(WIDTH, HEIGHT, OF_IMAGE_COLOR);
 }
 
 void touchArea::drawBorder() {
@@ -28,14 +28,15 @@ void touchArea::drawBorder() {
 }
 
 void touchArea::draw() {
-    depthImage.bind();
-    depthImage.draw(0, 0);
-    depthImage.unbind();
-    //drawBorder();
+    ofSetColor(255);
+    ofImage img;
+    img.setFromPixels(depthImage);
+    img.draw(0, 0);
+    drawBorder();
 }
 
-ofImage touchArea::getDepthImage() {
-    return depthImage;
+ofPixels & touchArea::getDepthImage() {
+    return this->depthImage;
 }
 
 vector<ofVec2f> touchArea::getBorderPoints() {
@@ -45,9 +46,7 @@ vector<ofVec2f> touchArea::getBorderPoints() {
 void touchArea::imitateTouch(int x, int y) {
     for (int i = x - 10; i < x + 10; i++)
         for (int j = y - 10; j < y + 10; j++)
-            depthImage.setColor(i, j, ofColor::white);
-    
-    depthImage.update();
+            depthImage.setColor(i, j, ofColor::yellow);
 }
 
 void touchArea::imitateRelease() {
