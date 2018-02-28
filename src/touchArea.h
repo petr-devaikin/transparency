@@ -13,16 +13,23 @@
 class touchArea {
 private:
     vector<ofVec2f> borderPoints;
-    ofPixels depthImage;
+    
+    ofFbo depthFbo; // depth points with substracted zero level
+    
+    ofPixels zeroLevelPixels; // depth points of the canvas in default state
+    ofImage brush; // touch image for imitation
     
 public:
-    const int WIDTH = 300;
+    const int WIDTH = 600;
     const int HEIGHT = 600;
+    const float MAX_DEPTH = .5;
     
     touchArea();
     
+    void recognizeBorders();
+    
     vector<ofVec2f> getBorderPoints();
-    ofPixels & getDepthImage();
+    ofFbo & getDepth();
     
     void drawBorder();
     void draw();

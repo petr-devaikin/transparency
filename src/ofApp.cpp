@@ -11,6 +11,9 @@ void ofApp::setup(){
     
     gui.loadFromFile("settings.xml");
     
+    // move it. it's here only for tests
+    touch.recognizeBorders();
+    
     proj.setTouchArea(&touch);
 }
 
@@ -18,10 +21,11 @@ void ofApp::setup(){
 void ofApp::update(){
     proj.setX(projectionX);
     proj.setY(projectionY);
-    proj.setWidth(projectionWidth);
-    proj.setHeight(projectionHeight);
+    proj.setSize(projectionWidth, projectionHeight);
     
-    proj.updateMapping();
+    proj.updateMapping(); // do it only of something changed!
+    
+    proj.update();
 }
 
 //--------------------------------------------------------------

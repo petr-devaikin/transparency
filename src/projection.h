@@ -18,9 +18,14 @@ private:
     ofVec2f size;
     
     touchArea * touch;
-    ofPixels alpha;
+    ofImage image1, image2;
+    
+    ofFbo maskFbo; // transformed mask from touchArea
+    ofFbo resultFbo;
     
     cv::Mat homography;
+    
+    ofShader shader;
     
 public:
     projection();
@@ -37,6 +42,8 @@ public:
     
     void setTouchArea(touchArea * t);
     void updateMapping();
+    
+    void update();
     
     void drawBorder();
     void draw();

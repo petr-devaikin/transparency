@@ -8,16 +8,34 @@
 #include "touchArea.h"
 
 touchArea::touchArea() {
+    zeroLevelPixels.allocate(WIDTH, HEIGHT, OF_IMAGE_GRAYSCALE);
+    zeroLevelPixels.clear();
+    
+    brush.load("brush.png");
+    brush.setImageType(OF_IMAGE_GRAYSCALE);
+    
+    depthFbo.allocate(WIDTH, HEIGHT, GL_RGBA);
+    depthFbo.begin();
+    {
+        ofClear(0);
+    }
+    depthFbo.end();
+}
+
+void touchArea::recognizeBorders() {
     borderPoints.push_back(ofVec2f(100, 300));
     borderPoints.push_back(ofVec2f(200, 290));
     borderPoints.push_back(ofVec2f(220, 500));
     borderPoints.push_back(ofVec2f(80, 540));
     
-    depthImage.allocate(WIDTH, HEIGHT, OF_IMAGE_COLOR);
+    // also setup zero level
+    zeroLevelPixels.clear();
+    
+    // setup min and max depth for kinect!
 }
 
 void touchArea::drawBorder() {
-    ofSetColor(ofColor::blue);
+    ofSetColor(0, 255, 0);
     ofNoFill();
     ofPolyline border;
     for (int i = 0; i < borderPoints.size(); i++) {
@@ -29,14 +47,12 @@ void touchArea::drawBorder() {
 
 void touchArea::draw() {
     ofSetColor(255);
-    ofImage img;
-    img.setFromPixels(depthImage);
-    img.draw(0, 0);
+    depthFbo.draw(0, 0);
     drawBorder();
 }
 
-ofPixels & touchArea::getDepthImage() {
-    return this->depthImage;
+ofFbo & touchArea::getDepth() {
+    return depthFbo;
 }
 
 vector<ofVec2f> touchArea::getBorderPoints() {
@@ -44,10 +60,19 @@ vector<ofVec2f> touchArea::getBorderPoints() {
 }
 
 void touchArea::imitateTouch(int x, int y) {
-    for (int i = x - 10; i < x + 10; i++)
-        for (int j = y - 10; j < y + 10; j++)
-            depthImage.setColor(i, j, ofColor::yellow);
+    depthFbo.begin();
+    {
+        ofClear(0);
+        ofSetColor(255);
+        brush.draw(x - brush.getWidth() / 2, y - brush.getHeight() / 2);
+    }
+    depthFbo.end();
 }
 
 void touchArea::imitateRelease() {
+    depthFbo.begin();
+    {
+        ofClear(0);
+    }
+    depthFbo.end();
 }
