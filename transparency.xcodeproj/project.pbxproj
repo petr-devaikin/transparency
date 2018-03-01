@@ -149,6 +149,13 @@
 		6F89E20A2048458F0075D888 /* libopencv_stitching.2.4.13.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_stitching.2.4.13.dylib; path = "../../../../../../../../usr/local/Cellar/opencv@2/2.4.13.5/lib/libopencv_stitching.2.4.13.dylib"; sourceTree = "<group>"; };
 		6F89E20B2048458F0075D888 /* libopencv_gpu.2.4.13.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_gpu.2.4.13.dylib; path = "../../../../../../../../usr/local/Cellar/opencv@2/2.4.13.5/lib/libopencv_gpu.2.4.13.dylib"; sourceTree = "<group>"; };
 		6F89E20C2048458F0075D888 /* libopencv_objdetect.2.4.13.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_objdetect.2.4.13.dylib; path = "../../../../../../../../usr/local/Cellar/opencv@2/2.4.13.5/lib/libopencv_objdetect.2.4.13.dylib"; sourceTree = "<group>"; };
+		6F89E26F204869940075D888 /* touchArea.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = touchArea.cpp; sourceTree = "<group>"; };
+		6F89E270204869940075D888 /* projection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = projection.h; sourceTree = "<group>"; };
+		6F89E271204869940075D888 /* projection.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = projection.cpp; sourceTree = "<group>"; };
+		6F89E272204869940075D888 /* ofApp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofApp.cpp; sourceTree = "<group>"; };
+		6F89E273204869940075D888 /* ofApp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofApp.h; sourceTree = "<group>"; };
+		6F89E274204869940075D888 /* touchArea.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = touchArea.h; sourceTree = "<group>"; };
+		6F89E275204869940075D888 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		6F930947CA4BCA2665A4F4E8 /* libfreenect_audio.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = libfreenect_audio.h; path = ../../../addons/ofxKinect/libs/libfreenect/include/libfreenect_audio.h; sourceTree = SOURCE_ROOT; };
 		70046E043EDDB466ED625C3B /* Tracker.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Tracker.h; path = ../../../addons/ofxCv/libs/ofxCv/include/ofxCv/Tracker.h; sourceTree = SOURCE_ROOT; };
 		71958293AC5292DE4B7C619D /* registration.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = registration.c; path = ../../../addons/ofxKinect/libs/libfreenect/src/registration.c; sourceTree = SOURCE_ROOT; };
@@ -410,6 +417,36 @@
 			path = cvlibs;
 			sourceTree = "<group>";
 		};
+		6F89E26D204869930075D888 /* ofxAruco */ = {
+			isa = PBXGroup;
+			children = (
+				6F89E276204869940075D888 /* libs */,
+				6F89E26E204869940075D888 /* src */,
+			);
+			name = ofxAruco;
+			sourceTree = "<group>";
+		};
+		6F89E26E204869940075D888 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				6F89E26F204869940075D888 /* touchArea.cpp */,
+				6F89E270204869940075D888 /* projection.h */,
+				6F89E271204869940075D888 /* projection.cpp */,
+				6F89E272204869940075D888 /* ofApp.cpp */,
+				6F89E273204869940075D888 /* ofApp.h */,
+				6F89E274204869940075D888 /* touchArea.h */,
+				6F89E275204869940075D888 /* main.cpp */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		6F89E276204869940075D888 /* libs */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = libs;
+			sourceTree = "<group>";
+		};
 		7CC1E591490DB083FB916812 /* CLD */ = {
 			isa = PBXGroup;
 			children = (
@@ -481,6 +518,7 @@
 		BB4B014C10F69532006C3DED /* addons */ = {
 			isa = PBXGroup;
 			children = (
+				6F89E26D204869930075D888 /* ofxAruco */,
 				6025FAF6414C2CA589764D26 /* ofxCv */,
 				480A780D8D0308AE4A368801 /* ofxGui */,
 				9683228C705CA3FF4F2EA945 /* ofxKinect */,

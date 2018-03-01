@@ -146,7 +146,7 @@ void ofApp::mouseDragged(int x, int y, int button){
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
     if (!calibraionMode)
-        touch.imitateTouch(x, y);
+        touch.imitateTouch(x - 10, y - (ofGetHeight() - touch.HEIGHT) / 2));
     else {
         if (showDepthView) {
             int xOffset = 10;
