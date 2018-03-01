@@ -17,7 +17,7 @@ touchArea::touchArea() {
     depthFbo.allocate(WIDTH, HEIGHT, GL_RGBA);
     depthFbo.begin();
     {
-        ofClear(0);
+        ofClear(0, 0, 0, 255);
     }
     depthFbo.end();
 }
@@ -62,9 +62,9 @@ vector<ofVec2f> touchArea::getBorderPoints() {
 void touchArea::imitateTouch(int x, int y) {
     depthFbo.begin();
     {
-        ofClear(0);
+        ofClear(0, 0, 0, 255);
         ofSetColor(255);
-        brush.draw(x - brush.getWidth() / 2, y - brush.getHeight() / 2);
+        brush.draw(x - brush.getWidth(), y - brush.getHeight(), brush.getWidth() * 2, brush.getHeight() * 2);
     }
     depthFbo.end();
 }
@@ -72,7 +72,7 @@ void touchArea::imitateTouch(int x, int y) {
 void touchArea::imitateRelease() {
     depthFbo.begin();
     {
-        ofClear(0);
+        ofClear(0, 0, 0, 255);
     }
     depthFbo.end();
 }

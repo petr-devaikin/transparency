@@ -11,6 +11,8 @@ using namespace cv;
 using namespace ofxCv;
 
 projection::projection() {
+    lastMaskUpdate = ofGetElapsedTimef();
+    
     // load shader
     shader.load("shadersGL3/shader");
     
@@ -30,15 +32,21 @@ void projection::setPosition(int x, int y) {
 }
 
 void projection::setSize(int width, int height) {
-    size.set(width, height);
-    
-    // upload image again!
-    image1.resize(width, height);
-    image2.resize(width, height);
-    
-    // reallocate buffer
-    resultFbo.allocate(width, height, GL_RGBA);
-    maskFbo.allocate(width, height, GL_RGBA);
+    if (width != size[0] && height != size[1])
+    {
+        size.set(width, height);
+        
+        // upload image again!
+        image1.resize(width, height);
+        image2.resize(width, height);
+        
+        // reallocate buffer
+        resultFbo.allocate(width, height, GL_RGBA);
+        maskFbo.allocate(width, height, GL_RGBA);
+        maskFbo.begin();
+        ofClear(0, 0, 0, 255);
+        maskFbo.end();
+    }
 }
 
 void projection::setX(int x) {
@@ -92,16 +100,28 @@ void projection::updateMapping() {
 }
 
 void projection::drawBorder() {
-    ofSetColor(100, 100, 100);
+    ofSetColor(255, 255, 255);
     ofNoFill();
     ofDrawRectangle(position[0], position[1], size[0], size[1]);
 }
 
 void projection::update() {
+    float currentTime = ofGetElapsedTimef();
+    float timeDiff = currentTime - lastMaskUpdate;
+    int fadeLevel = 255 * timeDiff / FADE_PERIOD;
+    if (fadeLevel >= 1)
+        lastMaskUpdate = currentTime;
+    
     // modify mask
     maskFbo.begin();
     {
-        ofClear(0, 0, 0, 0);
+        if (fadeLevel >= 1)
+        {
+            ofSetColor(fadeLevel, fadeLevel, fadeLevel, 255);
+            ofFill();
+            ofEnableBlendMode(OF_BLENDMODE_SUBTRACT);
+            ofDrawRectangle(0, 0, size[0], size[1]);
+        }
         
         ofPushMatrix();
         
@@ -109,26 +129,31 @@ void projection::update() {
         m4x4 = ofMatrix4x4::ofMatrix4x4(homography.ptr<float>(0));
         ofMultMatrix(m4x4);
         
+        ofEnableBlendMode(OF_BLENDMODE_SCREEN); // need MAX! not add
         ofSetColor(255);
         (touch->getDepth()).draw(0, 0);
+        ofEnableBlendMode(OF_BLENDMODE_ALPHA);
         
         ofPopMatrix();
     }
     maskFbo.end();
-    
-    
+
     // final drawing
     resultFbo.begin();
     {
+        ofClear(0, 0, 0, 0);
         ofSetColor(255);
-        image1.draw(0, 0);
         
-        shader.setUniformTexture("maskTex", maskFbo.getTexture(), 1);
+        //maskFbo.draw(0, 0); // to test how mask is transformed
+        
         shader.begin();
         {
+            shader.setUniformTexture("bgTex", image1.getTexture(), 1);
+            shader.setUniformTexture("maskTex", maskFbo.getTexture(), 2);
             image2.draw(0, 0);
         }
         shader.end();
+         
     }
     resultFbo.end();
 }

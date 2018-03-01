@@ -27,7 +27,11 @@ private:
     
     ofShader shader;
     
+    float lastMaskUpdate;
+    
 public:
+    const float FADE_PERIOD = 3;
+    
     projection();
     
     void setPosition(int x, int y);
