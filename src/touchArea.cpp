@@ -20,6 +20,11 @@ touchArea::touchArea() {
         ofClear(0, 0, 0, 255);
     }
     depthFbo.end();
+    
+    borderPoints.push_back(ofVec2f(0, 0));
+    borderPoints.push_back(ofVec2f(0, 0));
+    borderPoints.push_back(ofVec2f(0, 0));
+    borderPoints.push_back(ofVec2f(0, 0));
 }
 
 void touchArea::recognizeBorders() {
@@ -34,21 +39,26 @@ void touchArea::recognizeBorders() {
     // setup min and max depth for kinect!
 }
 
-void touchArea::drawBorder() {
+void touchArea::drawBorder(int x, int y) {
     ofSetColor(0, 255, 0);
     ofNoFill();
     ofPolyline border;
     for (int i = 0; i < borderPoints.size(); i++) {
-        border.addVertex(borderPoints[i]);
+        border.addVertex(borderPoints[i] + ofVec2f(x, y));
     }
     border.close();
     border.draw();
+    
+    ofNoFill();
+    ofSetColor(100, 100, 100);
+    ofDrawRectangle(x, y, WIDTH, HEIGHT);
 }
 
-void touchArea::draw() {
-    ofSetColor(255);
-    depthFbo.draw(0, 0);
-    drawBorder();
+void touchArea::draw(int x, int y) {
+    float yOffset = (ofGetHeight() - HEIGHT) / 2;
+    
+    ofSetColor(255, 255, 255, 200);
+    depthFbo.draw(x, y, WIDTH, HEIGHT);
 }
 
 ofFbo & touchArea::getDepth() {
@@ -57,6 +67,10 @@ ofFbo & touchArea::getDepth() {
 
 vector<ofVec2f> touchArea::getBorderPoints() {
     return borderPoints;
+}
+
+void touchArea::setBorderPoint(int i, float x, float y) {
+    borderPoints[i].set(x, y);
 }
 
 void touchArea::imitateTouch(int x, int y) {

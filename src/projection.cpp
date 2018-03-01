@@ -161,6 +161,4 @@ void projection::update() {
 void projection::draw() {
     ofSetColor(255);
     resultFbo.draw(position[0], position[1]);
-    
-    drawBorder();
 }

@@ -19,6 +19,16 @@ class ofApp : public ofBaseApp{
     ofxToggle showGrid;
     ofxToggle showDepthView;
     ofxToggle calibraionMode;
+    
+    const int SENS_RANGE = 5;
+    
+    bool dragProjection = false;
+    bool dragTouchArea = false;
+    int dragTouchAreaCornerNumber = 0;
+    
+    ofVec2f dragStart;
+    
+    void calibrationToggleListener(bool &toggleStatus);
 
 	public:
 		void setup();
@@ -37,5 +47,4 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
-		
 };

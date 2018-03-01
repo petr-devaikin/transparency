@@ -31,11 +31,13 @@ public:
     vector<ofVec2f> getBorderPoints();
     ofFbo & getDepth();
     
-    void drawBorder();
-    void draw();
+    void drawBorder(int x, int y);
+    void draw(int x, int y);
     
     void imitateTouch(int x, int y);
     void imitateRelease();
+    
+    void setBorderPoint(int i, float x, float y);
 };
 
 #endif /* touchArea_hpp */
