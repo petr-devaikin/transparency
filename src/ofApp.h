@@ -4,23 +4,27 @@
 #include "projection.h"
 #include "touchArea.h"
 #include "ofxGui.h"
+#include "ofxXmlSettings.h"
 
 class ofApp : public ofBaseApp{
     projection proj;
     touchArea touch;
-
-    // gui
-    ofParameter<int> projectionX;
-    ofParameter<int> projectionY;
-    ofParameter<int> projectionWidth;
-    ofParameter<int> projectionHeight;
+    
+    ofxXmlSettings projectionSettings;
+    ofxXmlSettings depthSettings;
+    
     ofxPanel gui;
+    
+    ofxToggle showGui;
+    ofxToggle showGrid;
+    ofxToggle showDepthView;
+    ofxToggle calibraionMode;
 
 	public:
 		void setup();
 		void update();
 		void draw();
-    void exit();
+        void exit();
 
 		void keyPressed(int key);
 		void keyReleased(int key);
