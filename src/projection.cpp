@@ -32,7 +32,7 @@ void projection::setPosition(int x, int y) {
 }
 
 void projection::setSize(int width, int height) {
-    if (width != size[0] && height != size[1])
+    if (width != size[0] || height != size[1])
     {
         size.set(width, height);
         
@@ -50,11 +50,11 @@ void projection::setSize(int width, int height) {
 }
 
 void projection::setX(int x) {
-    position[0] = x;
+    setPosition(x, position[1]);
 }
 
 void projection::setY(int y) {
-    position[1] = y;
+    setPosition(position[0], y);
 }
 
 void projection::setWidth(int width) {
@@ -102,7 +102,7 @@ void projection::updateMapping() {
 void projection::drawBorder() {
     ofSetColor(255, 255, 255);
     ofNoFill();
-    ofDrawRectangle(position[0], position[1], size[0], size[1]);
+    ofDrawRectangle(position[0] - 5, position[1] - 5, size[0] + 10, size[1] + 10);
 }
 
 void projection::update() {
@@ -156,6 +156,11 @@ void projection::update() {
          
     }
     resultFbo.end();
+}
+
+void projection::drawBoard() {
+    ofSetColor(255);
+    (touch->getBoard()).draw(position[0], position[1], size[0], size[1]);
 }
 
 void projection::draw() {

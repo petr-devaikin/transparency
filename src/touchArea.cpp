@@ -25,18 +25,54 @@ touchArea::touchArea() {
     borderPoints.push_back(ofVec2f(0, 0));
     borderPoints.push_back(ofVec2f(0, 0));
     borderPoints.push_back(ofVec2f(0, 0));
+    
+    // init marker recognizer
+    
+    //aruco.setup("board/intrinsics.yml", WIDTH, HEIGHT);
+    //aruco.setMinMaxMarkerDetectionSize(0.001, 0.25);
+    ofVec2f camSize(WIDTH, HEIGHT);
+    art.setup(camSize, camSize);
+    boardImage.load("board/board.png"); // load board image to dispolay
+    
+    // only for testing
+    fakeImage.load("board/test_image.jpg");
+    fakeImage.setImageType(OF_IMAGE_COLOR);
+    
+    // crop it!
+    if (fakeImage.getWidth() / fakeImage.getHeight() > WIDTH / (float) HEIGHT) {
+        float diff = fakeImage.getWidth() - fakeImage.getHeight() * WIDTH / (float) HEIGHT;
+        fakeImage.crop(diff / 2, 0, fakeImage.getWidth() - diff, fakeImage.getHeight());
+    }
+    else {
+        float diff = fakeImage.getHeight() - fakeImage.getWidth() * HEIGHT / (float) WIDTH;
+        fakeImage.crop(0, diff / 2, fakeImage.getWidth(), fakeImage.getHeight() - diff);
+    }
+    fakeImage.resize(WIDTH, HEIGHT);
+}
+
+ofImage & touchArea::getSensorImage() {
+    return fakeImage;
 }
 
 void touchArea::recognizeBorders() {
-    borderPoints.push_back(ofVec2f(100, 300));
-    borderPoints.push_back(ofVec2f(200, 290));
-    borderPoints.push_back(ofVec2f(220, 500));
-    borderPoints.push_back(ofVec2f(80, 540));
-    
-    // also setup zero level
-    zeroLevelPixels.clear();
-    
-    // setup min and max depth for kinect!
+    //art.update(cam);
+    art.ofxArtool5::GenericTracker::update(getSensorImage().getPixels());
+    if (art.isFound()) {
+        int n = art.getNumMarkers();
+        ARMarkerInfo marker = art.getMarker(0);
+        for (int i = 0; i < 4; i++) {
+            borderPoints[i] = ofVec2f(marker.vertex[i][0], marker.vertex[i][1]);
+        }
+        /*
+        borderPoints[0] = ofVec2f(p1[0], p1[1]);
+        borderPoints[1] = ofVec2f(p2[0], p2[1]);
+        borderPoints[2] = ofVec2f(p3[0], p3[1]);
+        borderPoints[3] = ofVec2f(p4[0], p4[1]);
+        */
+        
+        // also setup zero level
+        zeroLevelPixels.clear();
+    }
 }
 
 void touchArea::drawBorder(int x, int y) {
@@ -54,15 +90,22 @@ void touchArea::drawBorder(int x, int y) {
     ofDrawRectangle(x, y, WIDTH, HEIGHT);
 }
 
-void touchArea::draw(int x, int y) {
-    float yOffset = (ofGetHeight() - HEIGHT) / 2;
-    
+void touchArea::drawImage(int x, int y) {
+    ofSetColor(255, 255, 255, 200);
+    getSensorImage().draw(x, y);
+}
+
+void touchArea::drawDepth(int x, int y) {
     ofSetColor(255, 255, 255, 200);
     depthFbo.draw(x, y, WIDTH, HEIGHT);
 }
 
 ofFbo & touchArea::getDepth() {
     return depthFbo;
+}
+
+ofImage & touchArea::getBoard() {
+    return boardImage;
 }
 
 vector<ofVec2f> touchArea::getBorderPoints() {

@@ -1,4 +1,5 @@
+ofxArtool5
 ofxCv
 ofxGui
-ofxKinect
+ofxOpenCv
 ofxXmlSettings

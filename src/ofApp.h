@@ -23,6 +23,8 @@ class ofApp : public ofBaseApp{
     const int SENS_RANGE = 5;
     
     bool dragProjection = false;
+    bool resizeProjectionX = false;
+    bool resizeProjectionY = false;
     bool dragTouchArea = false;
     int dragTouchAreaCornerNumber = 0;
     

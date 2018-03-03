@@ -69,13 +69,18 @@ void ofApp::draw(){
             proj.drawBorder();
             
             if (showDepthView) {
-                touch.draw(10, (ofGetHeight() - touch.HEIGHT) / 2);
+                touch.drawDepth(10, (ofGetHeight() - touch.HEIGHT) / 2);
                 touch.drawBorder(10, (ofGetHeight() - touch.HEIGHT) / 2);
             }
         }
         else {
+            proj.drawBoard();
             proj.drawBorder();
-            touch.drawBorder(10, (ofGetHeight() - touch.HEIGHT) / 2);
+            
+            if (showDepthView) {
+                touch.drawImage(10,  (ofGetHeight() - touch.HEIGHT) / 2);
+                touch.drawBorder(10, (ofGetHeight() - touch.HEIGHT) / 2);
+            }
         }
     }
     
@@ -111,6 +116,9 @@ void ofApp::exit(){
 void ofApp::keyPressed(int key){
     if (key == 'g')
         showGui = !showGui;
+    
+    if (calibraionMode && key == 'r')
+        touch.recognizeBorders();
 }
 
 //--------------------------------------------------------------
@@ -140,13 +148,25 @@ void ofApp::mouseDragged(int x, int y, int button){
                              currentPosition[1] + y - dragStart[1]);
             dragStart.set(x, y);
         }
+        
+        if (resizeProjectionX) {
+            ofVec2f currentSize = proj.getSize();
+            proj.setWidth(currentSize[0] + x - dragStart[0]);
+            dragStart.set(x, y);
+        }
+        
+        if (resizeProjectionY) {
+            ofVec2f currentSize = proj.getSize();
+            proj.setHeight(currentSize[1] + y - dragStart[1]);
+            dragStart.set(x, y);
+        }
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
     if (!calibraionMode)
-        touch.imitateTouch(x - 10, y - (ofGetHeight() - touch.HEIGHT) / 2));
+        touch.imitateTouch(x - 10, y - (ofGetHeight() - touch.HEIGHT) / 2);
     else {
         if (showDepthView) {
             int xOffset = 10;
@@ -166,12 +186,20 @@ void ofApp::mousePressed(int x, int y, int button){
         // drag projection area only if the touch area is not dragged
         if (!dragTouchArea) {
             if (x >= proj.getPosition()[0] && x <= proj.getPosition()[0] + proj.getSize()[0] &&
+                abs(y - proj.getPosition()[1] - proj.getSize()[1]) < SENS_RANGE) {
+                resizeProjectionY = true;
+                dragStart.set(x, y);
+            }
+            else if (y >= proj.getPosition()[1] && y <= proj.getPosition()[1] + proj.getSize()[1] &&
+                    abs(x - proj.getPosition()[0] - proj.getSize()[0]) < SENS_RANGE) {
+                resizeProjectionX = true;
+                dragStart.set(x, y);
+            }
+            else if (x >= proj.getPosition()[0] && x <= proj.getPosition()[0] + proj.getSize()[0] &&
                 y >= proj.getPosition()[1] && y <= proj.getPosition()[1] + proj.getSize()[1]) {
                 dragProjection = true;
                 dragStart.set(x, y);
             }
-            
-            // resize!
         }
     }
 }
@@ -185,6 +213,10 @@ void ofApp::mouseReleased(int x, int y, int button){
             dragTouchArea = false;
         if (dragProjection)
             dragProjection = false;
+        if (resizeProjectionY)
+            resizeProjectionY = false;
+        if (resizeProjectionX)
+            resizeProjectionX = false;
     }
 }
 

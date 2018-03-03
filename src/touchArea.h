@@ -9,6 +9,7 @@
 #define touchArea_hpp
 
 #include "ofMain.h"
+#include "ofxARTPattern.h"
 
 class touchArea {
 private:
@@ -19,9 +20,17 @@ private:
     ofPixels zeroLevelPixels; // depth points of the canvas in default state
     ofImage brush; // touch image for imitation
     
+    //ofxAruco aruco;
+    ofxArtool5::PatternTracker art;
+    ofImage boardImage;
+    
+    ofImage fakeImage; // only for testing
+    
+    ofImage & getSensorImage();
+    
 public:
-    const int WIDTH = 600;
-    const int HEIGHT = 600;
+    const int WIDTH = 640;
+    const int HEIGHT = 480;
     const float MAX_DEPTH = .5;
     
     touchArea();
@@ -30,9 +39,11 @@ public:
     
     vector<ofVec2f> getBorderPoints();
     ofFbo & getDepth();
+    ofImage & getBoard();
     
     void drawBorder(int x, int y);
-    void draw(int x, int y);
+    void drawImage(int x, int y);
+    void drawDepth(int x, int y);
     
     void imitateTouch(int x, int y);
     void imitateRelease();

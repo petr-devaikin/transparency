@@ -50,6 +50,7 @@ public:
     void update();
     
     void drawBorder();
+    void drawBoard(); // for calibration
     void draw();
 };
 
