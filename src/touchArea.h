@@ -24,8 +24,6 @@ private:
     ofImage zeroLevelPixels; // depth points of the canvas in default state
     ofImage brush; // touch image for imitation
     
-    float maxDepth = 50; // to cale the touch;
-    
     //ofxAruco aruco;
     ofxArtool5::PatternTracker art;
     ofImage boardImage;
@@ -39,7 +37,7 @@ public:
     const int WIDTH = 640;
     const int HEIGHT = 480;
     
-    touchArea(testMode = true);
+    touchArea(bool testMode = true);
     
     void recognizeBorders();
     

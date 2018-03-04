@@ -29,6 +29,7 @@ private:
     
     float lastMaskUpdate;
     
+    int maxDepthLevel = 250; // to normalize depth picture
 public:
     const float FADE_PERIOD = 3;
     
@@ -41,8 +42,11 @@ public:
     void setWidth(int width);
     void setHeight(int height);
     
+    void setDepthLevel(int d);
+    
     ofVec2f getPosition();
     ofVec2f getSize();
+    int getDepthLevel();
     
     void setTouchArea(touchArea * t);
     void updateMapping();

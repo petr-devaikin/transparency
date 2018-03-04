@@ -19,6 +19,7 @@ class ofApp : public ofBaseApp{
     ofxToggle showGrid;
     ofxToggle showDepthView;
     ofxToggle calibraionMode;
+    ofParameter<int> maxDepth;
     
     const int SENS_RANGE = 5;
     

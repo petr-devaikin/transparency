@@ -16,6 +16,7 @@ void ofApp::setup(){
     
     proj.setPosition(projectionSettings.getValue("x", 100), projectionSettings.getValue("y", 50));
     proj.setSize(projectionSettings.getValue("width", 200), projectionSettings.getValue("height", 500));
+    proj.setDepthLevel(projectionSettings.getValue("maxDepth", 255));
     
     touch.setBorderPoint(0, depthSettings.getValue("x1", 100), depthSettings.getValue("y1", 100));
     touch.setBorderPoint(1, depthSettings.getValue("x2", 200), depthSettings.getValue("y2", 100));
@@ -34,6 +35,8 @@ void ofApp::setup(){
     gui.add(showGrid.setup("Grid", false));
     gui.add(showDepthView.setup("Depth View", false));
     gui.add(calibraionMode.setup("Calibration (r - recognize)", false));
+    //set this param in gui!!!
+    //gui.add(maxDepth.set)
     
     gui.loadFromFile("settings.xml");
     
@@ -102,6 +105,7 @@ void ofApp::exit(){
     projectionSettings.setValue("y", proj.getPosition()[1]);
     projectionSettings.setValue("width", proj.getSize()[0]);
     projectionSettings.setValue("height", proj.getSize()[1]);
+    projectionSettings.setValue("maxDepth", proj.getDepthLevel());
     projectionSettings.saveFile("projection_settings.xml");
     
     depthSettings.setValue("x1", touch.getBorderPoints()[0][0]);

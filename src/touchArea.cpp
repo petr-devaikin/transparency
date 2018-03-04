@@ -175,6 +175,7 @@ void touchArea::imitateTouch(int x, int y) {
         ofSetColor(255);
         zeroLevelPixels.draw(0, 0);
         ofEnableBlendMode(OF_BLENDMODE_ADD);
+        ofSetColor(100);
         brush.draw(x - brush.getWidth(), y - brush.getHeight(), brush.getWidth() * 2, brush.getHeight() * 2);
         ofDisableBlendMode();
     }
@@ -185,6 +186,7 @@ void touchArea::imitateRelease() {
     depthFboRaw.begin();
     {
         ofDisableBlendMode();
+        ofSetColor(255);
         zeroLevelPixels.draw(0, 0);
     }
     depthFboRaw.end();

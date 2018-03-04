@@ -148,6 +148,7 @@ void projection::update() {
         
         shader.begin();
         {
+            shader.setUniform1f("multiplier", 255.0 / maxDepthLevel);
             shader.setUniformTexture("bgTex", image1.getTexture(), 1);
             shader.setUniformTexture("maskTex", maskFbo.getTexture(), 2);
             image2.draw(0, 0);
@@ -166,4 +167,12 @@ void projection::drawBoard() {
 void projection::draw() {
     ofSetColor(255);
     resultFbo.draw(position[0], position[1]);
+}
+
+void projection::setDepthLevel(int d) {
+    maxDepthLevel = d;
+}
+
+int projection::getDepthLevel() {
+    return maxDepthLevel;
 }
