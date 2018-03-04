@@ -22,6 +22,9 @@ void ofApp::setup(){
     touch.setBorderPoint(2, depthSettings.getValue("x3", 200), depthSettings.getValue("y3", 500));
     touch.setBorderPoint(3, depthSettings.getValue("x4", 100), depthSettings.getValue("y4", 500));
     
+    // get zero pixels in the very beginning
+    touch.updateZeroPixels();
+    
     proj.updateMapping();
     
     // gui
@@ -39,6 +42,7 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    touch.update();
     proj.update();
 }
 
@@ -119,6 +123,9 @@ void ofApp::keyPressed(int key){
     
     if (calibraionMode && key == 'r')
         touch.recognizeBorders();
+    
+    if (calibraionMode && key == 'z')
+        touch.updateZeroPixels();
 }
 
 //--------------------------------------------------------------
