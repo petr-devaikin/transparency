@@ -34,7 +34,7 @@ private:
     
     void updateDepth(); // get depth pixels from camera.
 public:
-    const int WIDTH = 640;
+    const int WIDTH = 300;
     const int HEIGHT = 480;
     
     touchArea(bool testMode = true);

@@ -11,8 +11,10 @@ using namespace cv;
 using namespace ofxCv;
 
 projection::projection() {
+}
+
+void projection::init(const string& img_1_path, const string& img_2_path) {
     lastMaskUpdate = ofGetElapsedTimef();
-    
     // load shader
     shader.load("shadersGL3/shader");
     
@@ -23,8 +25,11 @@ projection::projection() {
     homography.at<float>(2, 2) = homography.at<float>(3, 3) = 1;
     
     // load images
-    image1.load("img0.jpg");
-    image2.load("img1.jpg");
+    image1_original.load(img_1_path);
+    image2_original.load(img_2_path);
+    
+    image1.clone(image1_original);
+    image2.clone(image2_original);
 }
 
 void projection::setPosition(int x, int y) {
@@ -37,6 +42,8 @@ void projection::setSize(int width, int height) {
         size.set(width, height);
         
         // upload image again!
+        image1.clone(image1_original);
+        image2.clone(image2_original);
         image1.resize(width, height);
         image2.resize(width, height);
         

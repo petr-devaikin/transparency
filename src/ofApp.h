@@ -22,6 +22,7 @@ class ofApp : public ofBaseApp{
     ofParameter<int> maxDepth;
     
     const int SENS_RANGE = 5;
+    const int BORDER_MARGIN = 5;
     
     bool dragProjection = false;
     bool resizeProjectionX = false;

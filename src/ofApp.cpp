@@ -12,6 +12,7 @@ void ofApp::setup(){
     
     // setup from config
     
+    proj.init("img0.jpg", "img1.jpg");
     proj.setTouchArea(&touch);
     
     proj.setPosition(projectionSettings.getValue("x", 100), projectionSettings.getValue("y", 50));
@@ -125,6 +126,9 @@ void ofApp::keyPressed(int key){
     if (key == 'g')
         showGui = !showGui;
     
+    if (key == 't')
+        showDepthView = !showDepthView;
+    
     if (calibraionMode && key == 'r')
         touch.recognizeBorders();
     
@@ -197,11 +201,12 @@ void ofApp::mousePressed(int x, int y, int button){
         // drag projection area only if the touch area is not dragged
         if (!dragTouchArea) {
             if (x >= proj.getPosition()[0] && x <= proj.getPosition()[0] + proj.getSize()[0] &&
-                abs(y - proj.getPosition()[1] - proj.getSize()[1]) < SENS_RANGE) {
+                abs(y - proj.getPosition()[1] - proj.getSize()[1] - BORDER_MARGIN) < SENS_RANGE) {
                 resizeProjectionY = true;
+                cout << "Y";
                 dragStart.set(x, y);
             }
-            else if (y >= proj.getPosition()[1] && y <= proj.getPosition()[1] + proj.getSize()[1] &&
+            else if (y >= proj.getPosition()[1] && y <= proj.getPosition()[1] + proj.getSize()[1] + BORDER_MARGIN &&
                     abs(x - proj.getPosition()[0] - proj.getSize()[0]) < SENS_RANGE) {
                 resizeProjectionX = true;
                 dragStart.set(x, y);

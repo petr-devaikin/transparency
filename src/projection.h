@@ -18,6 +18,7 @@ private:
     ofVec2f size;
     
     touchArea * touch;
+    ofImage image1_original, image2_original;
     ofImage image1, image2;
     
     ofFbo maskFbo; // transformed mask from touchArea
@@ -29,11 +30,13 @@ private:
     
     float lastMaskUpdate;
     
-    int maxDepthLevel = 250; // to normalize depth picture
+    int maxDepthLevel = 10; // to normalize depth picture
 public:
-    const float FADE_PERIOD = 3;
+    const float FADE_PERIOD = 4;
     
     projection();
+    
+    void init(const string& image_1_path, const string& image_2_path);
     
     void setPosition(int x, int y);
     void setSize(int width, int height);
