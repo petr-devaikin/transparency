@@ -6,12 +6,16 @@
 #include "ofxGui.h"
 #include "ofxXmlSettings.h"
 
+const int SENS_RANGE = 5;
+const int BORDER_MARGIN = 5;
+
+const string PROJ_SETTINGS_FILE = "projection_settings.xml";
+const string DEPTH_SETTINGS_FILE = "depth_settings.xml";
+
+
 class ofApp : public ofBaseApp{
     projection proj;
     touchArea touch;
-    
-    ofxXmlSettings projectionSettings;
-    ofxXmlSettings depthSettings;
     
     ofxPanel gui;
     
@@ -20,9 +24,6 @@ class ofApp : public ofBaseApp{
     ofxToggle showDepthView;
     ofxToggle calibraionMode;
     ofParameter<int> maxDepth;
-    
-    const int SENS_RANGE = 5;
-    const int BORDER_MARGIN = 5;
     
     bool dragProjection = false;
     bool resizeProjectionX = false;
@@ -33,6 +34,10 @@ class ofApp : public ofBaseApp{
     ofVec2f dragStart;
     
     void calibrationToggleListener(bool &toggleStatus);
+    
+    // settings
+    void loadSettings();
+    void saveSettings();
 
 	public:
 		void setup();

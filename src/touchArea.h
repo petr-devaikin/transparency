@@ -9,41 +9,38 @@
 #define touchArea_hpp
 
 #include "ofMain.h"
-#include "ofxARTPattern.h"
-#include "ofxARTGenericTracker.h"
+#include <librealsense2/rs.hpp>
 
 class touchArea {
 private:
     bool _testMode;
     
+    const int WIDTH = 1280;
+    const int HEIGHT = 720;
+    
     vector<ofVec2f> borderPoints;
     
-    ofFbo depthFboRaw; // depth points
     ofFbo depthFbo; // depth points with substracted zero level
     
-    ofImage zeroLevelPixels; // depth points of the canvas in default state
     ofImage brush; // touch image for imitation
     
-    //ofxAruco aruco;
-    ofxArtool5::PatternTracker art;
-    ofImage boardImage;
+    ofImage rgbCameraImage; // last data from sensor
+    unsigned short * depthCameraData; // last data from sensor
+    unsigned short * zeroDepthCameraData; // zero level pioxels
     
-    ofImage fakeImage; // only for testing
+    void updateFromCamera(); // ger rgb and depth data from camera
     
-    ofImage & getSensorImage();
-    
-    void updateDepth(); // get depth pixels from camera.
+    // RealSense
+    rs2::pipeline pipe;
+    rs2::frameset frames;
 public:
-    const int WIDTH = 300;
-    const int HEIGHT = 480;
+    touchArea(bool testMode = false);
     
-    touchArea(bool testMode = true);
-    
-    void recognizeBorders();
+    int getWidth();
+    int getHeight();
     
     vector<ofVec2f> getBorderPoints();
     ofFbo & getDepth();
-    ofImage & getBoard();
     
     void drawBorder(int x, int y);
     void drawImage(int x, int y);

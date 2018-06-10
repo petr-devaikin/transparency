@@ -1,47 +1,83 @@
 #include "ofApp.h"
 
+
 //--------------------------------------------------------------
 void ofApp::setup(){
-    // projection settings
+    // gui
+    gui.setup();
     
-    projectionSettings.loadFile("projection_settings.xml");
+    gui.add(showGui.setup("GUI (g)", true));
+    gui.add(showGrid.setup("Grid", false)); // show grid to make lines parallel
+    gui.add(showDepthView.setup("Depth View", false)); // show depth camera view
+    gui.add(calibraionMode.setup("Calibration", false)); // change the borders
+    //set this param in gui!!!
+    //gui.add(maxDepth.set)
     
-    // depth sensor settings
+    // load settings from files
+    loadSettings();
     
-    depthSettings.loadFile("depth_settings.xml");
+    // get zero pixels in the very beginning
+    touch.updateZeroPixels();
     
-    // setup from config
-    
+    // init projection
     proj.init("img0.jpg", "img1.jpg");
     proj.setTouchArea(&touch);
+    proj.updateMapping();
     
+    
+    calibraionMode.addListener(this, &ofApp::calibrationToggleListener);
+}
+
+//--------------------------------------------------------------
+void ofApp::loadSettings() {
+    // projection settings
+    ofxXmlSettings projectionSettings;
+    projectionSettings.loadFile(PROJ_SETTINGS_FILE);
     proj.setPosition(projectionSettings.getValue("x", 100), projectionSettings.getValue("y", 50));
     proj.setSize(projectionSettings.getValue("width", 200), projectionSettings.getValue("height", 500));
     proj.setDepthLevel(projectionSettings.getValue("maxDepth", 255));
     
+    // depth sensor settings
+    ofxXmlSettings depthSettings;
+    depthSettings.loadFile(DEPTH_SETTINGS_FILE);
     touch.setBorderPoint(0, depthSettings.getValue("x1", 100), depthSettings.getValue("y1", 100));
     touch.setBorderPoint(1, depthSettings.getValue("x2", 200), depthSettings.getValue("y2", 100));
     touch.setBorderPoint(2, depthSettings.getValue("x3", 200), depthSettings.getValue("y3", 500));
     touch.setBorderPoint(3, depthSettings.getValue("x4", 100), depthSettings.getValue("y4", 500));
     
-    // get zero pixels in the very beginning
-    touch.updateZeroPixels();
-    
-    proj.updateMapping();
-    
     // gui
-    gui.setup();
-    
-    gui.add(showGui.setup("GUI (g)", true));
-    gui.add(showGrid.setup("Grid", false));
-    gui.add(showDepthView.setup("Depth View", false));
-    gui.add(calibraionMode.setup("Calibration (r - recognize)", false));
-    //set this param in gui!!!
-    //gui.add(maxDepth.set)
-    
     gui.loadFromFile("settings.xml");
+}
+
+void ofApp::saveSettings() {
+    // save projection settings
+    ofxXmlSettings projectionSettings;
     
-    calibraionMode.addListener(this, &ofApp::calibrationToggleListener);
+    projectionSettings.setValue("x", proj.getPosition()[0]);
+    projectionSettings.setValue("y", proj.getPosition()[1]);
+    projectionSettings.setValue("width", proj.getSize()[0]);
+    projectionSettings.setValue("height", proj.getSize()[1]);
+    projectionSettings.setValue("maxDepth", proj.getDepthLevel());
+    
+    projectionSettings.saveFile(PROJ_SETTINGS_FILE);
+    
+    // save depth settings
+    
+    ofxXmlSettings depthSettings;
+    
+    depthSettings.setValue("x1", touch.getBorderPoints()[0][0]);
+    depthSettings.setValue("y1", touch.getBorderPoints()[0][1]);
+    depthSettings.setValue("x2", touch.getBorderPoints()[1][0]);
+    depthSettings.setValue("y2", touch.getBorderPoints()[1][1]);
+    depthSettings.setValue("x3", touch.getBorderPoints()[2][0]);
+    depthSettings.setValue("y3", touch.getBorderPoints()[2][1]);
+    depthSettings.setValue("x4", touch.getBorderPoints()[3][0]);
+    depthSettings.setValue("y4", touch.getBorderPoints()[3][1]);
+    
+    depthSettings.saveFile(DEPTH_SETTINGS_FILE);
+    
+    // GUI
+    gui.saveToFile("settings.xml");
 }
 
 //--------------------------------------------------------------
@@ -77,17 +113,16 @@ void ofApp::draw(){
             proj.drawBorder();
             
             if (showDepthView) {
-                touch.drawDepth(10, (ofGetHeight() - touch.HEIGHT) / 2);
-                touch.drawBorder(10, (ofGetHeight() - touch.HEIGHT) / 2);
+                touch.drawDepth(10, (ofGetHeight() - touch.getHeight()) / 2);
+                touch.drawBorder(10, (ofGetHeight() - touch.getHeight()) / 2);
             }
         }
         else {
-            proj.drawBoard();
             proj.drawBorder();
             
             if (showDepthView) {
-                touch.drawImage(10,  (ofGetHeight() - touch.HEIGHT) / 2);
-                touch.drawBorder(10, (ofGetHeight() - touch.HEIGHT) / 2);
+                touch.drawImage(10,  (ofGetHeight() - touch.getHeight()) / 2);
+                touch.drawBorder(10, (ofGetHeight() - touch.getHeight()) / 2);
             }
         }
     }
@@ -100,25 +135,8 @@ void ofApp::draw(){
 void ofApp::exit(){
     calibraionMode.removeListener(this, &ofApp::calibrationToggleListener);
     
-    gui.saveToFile("settings.xml");
-    
-    projectionSettings.setValue("x", proj.getPosition()[0]);
-    projectionSettings.setValue("y", proj.getPosition()[1]);
-    projectionSettings.setValue("width", proj.getSize()[0]);
-    projectionSettings.setValue("height", proj.getSize()[1]);
-    projectionSettings.setValue("maxDepth", proj.getDepthLevel());
-    projectionSettings.saveFile("projection_settings.xml");
-    
-    depthSettings.setValue("x1", touch.getBorderPoints()[0][0]);
-    depthSettings.setValue("y1", touch.getBorderPoints()[0][1]);
-    depthSettings.setValue("x2", touch.getBorderPoints()[1][0]);
-    depthSettings.setValue("y2", touch.getBorderPoints()[1][1]);
-    depthSettings.setValue("x3", touch.getBorderPoints()[2][0]);
-    depthSettings.setValue("y3", touch.getBorderPoints()[2][1]);
-    depthSettings.setValue("x4", touch.getBorderPoints()[3][0]);
-    depthSettings.setValue("y4", touch.getBorderPoints()[3][1]);
-    
-    depthSettings.saveFile("depth_settings.xml");
+    // save settings
+    saveSettings();
 }
 
 //--------------------------------------------------------------
@@ -128,9 +146,6 @@ void ofApp::keyPressed(int key){
     
     if (key == 't')
         showDepthView = !showDepthView;
-    
-    if (calibraionMode && key == 'r')
-        touch.recognizeBorders();
     
     if (calibraionMode && key == 'z')
         touch.updateZeroPixels();
@@ -148,7 +163,7 @@ void ofApp::mouseMoved(int x, int y ){
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
     if (!calibraionMode)
-        touch.imitateTouch(x - 10, y - (ofGetHeight() - touch.HEIGHT) / 2);
+        touch.imitateTouch(x - 10, y - (ofGetHeight() - touch.getHeight()) / 2);
     else {
         if (dragTouchArea) {
             ofVec2f currentPosition = touch.getBorderPoints()[dragTouchAreaCornerNumber];
@@ -181,11 +196,11 @@ void ofApp::mouseDragged(int x, int y, int button){
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
     if (!calibraionMode)
-        touch.imitateTouch(x - 10, y - (ofGetHeight() - touch.HEIGHT) / 2);
+        touch.imitateTouch(x - 10, y - (ofGetHeight() - touch.getHeight()) / 2);
     else {
         if (showDepthView) {
             int xOffset = 10;
-            int yOffset = (ofGetHeight() - touch.HEIGHT) / 2;
+            int yOffset = (ofGetHeight() - touch.getHeight()) / 2;
             
             vector<ofVec2f> points = touch.getBorderPoints();
             for (int i = 0; i < points.size(); i++) {

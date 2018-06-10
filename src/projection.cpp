@@ -133,7 +133,7 @@ void projection::update() {
         ofPushMatrix();
         
         ofMatrix4x4 m4x4;
-        m4x4 = ofMatrix4x4::ofMatrix4x4(homography.ptr<float>(0));
+        m4x4 = ofMatrix4x4(homography.ptr<float>(0));
         ofMultMatrix(m4x4);
         
         ofEnableBlendMode(OF_BLENDMODE_SCREEN); // need MAX! not add
@@ -164,11 +164,6 @@ void projection::update() {
          
     }
     resultFbo.end();
-}
-
-void projection::drawBoard() {
-    ofSetColor(255);
-    (touch->getBoard()).draw(position[0], position[1], size[0], size[1]);
 }
 
 void projection::draw() {

@@ -6,11 +6,12 @@
 //
 
 #include "touchArea.h"
+#include "ofxCv.h"
 
 touchArea::touchArea(bool testMode) {
     _testMode = testMode;
     
-    zeroLevelPixels.allocate(WIDTH, HEIGHT, OF_IMAGE_GRAYSCALE);
+    //zeroLevelPixels.allocate(WIDTH, HEIGHT, OF_IMAGE_GRAYSCALE);
     //zeroLevelPixels.clear();
     
     brush.load("brush.png");
@@ -23,93 +24,41 @@ touchArea::touchArea(bool testMode) {
     }
     depthFbo.end();
     
-    depthFboRaw.allocate(WIDTH, HEIGHT, GL_RGBA);
-    depthFboRaw.begin();
-    {
-        ofClear(0, 0, 0, 255);
-    }
-    depthFboRaw.end();
+    // zeroLevels
+    rgbCameraImage.allocate(WIDTH, HEIGHT, OF_IMAGE_COLOR);
+    depthCameraData = new unsigned short [WIDTH * HEIGHT](); // allocate with zeros
+    zeroDepthCameraData = new unsigned short [WIDTH * HEIGHT](); // allocate with zeros
     
     // init border points with 0
-    
     borderPoints.push_back(ofVec2f(0, 0));
     borderPoints.push_back(ofVec2f(0, 0));
     borderPoints.push_back(ofVec2f(0, 0));
     borderPoints.push_back(ofVec2f(0, 0));
     
-    // init marker recognizer
     
-    //aruco.setup("board/intrinsics.yml", WIDTH, HEIGHT);
-    //aruco.setMinMaxMarkerDetectionSize(0.001, 0.25);
-    ofVec2f camSize(WIDTH, HEIGHT);
-    art.setup(camSize, camSize);
-    boardImage.load("board/board.png"); // load board image to dispolay
+    // depth camera
+    rs2::config cfg;
+    cfg.enable_stream(RS2_STREAM_DEPTH, WIDTH, HEIGHT);
+    cfg.enable_stream(RS2_STREAM_COLOR, WIDTH, HEIGHT);
+    rs2::context ctx;
+    auto device_list = ctx.query_devices();
     
-    // only for testing. image to recognize markers
-    if (_testMode) {
-        fakeImage.load("board/test_image.jpg");
-        fakeImage.setImageType(OF_IMAGE_COLOR);
-        
-        // crop it!
-        if (fakeImage.getWidth() / fakeImage.getHeight() > WIDTH / (float) HEIGHT) {
-            float diff = fakeImage.getWidth() - fakeImage.getHeight() * WIDTH / (float) HEIGHT;
-            fakeImage.crop(diff / 2, 0, fakeImage.getWidth() - diff, fakeImage.getHeight());
-        }
-        else {
-            float diff = fakeImage.getHeight() - fakeImage.getWidth() * HEIGHT / (float) WIDTH;
-            fakeImage.crop(0, diff / 2, fakeImage.getWidth(), fakeImage.getHeight() - diff);
-        }
-        fakeImage.resize(WIDTH, HEIGHT);
+    if (device_list.size() > 0) {
+        pipe.start(cfg);
+        frames = pipe.wait_for_frames();
+        cout << "Camera found!\n";
     }
-}
-
-ofImage & touchArea::getSensorImage() {
-    return fakeImage;
+    else {
+        cout << "Camera not found!\n";
+        _testMode = true;
+    }
 }
 
 void touchArea::updateZeroPixels() {
-    // update zero level from depth camera
-    
-    if (_testMode) {
-        // immitate some depth values. test
-        for (int i = 0; i < WIDTH; i++)
-            for (int j = 0; j < HEIGHT; j++)
-                zeroLevelPixels.setColor(i, j, ofColor(ofVec2f(i, j).distance(ofVec2f(0, 0)) * 100.0 / WIDTH));
-        zeroLevelPixels.update();
-        
-        // this is only for tests
-        depthFboRaw.begin();
-        {
-            ofDisableBlendMode();
-            zeroLevelPixels.draw(0, 0);
-        }
-        depthFboRaw.end();
+    if (!_testMode) {
+        // copy zero level from current frame
+        memcpy(zeroDepthCameraData, depthCameraData, WIDTH * HEIGHT * 2);
     }
-}
-
-void touchArea::recognizeBorders() {
-    // recognize markers
-    /*
-    art.ofxArtool5::GenericTracker::update(getSensorImage().getPixels());
-    if (art.isFound()) {
-        int n = art.getNumMarkers();
-        ARMarkerInfo marker = art.getMarker(0);
-        for (int i = 0; i < 4; i++) {
-            borderPoints[i] = ofVec2f(marker.vertex[i][0], marker.vertex[i][1]);
-        }
-        for (int i = 0; i < art.getNumMarkers(); i++)
-            cout << art.getMarker(i).idPatt << " " << art.getMarker(i).id << "\n";
-        /*
-        borderPoints[0] = ofVec2f(p1[0], p1[1]);
-        borderPoints[1] = ofVec2f(p2[0], p2[1]);
-        borderPoints[2] = ofVec2f(p3[0], p3[1]);
-        borderPoints[3] = ofVec2f(p4[0], p4[1]);
-     
-    }
-    */
-    
-    // update pixels
-    updateZeroPixels();
 }
 
 void touchArea::drawBorder(int x, int y) {
@@ -129,35 +78,48 @@ void touchArea::drawBorder(int x, int y) {
 
 void touchArea::drawImage(int x, int y) {
     ofSetColor(255, 255, 255, 200);
-    getSensorImage().draw(x, y);
+    rgbCameraImage.draw(x, y);
 }
 
 void touchArea::drawDepth(int x, int y) {
     ofSetColor(255, 255, 255, 200);
-    depthFboRaw.draw(x, y);
+    depthFbo.draw(x, y);
 }
 
-void touchArea::updateDepth() {
-    // get depthFboRaw from camera
+void touchArea::updateFromCamera() {
+    rs2::frameset newFrames;
+    if (pipe.poll_for_frames(&newFrames))
+        frames = newFrames;
     
-    // prepare depthRbo
+    // update rgb picture
+    rs2::frame rgbFrame = frames.get_color_frame();
+    memcpy(rgbCameraImage.getPixels().getData(), rgbFrame.get_data(), WIDTH * HEIGHT * 3);
+    rgbCameraImage.update();
+    
+    // update depth buffer
+    rs2::depth_frame depthFrame = frames.get_depth_frame();
+    memcpy(depthCameraData, depthFrame.get_data(), WIDTH * HEIGHT * 2);
+    
+    // calculate substracted depth result
+    ofImage substractedImage;
+    substractedImage.allocate(WIDTH, HEIGHT, OF_IMAGE_GRAYSCALE);
+    
+    // iterate only withing borders !!!
+    for (int i = 0; i < WIDTH; i++)
+        for (int j = 0; j < HEIGHT; j++) {
+            substractedImage.getPixels().getData()[j * WIDTH + i] = depthCameraData[j * WIDTH + i] - zeroDepthCameraData[j * WIDTH + i];
+        }
+    
     depthFbo.begin();
     {
-        ofDisableBlendMode();
-        depthFboRaw.draw(0, 0);
-        ofEnableBlendMode(OF_BLENDMODE_SUBTRACT);
-        zeroLevelPixels.draw(0, 0);
-        ofDisableBlendMode();
+        ofClear(0, 0, 0, 255);
+        substractedImage.draw(0, 0);
     }
     depthFbo.end();
 }
 
 ofFbo & touchArea::getDepth() {
     return depthFbo;
-}
-
-ofImage & touchArea::getBoard() {
-    return boardImage;
 }
 
 vector<ofVec2f> touchArea::getBorderPoints() {
@@ -169,29 +131,33 @@ void touchArea::setBorderPoint(int i, float x, float y) {
 }
 
 void touchArea::imitateTouch(int x, int y) {
-    depthFboRaw.begin();
+    depthFbo.begin();
     {
         ofClear(0, 0, 0, 255);
         ofSetColor(255);
-        zeroLevelPixels.draw(0, 0);
-        ofEnableBlendMode(OF_BLENDMODE_ADD);
         ofSetColor(100);
         brush.draw(x - brush.getWidth(), y - brush.getHeight(), brush.getWidth() * 2, brush.getHeight() * 2);
-        ofDisableBlendMode();
     }
-    depthFboRaw.end();
+    depthFbo.end();
 }
 
 void touchArea::imitateRelease() {
-    depthFboRaw.begin();
+    depthFbo.begin();
     {
-        ofDisableBlendMode();
-        ofSetColor(255);
-        zeroLevelPixels.draw(0, 0);
+        ofClear(0, 0, 0, 255);
     }
-    depthFboRaw.end();
+    depthFbo.end();
 }
 
 void touchArea::update() {
-    updateDepth();
+    if (!_testMode)
+        updateFromCamera();
+}
+
+int touchArea::getWidth() {
+    return WIDTH;
+}
+
+int touchArea::getHeight() {
+    return HEIGHT;
 }
