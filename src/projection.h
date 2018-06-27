@@ -24,15 +24,13 @@ private:
     ofFbo maskFbo; // transformed mask from touchArea
     ofFbo resultFbo;
     
-    cv::Mat homography;
-    
     ofShader shader;
     
     float lastMaskUpdate;
     
-    int maxDepthLevel = 10; // to normalize depth picture
+    int maxDepthLevel = 255; // to normalize depth picture
 public:
-    const float FADE_PERIOD = 4;
+    const float FADE_PERIOD = 2;
     
     projection();
     
@@ -45,6 +43,9 @@ public:
     void setWidth(int width);
     void setHeight(int height);
     
+    int getWidth();
+    int getHeight();
+    
     void setDepthLevel(int d);
     
     ofVec2f getPosition();
@@ -52,7 +53,6 @@ public:
     int getDepthLevel();
     
     void setTouchArea(touchArea * t);
-    void updateMapping();
     
     void update();
     

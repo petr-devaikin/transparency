@@ -10,6 +10,7 @@
 
 #include "ofMain.h"
 #include <librealsense2/rs.hpp>
+#include "ofxCv.h"
 
 class touchArea {
 private:
@@ -18,9 +19,12 @@ private:
     const int WIDTH = 1280;
     const int HEIGHT = 720;
     
-    vector<ofVec2f> borderPoints;
+    const float MM_PER_DEPTH_BYTE = 0.9;
     
-    ofFbo depthFbo; // depth points with substracted zero level
+    vector<ofVec2f> touchBorderPoints;
+    float maxDepth; // max depth in mm to scale the depth image
+    
+    ofFbo depthFbo; // depth points with substracted zero level, transformed to the result screen projection
     
     ofImage brush; // touch image for imitation
     
@@ -33,8 +37,23 @@ private:
     // RealSense
     rs2::pipeline pipe;
     rs2::frameset frames;
+    
+    // transformation
+    ofMatrix4x4 transform;
+    
+    // to get zero pixels in the very begining
+    bool isZeroInitialized = false;
+    
+    // filters
+    rs2::decimation_filter dec_filter;
+    rs2::spatial_filter spat_filter;
+    rs2::temporal_filter temp_filter;
+    
+    rs2::disparity_transform depth_to_disparity;
+    rs2::disparity_transform disparity_to_depth;
 public:
     touchArea(bool testMode = false);
+    ~touchArea();
     
     int getWidth();
     int getHeight();
@@ -50,7 +69,11 @@ public:
     void imitateRelease();
     
     void setBorderPoint(int i, float x, float y);
+    
     void updateZeroPixels();
+    void setResultScreenSize(int width, int height);
+    
+    void setMaxDepth(float maxDepth); // in mm
     
     void update();
 };

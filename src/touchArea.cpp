@@ -6,7 +6,8 @@
 //
 
 #include "touchArea.h"
-#include "ofxCv.h"
+
+using namespace cv;
 
 touchArea::touchArea(bool testMode) {
     _testMode = testMode;
@@ -17,23 +18,16 @@ touchArea::touchArea(bool testMode) {
     brush.load("brush.png");
     brush.setImageType(OF_IMAGE_GRAYSCALE);
     
-    depthFbo.allocate(WIDTH, HEIGHT, GL_RGBA);
-    depthFbo.begin();
-    {
-        ofClear(0, 0, 0, 255);
-    }
-    depthFbo.end();
-    
     // zeroLevels
     rgbCameraImage.allocate(WIDTH, HEIGHT, OF_IMAGE_COLOR);
     depthCameraData = new unsigned short [WIDTH * HEIGHT](); // allocate with zeros
     zeroDepthCameraData = new unsigned short [WIDTH * HEIGHT](); // allocate with zeros
     
     // init border points with 0
-    borderPoints.push_back(ofVec2f(0, 0));
-    borderPoints.push_back(ofVec2f(0, 0));
-    borderPoints.push_back(ofVec2f(0, 0));
-    borderPoints.push_back(ofVec2f(0, 0));
+    touchBorderPoints.push_back(ofVec2f(0, 0));
+    touchBorderPoints.push_back(ofVec2f(0, 0));
+    touchBorderPoints.push_back(ofVec2f(0, 0));
+    touchBorderPoints.push_back(ofVec2f(0, 0));
     
     
     // depth camera
@@ -45,6 +39,7 @@ touchArea::touchArea(bool testMode) {
     
     if (device_list.size() > 0) {
         pipe.start(cfg);
+        
         frames = pipe.wait_for_frames();
         cout << "Camera found!\n";
     }
@@ -52,6 +47,25 @@ touchArea::touchArea(bool testMode) {
         cout << "Camera not found!\n";
         _testMode = true;
     }
+    
+    // init transform matrix
+    transform = ofMatrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    depthFbo.allocate(10, 10, GL_RGBA);
+    // [? ? 0 ?]
+    // [? ? 0 ?]
+    // [0 0 1 0]
+    // [? ? 0 1]
+    
+    // init filters
+    depth_to_disparity = rs2::disparity_transform(true);
+    disparity_to_depth = rs2::disparity_transform(false);
+}
+
+touchArea::~touchArea() {
+    pipe.stop();
+    
+    delete[] depthCameraData;
+    delete[] zeroDepthCameraData;
 }
 
 void touchArea::updateZeroPixels() {
@@ -65,11 +79,17 @@ void touchArea::drawBorder(int x, int y) {
     ofSetColor(0, 255, 0);
     ofNoFill();
     ofPolyline border;
-    for (int i = 0; i < borderPoints.size(); i++) {
-        border.addVertex(borderPoints[i] + ofVec2f(x, y));
+    for (int i = 0; i < touchBorderPoints.size(); i++) {
+        border.addVertex(touchBorderPoints[i] + ofVec2f(x, y));
     }
     border.close();
     border.draw();
+    
+    // label the corners
+    ofDrawBitmapString("Top Left", touchBorderPoints[0][0], touchBorderPoints[0][1]);
+    ofDrawBitmapString("Top Right", touchBorderPoints[1][0], touchBorderPoints[1][1]);
+    ofDrawBitmapString("Bottom Right", touchBorderPoints[2][0], touchBorderPoints[2][1]);
+    ofDrawBitmapString("Bottom Left", touchBorderPoints[3][0], touchBorderPoints[3][1]);
     
     ofNoFill();
     ofSetColor(100, 100, 100);
@@ -82,8 +102,12 @@ void touchArea::drawImage(int x, int y) {
 }
 
 void touchArea::drawDepth(int x, int y) {
-    ofSetColor(255, 255, 255, 200);
+    ofSetColor(255);
     depthFbo.draw(x, y);
+    
+    ofSetColor(0, 0, 255);
+    ofNoFill();
+    ofDrawRectangle(x, y, depthFbo.getWidth(), depthFbo.getHeight());
 }
 
 void touchArea::updateFromCamera() {
@@ -98,7 +122,24 @@ void touchArea::updateFromCamera() {
     
     // update depth buffer
     rs2::depth_frame depthFrame = frames.get_depth_frame();
+    
+    // apply filters
+    //depthFrame = dec_filter.process(depthFrame);
+    /*
+    depthFrame = depth_to_disparity.process(depthFrame);
+    depthFrame = spat_filter.process(depthFrame);
+    depthFrame = temp_filter.process(depthFrame);
+    depthFrame = disparity_to_depth.process(depthFrame);
+     */
+    
+    // copy depth data
     memcpy(depthCameraData, depthFrame.get_data(), WIDTH * HEIGHT * 2);
+    
+    // update zero pixels in the very beginning
+    if (!isZeroInitialized) {
+        isZeroInitialized = true;
+        updateZeroPixels();
+    }
     
     // calculate substracted depth result
     ofImage substractedImage;
@@ -107,13 +148,31 @@ void touchArea::updateFromCamera() {
     // iterate only withing borders !!!
     for (int i = 0; i < WIDTH; i++)
         for (int j = 0; j < HEIGHT; j++) {
-            substractedImage.getPixels().getData()[j * WIDTH + i] = depthCameraData[j * WIDTH + i] - zeroDepthCameraData[j * WIDTH + i];
+            float res = 0;
+            // exclude error pixels
+            if (depthCameraData[j * WIDTH + i] > 0) {
+                res = zeroDepthCameraData[j * WIDTH + i] - depthCameraData[j * WIDTH + i];
+                res = res * MM_PER_DEPTH_BYTE / maxDepth;
+                res = pow(res, 3); // power of 3 to be sensitive more to deep touch
+                res *= 255;
+                if (res < 0) res = 0;
+                if (res > 255) res = 255;
+            }
+            substractedImage.getPixels().getData()[(j * WIDTH + i)] = res;
         }
     
     depthFbo.begin();
     {
         ofClear(0, 0, 0, 255);
+        
+        ofPushMatrix();
+        
+        ofMultMatrix(transform);
+        
+        ofSetColor(255);
         substractedImage.draw(0, 0);
+        
+        ofPopMatrix();
     }
     depthFbo.end();
 }
@@ -123,11 +182,11 @@ ofFbo & touchArea::getDepth() {
 }
 
 vector<ofVec2f> touchArea::getBorderPoints() {
-    return borderPoints;
+    return touchBorderPoints;
 }
 
 void touchArea::setBorderPoint(int i, float x, float y) {
-    borderPoints[i].set(x, y);
+    touchBorderPoints[i].set(x, y);
 }
 
 void touchArea::imitateTouch(int x, int y) {
@@ -160,4 +219,37 @@ int touchArea::getWidth() {
 
 int touchArea::getHeight() {
     return HEIGHT;
+}
+
+void touchArea::setResultScreenSize(int width, int height) {
+    // change the result buffer
+    depthFbo.allocate(width, height, GL_RGBA);
+    depthFbo.begin();
+    {
+        ofClear(0);
+    }
+    depthFbo.end();
+    
+    // update transformation
+
+    vector<Point2f> srcPoints, dstPoints;
+    for (int i = 0; i < 4; i++) {
+        srcPoints.push_back(Point2f(touchBorderPoints[i][0], touchBorderPoints[i][1]));
+    }
+    
+    dstPoints.push_back(Point2f(0, 0));
+    dstPoints.push_back(Point2f(width, 0));
+    dstPoints.push_back(Point2f(width, height));
+    dstPoints.push_back(Point2f(0, height));
+    
+    
+    Mat m = findHomography(srcPoints, dstPoints);
+    transform.set(m.at<double>(0, 0), m.at<double>(1, 0), 0, m.at<double>(2, 0),
+                  m.at<double>(0, 1), m.at<double>(1, 1), 0, m.at<double>(2, 1),
+                  0, 0, 1, 0,
+                  m.at<double>(0, 2), m.at<double>(1, 2), 0, 1);
+}
+
+void touchArea::setMaxDepth(float m) {
+    maxDepth = m;
 }

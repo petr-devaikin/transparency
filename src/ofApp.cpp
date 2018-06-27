@@ -3,40 +3,28 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    // init projection
+    proj.init("img0.jpg", "img1.jpg");
+    proj.setTouchArea(&touch);
+    
     // gui
     gui.setup();
     
     gui.add(showGui.setup("GUI (g)", true));
     gui.add(showGrid.setup("Grid", false)); // show grid to make lines parallel
-    gui.add(showDepthView.setup("Depth View", false)); // show depth camera view
     gui.add(calibraionMode.setup("Calibration", false)); // change the borders
+    gui.add(showDepthView.setup("Depth View", false)); // show depth camera view
     //set this param in gui!!!
     //gui.add(maxDepth.set)
     
     // load settings from files
     loadSettings();
     
-    // get zero pixels in the very beginning
-    touch.updateZeroPixels();
-    
-    // init projection
-    proj.init("img0.jpg", "img1.jpg");
-    proj.setTouchArea(&touch);
-    proj.updateMapping();
-    
-    
-    calibraionMode.addListener(this, &ofApp::calibrationToggleListener);
+    touch.setResultScreenSize(proj.getSize()[0], proj.getSize()[1]);
 }
 
 //--------------------------------------------------------------
 void ofApp::loadSettings() {
-    // projection settings
-    ofxXmlSettings projectionSettings;
-    projectionSettings.loadFile(PROJ_SETTINGS_FILE);
-    proj.setPosition(projectionSettings.getValue("x", 100), projectionSettings.getValue("y", 50));
-    proj.setSize(projectionSettings.getValue("width", 200), projectionSettings.getValue("height", 500));
-    proj.setDepthLevel(projectionSettings.getValue("maxDepth", 255));
-    
     // depth sensor settings
     ofxXmlSettings depthSettings;
     depthSettings.loadFile(DEPTH_SETTINGS_FILE);
@@ -44,6 +32,15 @@ void ofApp::loadSettings() {
     touch.setBorderPoint(1, depthSettings.getValue("x2", 200), depthSettings.getValue("y2", 100));
     touch.setBorderPoint(2, depthSettings.getValue("x3", 200), depthSettings.getValue("y3", 500));
     touch.setBorderPoint(3, depthSettings.getValue("x4", 100), depthSettings.getValue("y4", 500));
+    
+    touch.setMaxDepth(100); // set 5cm max depth
+    
+    // projection settings
+    ofxXmlSettings projectionSettings;
+    projectionSettings.loadFile(PROJ_SETTINGS_FILE);
+    proj.setPosition(projectionSettings.getValue("x", 100), projectionSettings.getValue("y", 50));
+    proj.setSize(projectionSettings.getValue("width", 200), projectionSettings.getValue("height", 500));
+    proj.setDepthLevel(projectionSettings.getValue("maxDepth", 255));
     
     // gui
     gui.loadFromFile("settings.xml");
@@ -113,16 +110,17 @@ void ofApp::draw(){
             proj.drawBorder();
             
             if (showDepthView) {
-                touch.drawDepth(10, (ofGetHeight() - touch.getHeight()) / 2);
-                touch.drawBorder(10, (ofGetHeight() - touch.getHeight()) / 2);
+                touch.drawDepth(10, proj.getPosition()[1]);
             }
         }
         else {
-            proj.drawBorder();
-            
             if (showDepthView) {
                 touch.drawImage(10,  (ofGetHeight() - touch.getHeight()) / 2);
                 touch.drawBorder(10, (ofGetHeight() - touch.getHeight()) / 2);
+            }
+            else {
+                proj.draw();
+                proj.drawBorder();
             }
         }
     }
@@ -133,8 +131,6 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::exit(){
-    calibraionMode.removeListener(this, &ofApp::calibrationToggleListener);
-    
     // save settings
     saveSettings();
 }
@@ -147,8 +143,10 @@ void ofApp::keyPressed(int key){
     if (key == 't')
         showDepthView = !showDepthView;
     
-    if (calibraionMode && key == 'z')
+    if (calibraionMode && key == 'z') {
         touch.updateZeroPixels();
+        touch.setResultScreenSize(proj.getSize()[0], proj.getSize()[1]);
+    }
 }
 
 //--------------------------------------------------------------
@@ -218,7 +216,6 @@ void ofApp::mousePressed(int x, int y, int button){
             if (x >= proj.getPosition()[0] && x <= proj.getPosition()[0] + proj.getSize()[0] &&
                 abs(y - proj.getPosition()[1] - proj.getSize()[1] - BORDER_MARGIN) < SENS_RANGE) {
                 resizeProjectionY = true;
-                cout << "Y";
                 dragStart.set(x, y);
             }
             else if (y >= proj.getPosition()[1] && y <= proj.getPosition()[1] + proj.getSize()[1] + BORDER_MARGIN &&
@@ -274,9 +271,4 @@ void ofApp::gotMessage(ofMessage msg){
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
-}
-
-void ofApp::calibrationToggleListener(bool & pressed) {
-    if (!pressed)
-        proj.updateMapping();
 }
