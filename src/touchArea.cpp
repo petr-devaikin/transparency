@@ -158,9 +158,9 @@ void touchArea::updateFromCamera() {
     ofImage substractedImage;
     substractedImage.allocate(WIDTH, HEIGHT, OF_IMAGE_GRAYSCALE);
     
-    // iterate only withing borders !!!
-    for (int i = 0; i < WIDTH; i++)
-        for (int j = 0; j < HEIGHT; j++) {
+    // iterate only withing the bounding area
+    for (int i = floor(boundingArea.x); i <= ceil(boundingArea.x + boundingArea.width); i++)
+        for (int j = floor(boundingArea.y); j <= ceil(boundingArea.y + boundingArea.height); j++) {
             float res = 0;
             // exclude error pixels
             if (depthCameraData[j * WIDTH + i] > 0) {
@@ -200,6 +200,16 @@ vector<ofVec2f> touchArea::getBorderPoints() {
 
 void touchArea::setBorderPoint(int i, float x, float y) {
     touchBorderPoints[i].set(x, y);
+    
+    // recalculate bounding rectangle
+    float minX = WIDTH, minY = HEIGHT, maxX = 0, maxY = 0;
+    for (int j = 0; j < 4; j++) {
+        if (touchBorderPoints[j][0] < minX) minX = touchBorderPoints[j][0];
+        if (touchBorderPoints[j][1] < minY) minY = touchBorderPoints[j][1];
+        if (touchBorderPoints[j][0] > maxX) maxX = touchBorderPoints[j][0];
+        if (touchBorderPoints[j][1] > maxY) maxY = touchBorderPoints[j][1];
+    }
+    boundingArea = ofRectangle(minX, minY, maxX - minX, maxY - minY);
 }
 
 void touchArea::imitateTouch(int x, int y) {

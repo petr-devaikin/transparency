@@ -11,8 +11,9 @@ projection::projection() {
     size.set(0, 0);
     position.set(0, 0);
     
-    // load shader
-    shader.load("shadersGL3/shader");
+    // load shaders
+    maxShader.load("shadersGL3/max_shader");
+    finalShader.load("shadersGL3/shader");
 }
 
 void projection::init(const string& img_1_path, const string& img_2_path) {
@@ -51,6 +52,13 @@ void projection::setSize(int width, int height) {
             ofClear(0, 0, 0, 255);
         }
         maskFbo.end();
+        
+        tempFbo.allocate(width, height, GL_RGBA);
+        tempFbo.begin();
+        {
+            ofClear(0, 0, 0, 255);
+        }
+        tempFbo.end();
     }
 }
 
@@ -97,34 +105,39 @@ void projection::drawBorder() {
 }
 
 void projection::update() {
+    // fading old mask
     float currentTime = ofGetElapsedTimef();
     float timeDiff = currentTime - lastMaskUpdate;
-    int fadeLevel = 255 * timeDiff / FADE_PERIOD;
-    if (fadeLevel >= 1)
-        lastMaskUpdate = currentTime;
+    float fadeLevel = timeDiff / FADE_PERIOD;
+    lastMaskUpdate = currentTime;
     
-    // update images
+    tempFbo.begin();
+    {
+        ofClear(0, 0, 0, 255);
+        ofSetColor(255);
+        maskFbo.draw(0, 0);
+    }
+    tempFbo.end();
+    
+    // add current touch to mask
+    maskFbo.begin();
+    {
+        ofClear(0, 0, 0, 255);
+        ofSetColor(255);
+        maxShader.begin();
+        {
+            maxShader.setUniformTexture("oldTex", tempFbo.getTexture(), 1);
+            maxShader.setUniform1f("fadeLevel", fadeLevel);
+            (touch->getDepth()).draw(0, 0);
+        }
+        maxShader.end();
+    }
+    maskFbo.end();
+    
+    // update images // why???
     image1.update();
     image2.update();
     
-    // modify mask
-    maskFbo.begin();
-    {
-        if (fadeLevel >= 1)
-        {
-            ofSetColor(fadeLevel, fadeLevel, fadeLevel, 255);
-            ofFill();
-            ofEnableBlendMode(OF_BLENDMODE_SUBTRACT);
-            ofDrawRectangle(0, 0, size[0], size[1]);
-        }
-        
-        
-        ofEnableBlendMode(OF_BLENDMODE_SCREEN); // need MAX! not add
-        ofSetColor(255);
-        (touch->getDepth()).draw(0, 0);
-        ofEnableBlendMode(OF_BLENDMODE_ALPHA);
-    }
-    maskFbo.end();
 
     // final drawing
     resultFbo.begin();
@@ -134,14 +147,13 @@ void projection::update() {
         
         //maskFbo.draw(0, 0); // to test how mask is transformed
         
-        shader.begin();
+        finalShader.begin();
         {
-            shader.setUniformTexture("bgTex", image1.getTexture(), 1);
-            shader.setUniformTexture("maskTex", maskFbo.getTexture(), 2);
+            finalShader.setUniformTexture("bgTex", image1.getTexture(), 1);
+            finalShader.setUniformTexture("maskTex", maskFbo.getTexture(), 2);
             image2.draw(0, 0);
         }
-        shader.end();
-         
+        finalShader.end();
     }
     resultFbo.end();
 }

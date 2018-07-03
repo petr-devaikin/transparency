@@ -22,13 +22,15 @@ private:
     ofImage image1, image2;
     
     ofFbo maskFbo; // transformed mask from touchArea
+    ofFbo tempFbo; // fbo for mixin
     ofFbo resultFbo;
     
-    ofShader shader;
+    ofShader maxShader; // to leave touch trace
+    ofShader finalShader; // to combine two images
     
     float lastMaskUpdate;
 public:
-    const float FADE_PERIOD = 2;
+    const float FADE_PERIOD = 2; // how long white color disappear
     
     projection();
     

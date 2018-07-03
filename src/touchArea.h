@@ -22,6 +22,7 @@ private:
     float depth_scale = 1; // depth bite to meters
     
     vector<ofVec2f> touchBorderPoints;
+    ofRectangle boundingArea;
     float maxDepth; // max depth in mm to scale the depth image
     
     ofFbo depthFbo; // depth points with substracted zero level, transformed to the result screen projection

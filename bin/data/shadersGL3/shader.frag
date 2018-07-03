@@ -18,7 +18,7 @@ void main()
     vec3 foreground = texture(tex0, texCoordVarying).rgb;
 
     // get alpha from mask
-    float mask = texture(maskTex, texCoordVarying).r / 255.0;
+    float mask = texture(maskTex, texCoordVarying).r;
     if (mask > 1) mask = 1;
     
     //mix the rgb from tex0 with the alpha of the mask
