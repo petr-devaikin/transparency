@@ -12,29 +12,24 @@
 #include "touchArea.h"
 #include "ofxCv.h"
 
-class projection {
+class projectionFading {
 private:
-    ofVec2f position;
-    ofVec2f size;
-    
     touchArea * touch;
-    ofImage image1_original, image2_original;
-    ofImage image1, image2;
     
-    ofFbo maskFbo; // transformed mask from touchArea
     ofFbo tempFbo; // fbo for mixin
-    ofFbo resultFbo;
     
     ofShader maxShader; // to leave touch trace
     ofShader finalShader; // to combine two images
     
     float lastMaskUpdate;
+protected:
+    ofVec2f position;
+    ofVec2f size;
+    ofFbo maskFbo; // transformed mask from touchArea
 public:
     const float FADE_PERIOD = 2; // how long white color disappear
     
-    projection();
-    
-    void init(const string& image_1_path, const string& image_2_path);
+    projectionFading();
     
     void setPosition(int x, int y);
     void setSize(int width, int height);
