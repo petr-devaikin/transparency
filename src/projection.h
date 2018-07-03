@@ -27,8 +27,6 @@ private:
     ofShader shader;
     
     float lastMaskUpdate;
-    
-    int maxDepthLevel = 255; // to normalize depth picture
 public:
     const float FADE_PERIOD = 2;
     
@@ -46,11 +44,9 @@ public:
     int getWidth();
     int getHeight();
     
-    void setDepthLevel(int d);
     
     ofVec2f getPosition();
     ofVec2f getSize();
-    int getDepthLevel();
     
     void setTouchArea(touchArea * t);
     

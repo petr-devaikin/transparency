@@ -30,21 +30,9 @@ touchArea::touchArea(bool testMode) {
     touchBorderPoints.push_back(ofVec2f(0, 0));
     
     
-    // depth camera
-    rs2::config cfg;
-    cfg.enable_stream(RS2_STREAM_DEPTH, WIDTH, HEIGHT);
-    cfg.enable_stream(RS2_STREAM_COLOR, WIDTH, HEIGHT);
-    rs2::context ctx;
-    auto device_list = ctx.query_devices();
-    
-    if (device_list.size() > 0) {
-        pipe.start(cfg);
-        
-        frames = pipe.wait_for_frames();
-        cout << "Camera found!\n";
-    }
+    // looking depth camera
+    if (findCamera()) {}
     else {
-        cout << "Camera not found!\n";
         _testMode = true;
     }
     
@@ -59,6 +47,31 @@ touchArea::touchArea(bool testMode) {
     // init filters
     depth_to_disparity = rs2::disparity_transform(true);
     disparity_to_depth = rs2::disparity_transform(false);
+}
+
+bool touchArea::findCamera() {
+    cout << "Looking for RealSense\n";
+    rs2::config cfg;
+    cfg.enable_stream(RS2_STREAM_DEPTH, WIDTH, HEIGHT);
+    cfg.enable_stream(RS2_STREAM_COLOR, WIDTH, HEIGHT);
+    rs2::context ctx;
+    auto device_list = ctx.query_devices();
+    
+    if (device_list.size() > 0) {
+        rs2::pipeline_profile profile = pipe.start(cfg);
+        auto depth_sensor = profile.get_device().first<rs2::depth_sensor>();
+        
+        // get scale from the sensor
+        depth_scale = depth_sensor.get_depth_scale();
+        
+        frames = pipe.wait_for_frames();
+        cout << "RealSense found!\n";
+        return true;
+    }
+    else {
+        cout << "Camera not found!\n";
+        return false;
+    }
 }
 
 touchArea::~touchArea() {
@@ -152,7 +165,7 @@ void touchArea::updateFromCamera() {
             // exclude error pixels
             if (depthCameraData[j * WIDTH + i] > 0) {
                 res = zeroDepthCameraData[j * WIDTH + i] - depthCameraData[j * WIDTH + i];
-                res = res * MM_PER_DEPTH_BYTE / maxDepth;
+                res = res * depth_scale / maxDepth;
                 res = pow(res, 3); // power of 3 to be sensitive more to deep touch
                 res *= 255;
                 if (res < 0) res = 0;

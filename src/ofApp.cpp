@@ -33,14 +33,13 @@ void ofApp::loadSettings() {
     touch.setBorderPoint(2, depthSettings.getValue("x3", 200), depthSettings.getValue("y3", 500));
     touch.setBorderPoint(3, depthSettings.getValue("x4", 100), depthSettings.getValue("y4", 500));
     
-    touch.setMaxDepth(100); // set 5cm max depth
+    touch.setMaxDepth(0.1); // set 10cm max depth
     
     // projection settings
     ofxXmlSettings projectionSettings;
     projectionSettings.loadFile(PROJ_SETTINGS_FILE);
     proj.setPosition(projectionSettings.getValue("x", 100), projectionSettings.getValue("y", 50));
     proj.setSize(projectionSettings.getValue("width", 200), projectionSettings.getValue("height", 500));
-    proj.setDepthLevel(projectionSettings.getValue("maxDepth", 255));
     
     // gui
     gui.loadFromFile("settings.xml");
@@ -54,7 +53,6 @@ void ofApp::saveSettings() {
     projectionSettings.setValue("y", proj.getPosition()[1]);
     projectionSettings.setValue("width", proj.getSize()[0]);
     projectionSettings.setValue("height", proj.getSize()[1]);
-    projectionSettings.setValue("maxDepth", proj.getDepthLevel());
     
     projectionSettings.saveFile(PROJ_SETTINGS_FILE);
     

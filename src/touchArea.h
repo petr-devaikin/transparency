@@ -19,7 +19,7 @@ private:
     const int WIDTH = 1280;
     const int HEIGHT = 720;
     
-    const float MM_PER_DEPTH_BYTE = 0.9;
+    float depth_scale = 1; // depth bite to meters
     
     vector<ofVec2f> touchBorderPoints;
     float maxDepth; // max depth in mm to scale the depth image
@@ -54,6 +54,8 @@ private:
 public:
     touchArea(bool testMode = false);
     ~touchArea();
+    
+    bool findCamera();
     
     int getWidth();
     int getHeight();

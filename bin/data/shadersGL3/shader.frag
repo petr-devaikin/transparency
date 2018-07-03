@@ -4,7 +4,6 @@
 uniform sampler2DRect tex0;
 uniform sampler2DRect bgTex;
 uniform sampler2DRect maskTex;
-uniform float multiplier;
 
 // this comes from the vertex shader
 in vec2 texCoordVarying;
@@ -19,7 +18,7 @@ void main()
     vec3 foreground = texture(tex0, texCoordVarying).rgb;
 
     // get alpha from mask
-    float mask = texture(maskTex, texCoordVarying).r * multiplier;
+    float mask = texture(maskTex, texCoordVarying).r / 255.0;
     if (mask > 1) mask = 1;
     
     //mix the rgb from tex0 with the alpha of the mask
