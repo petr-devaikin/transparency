@@ -47,6 +47,9 @@ touchArea::touchArea(bool testMode) {
     // init filters
     depth_to_disparity = rs2::disparity_transform(true);
     disparity_to_depth = rs2::disparity_transform(false);
+    
+    // load shader
+    rainbowShader.load("shadersGL3/rainbow_shader");
 }
 
 bool touchArea::findCamera() {
@@ -116,7 +119,11 @@ void touchArea::drawImage(int x, int y) {
 
 void touchArea::drawDepth(int x, int y) {
     ofSetColor(255);
-    depthFbo.draw(x, y);
+    rainbowShader.begin();
+    {
+        depthFbo.draw(x, y);
+    }
+    rainbowShader.end();
     
     ofSetColor(0, 0, 255);
     ofNoFill();

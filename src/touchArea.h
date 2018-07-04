@@ -52,6 +52,8 @@ private:
     
     rs2::disparity_transform depth_to_disparity;
     rs2::disparity_transform disparity_to_depth;
+    
+    ofShader rainbowShader; // rainbow output
 public:
     touchArea(bool testMode = false);
     ~touchArea();
