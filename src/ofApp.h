@@ -1,9 +1,12 @@
 #pragma once
 
 #include "ofMain.h"
+
 #include "projectionFading.h"
 #include "projectionTransparency.h"
 #include "projectionRainbow.h"
+#include "projectionFlowers.h"
+
 #include "touchArea.h"
 #include "ofxGui.h"
 #include "ofxXmlSettings.h"
@@ -18,7 +21,8 @@ const string DEPTH_SETTINGS_FILE = "depth_settings.xml";
 class ofApp : public ofBaseApp{
     //projectionFading proj;
     //projectionTransparency proj;
-    projectionRainbow proj;
+    //projectionRainbow proj;
+    projectionFlowers proj = projectionFlowers(100);
     touchArea touch;
     
     ofxPanel gui;

@@ -25,6 +25,7 @@
 		6F767F8B20CD5F9A00B851D8 /* librealsense2.2.12.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F767F8A20CD5F9A00B851D8 /* librealsense2.2.12.0.dylib */; };
 		6F8F176D20EC17A2003F5E7D /* projectionTransparency.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F176B20EC17A2003F5E7D /* projectionTransparency.cpp */; };
 		6F8F177020EC1D8F003F5E7D /* projectionRainbow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F176F20EC1D8F003F5E7D /* projectionRainbow.cpp */; };
+		6F8F177320ED42C4003F5E7D /* projectionFlowers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F177220ED42C4003F5E7D /* projectionFlowers.cpp */; };
 		7CDAD32BE4FA46701E3552C7 /* RunningBackground.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5CBF6AED6A17AC0C17F63CC4 /* RunningBackground.cpp */; };
 		837220E80EB56CD44AD27F2A /* ofxSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 15F2C6477A769C03A56D1401 /* ofxSlider.cpp */; };
 		856AA354D08AB4B323081444 /* ofxBaseGui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9604B925D32EE39065747725 /* ofxBaseGui.cpp */; };
@@ -170,6 +171,8 @@
 		6F8F176C20EC17A2003F5E7D /* projectionTransparency.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = projectionTransparency.h; sourceTree = "<group>"; };
 		6F8F176E20EC1D8F003F5E7D /* projectionRainbow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = projectionRainbow.h; sourceTree = "<group>"; };
 		6F8F176F20EC1D8F003F5E7D /* projectionRainbow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = projectionRainbow.cpp; sourceTree = "<group>"; };
+		6F8F177120ED42C4003F5E7D /* projectionFlowers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = projectionFlowers.h; sourceTree = "<group>"; };
+		6F8F177220ED42C4003F5E7D /* projectionFlowers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = projectionFlowers.cpp; sourceTree = "<group>"; };
 		70046E043EDDB466ED625C3B /* Tracker.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Tracker.h; path = ../../../addons/ofxCv/libs/ofxCv/include/ofxCv/Tracker.h; sourceTree = SOURCE_ROOT; };
 		7101CF2125B8B2BF46AA2662 /* cxcore.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = cxcore.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv/cxcore.hpp; sourceTree = SOURCE_ROOT; };
 		71C98C3F44D63B39F1482A54 /* background_segm.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = background_segm.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/video/background_segm.hpp; sourceTree = SOURCE_ROOT; };
@@ -948,6 +951,8 @@
 				6F8F176B20EC17A2003F5E7D /* projectionTransparency.cpp */,
 				6F8F176E20EC1D8F003F5E7D /* projectionRainbow.h */,
 				6F8F176F20EC1D8F003F5E7D /* projectionRainbow.cpp */,
+				6F8F177120ED42C4003F5E7D /* projectionFlowers.h */,
+				6F8F177220ED42C4003F5E7D /* projectionFlowers.cpp */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
@@ -1085,6 +1090,7 @@
 				DBCB84A37F9AECC254870D79 /* Wrappers.cpp in Sources */,
 				7CDAD32BE4FA46701E3552C7 /* RunningBackground.cpp in Sources */,
 				10B69DE456AED1288FC9316B /* Tracker.cpp in Sources */,
+				6F8F177320ED42C4003F5E7D /* projectionFlowers.cpp in Sources */,
 				EBCDE831EFAE08274E799C97 /* Calibration.cpp in Sources */,
 				5CC34D433F5806179935B89D /* Flow.cpp in Sources */,
 				6AABAB39E82AF5CFEA23A205 /* ContourFinder.cpp in Sources */,
