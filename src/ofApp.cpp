@@ -4,7 +4,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     // init projection
-    //proj.init("img0.jpg", "img1.jpg");
+    proj.init("img0.jpg", "img1.jpg");
     proj.setTouchArea(&touch);
     
     // gui

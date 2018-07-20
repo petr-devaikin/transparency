@@ -24,8 +24,9 @@
 		6AABAB39E82AF5CFEA23A205 /* ContourFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5FBB4A8427353AED09174BE5 /* ContourFinder.cpp */; };
 		6F767F8B20CD5F9A00B851D8 /* librealsense2.2.12.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F767F8A20CD5F9A00B851D8 /* librealsense2.2.12.0.dylib */; };
 		6F8F176D20EC17A2003F5E7D /* projectionTransparency.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F176B20EC17A2003F5E7D /* projectionTransparency.cpp */; };
-		6F8F177020EC1D8F003F5E7D /* projectionRainbow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F176F20EC1D8F003F5E7D /* projectionRainbow.cpp */; };
+		6F8F177020EC1D8F003F5E7D /* projectionSimpleShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F176F20EC1D8F003F5E7D /* projectionSimpleShader.cpp */; };
 		6F8F177320ED42C4003F5E7D /* projectionFlowers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F177220ED42C4003F5E7D /* projectionFlowers.cpp */; };
+		6F8F1777210282A3003F5E7D /* projectionFluctuation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F1775210282A3003F5E7D /* projectionFluctuation.cpp */; };
 		7CDAD32BE4FA46701E3552C7 /* RunningBackground.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5CBF6AED6A17AC0C17F63CC4 /* RunningBackground.cpp */; };
 		837220E80EB56CD44AD27F2A /* ofxSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 15F2C6477A769C03A56D1401 /* ofxSlider.cpp */; };
 		856AA354D08AB4B323081444 /* ofxBaseGui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9604B925D32EE39065747725 /* ofxBaseGui.cpp */; };
@@ -169,10 +170,20 @@
 		6F767F8A20CD5F9A00B851D8 /* librealsense2.2.12.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = librealsense2.2.12.0.dylib; path = ../../../../../../../usr/local/lib/librealsense2.2.12.0.dylib; sourceTree = "<group>"; };
 		6F8F176B20EC17A2003F5E7D /* projectionTransparency.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = projectionTransparency.cpp; sourceTree = "<group>"; };
 		6F8F176C20EC17A2003F5E7D /* projectionTransparency.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = projectionTransparency.h; sourceTree = "<group>"; };
-		6F8F176E20EC1D8F003F5E7D /* projectionRainbow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = projectionRainbow.h; sourceTree = "<group>"; };
-		6F8F176F20EC1D8F003F5E7D /* projectionRainbow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = projectionRainbow.cpp; sourceTree = "<group>"; };
+		6F8F176E20EC1D8F003F5E7D /* projectionSimpleShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = projectionSimpleShader.h; sourceTree = "<group>"; };
+		6F8F176F20EC1D8F003F5E7D /* projectionSimpleShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = projectionSimpleShader.cpp; sourceTree = "<group>"; };
 		6F8F177120ED42C4003F5E7D /* projectionFlowers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = projectionFlowers.h; sourceTree = "<group>"; };
 		6F8F177220ED42C4003F5E7D /* projectionFlowers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = projectionFlowers.cpp; sourceTree = "<group>"; };
+		6F8F1775210282A3003F5E7D /* projectionFluctuation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = projectionFluctuation.cpp; sourceTree = "<group>"; };
+		6F8F1776210282A3003F5E7D /* projectionFluctuation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = projectionFluctuation.hpp; sourceTree = "<group>"; };
+		6F8F1779210285C8003F5E7D /* rainbow_shader.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = rainbow_shader.frag; sourceTree = "<group>"; };
+		6F8F177A210285C8003F5E7D /* max_shader.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = max_shader.vert; sourceTree = "<group>"; };
+		6F8F177B210285C8003F5E7D /* shader.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shader.vert; sourceTree = "<group>"; };
+		6F8F177C210285C8003F5E7D /* shader.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shader.frag; sourceTree = "<group>"; };
+		6F8F177D210285C8003F5E7D /* max_shader.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = max_shader.frag; sourceTree = "<group>"; };
+		6F8F177E210285C8003F5E7D /* rainbow_shader.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = rainbow_shader.vert; sourceTree = "<group>"; };
+		6F8F1781210289AF003F5E7D /* fluctuation_shader.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = fluctuation_shader.vert; sourceTree = "<group>"; };
+		6F8F1782210289AF003F5E7D /* fluctuation_shader.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = fluctuation_shader.frag; sourceTree = "<group>"; };
 		70046E043EDDB466ED625C3B /* Tracker.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Tracker.h; path = ../../../addons/ofxCv/libs/ofxCv/include/ofxCv/Tracker.h; sourceTree = SOURCE_ROOT; };
 		7101CF2125B8B2BF46AA2662 /* cxcore.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = cxcore.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv/cxcore.hpp; sourceTree = SOURCE_ROOT; };
 		71C98C3F44D63B39F1482A54 /* background_segm.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = background_segm.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/video/background_segm.hpp; sourceTree = SOURCE_ROOT; };
@@ -623,6 +634,22 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		6F8F1778210285C8003F5E7D /* shadersGL3 */ = {
+			isa = PBXGroup;
+			children = (
+				6F8F1782210289AF003F5E7D /* fluctuation_shader.frag */,
+				6F8F1781210289AF003F5E7D /* fluctuation_shader.vert */,
+				6F8F177E210285C8003F5E7D /* rainbow_shader.vert */,
+				6F8F1779210285C8003F5E7D /* rainbow_shader.frag */,
+				6F8F177A210285C8003F5E7D /* max_shader.vert */,
+				6F8F177D210285C8003F5E7D /* max_shader.frag */,
+				6F8F177B210285C8003F5E7D /* shader.vert */,
+				6F8F177C210285C8003F5E7D /* shader.frag */,
+			);
+			name = shadersGL3;
+			path = bin/data/shadersGL3;
+			sourceTree = "<group>";
+		};
 		737B033AA777B67BA4F8F4D2 /* opencv */ = {
 			isa = PBXGroup;
 			children = (
@@ -926,6 +953,7 @@
 		E4B69B4A0A3A1720003C02F2 = {
 			isa = PBXGroup;
 			children = (
+				6F8F1778210285C8003F5E7D /* shadersGL3 */,
 				E4B6FCAD0C3E899E008CF71C /* openFrameworks-Info.plist */,
 				E4EB6923138AFD0F00A09F29 /* Project.xcconfig */,
 				E4B69E1C0A3A1BDC003C02F2 /* src */,
@@ -949,10 +977,12 @@
 				0A8C1ED05BFA23984FB40C73 /* projectionFading.cpp */,
 				6F8F176C20EC17A2003F5E7D /* projectionTransparency.h */,
 				6F8F176B20EC17A2003F5E7D /* projectionTransparency.cpp */,
-				6F8F176E20EC1D8F003F5E7D /* projectionRainbow.h */,
-				6F8F176F20EC1D8F003F5E7D /* projectionRainbow.cpp */,
+				6F8F176E20EC1D8F003F5E7D /* projectionSimpleShader.h */,
+				6F8F176F20EC1D8F003F5E7D /* projectionSimpleShader.cpp */,
 				6F8F177120ED42C4003F5E7D /* projectionFlowers.h */,
 				6F8F177220ED42C4003F5E7D /* projectionFlowers.cpp */,
+				6F8F1775210282A3003F5E7D /* projectionFluctuation.cpp */,
+				6F8F1776210282A3003F5E7D /* projectionFluctuation.hpp */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
@@ -1103,6 +1133,7 @@
 				856AA354D08AB4B323081444 /* ofxBaseGui.cpp in Sources */,
 				6F8F176D20EC17A2003F5E7D /* projectionTransparency.cpp in Sources */,
 				B56FE57CC35806596D38118C /* ofxSliderGroup.cpp in Sources */,
+				6F8F1777210282A3003F5E7D /* projectionFluctuation.cpp in Sources */,
 				1CD33E884D9E3358252E82A1 /* ofxToggle.cpp in Sources */,
 				5CBB2AB3A60F65431D7B555D /* ofxButton.cpp in Sources */,
 				B266578FC55D23BFEBC042E7 /* ofxGuiGroup.cpp in Sources */,
@@ -1110,7 +1141,7 @@
 				F285EB3169F1566CA3D93C20 /* ofxPanel.cpp in Sources */,
 				837220E80EB56CD44AD27F2A /* ofxSlider.cpp in Sources */,
 				250A95BA26587BE85DB0A353 /* ofxCvColorImage.cpp in Sources */,
-				6F8F177020EC1D8F003F5E7D /* projectionRainbow.cpp in Sources */,
+				6F8F177020EC1D8F003F5E7D /* projectionSimpleShader.cpp in Sources */,
 				D3301F6A0B43BB293ED97C1D /* ofxCvShortImage.cpp in Sources */,
 				1D5F3298C2FA073628012944 /* ofxCvContourFinder.cpp in Sources */,
 				E212C821D1064B92DD953A42 /* ofxCvHaarFinder.cpp in Sources */,

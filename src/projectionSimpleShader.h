@@ -11,15 +11,16 @@
 #include "ofMain.h"
 #include "projectionFading.h"
 
-class projectionRainbow : public projectionFading {
+class projectionSimpleShader : public projectionFading {
 private:
     ofFbo resultFbo;
-    
-    ofShader rainbowShader; // to combine two images
+protected:
+    ofShader shader; // to combine two images
+    void prepareShader(); // to pass some parameters, for example
 public:
     const float FADE_PERIOD = 2; // how long white color disappear
     
-    projectionRainbow();
+    projectionSimpleShader(string filename = "shadersGL3/rainbow_shader");
     
     void setSize(int width, int height);
     

@@ -49,6 +49,7 @@ private:
     rs2::decimation_filter dec_filter;
     rs2::spatial_filter spat_filter;
     rs2::temporal_filter temp_filter;
+    rs2::hole_filling_filter hole_filter;
     
     rs2::disparity_transform depth_to_disparity;
     rs2::disparity_transform disparity_to_depth;

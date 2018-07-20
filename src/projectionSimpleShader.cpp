@@ -5,13 +5,13 @@
 //  Created by Petr Devaikin on 10.02.18.
 //
 
-#include "projectionRainbow.h"
+#include "projectionSimpleShader.h"
 
-projectionRainbow::projectionRainbow() {
-    rainbowShader.load("shadersGL3/rainbow_shader");
+projectionSimpleShader::projectionSimpleShader(string filename) {
+    shader.load(filename);
 }
 
-void projectionRainbow::setSize(int width, int height) {
+void projectionSimpleShader::setSize(int width, int height) {
     if ((width != size[0] && width > 0) || (height != size[1] && height > 0)) {
         
         // reallocate buffer
@@ -27,7 +27,12 @@ void projectionRainbow::setSize(int width, int height) {
 }
 
 
-void projectionRainbow::update() {
+void projectionSimpleShader::prepareShader() {
+    // shader. ... set some params if needed
+}
+
+
+void projectionSimpleShader::update() {
     projectionFading::update();
     
     // final drawing
@@ -36,16 +41,17 @@ void projectionRainbow::update() {
         ofClear(0, 0, 0, 0);
         ofSetColor(255);
         
-        rainbowShader.begin();
+        shader.begin();
         {
+            prepareShader();
             maskFbo.draw(0, 0);
         }
-        rainbowShader.end();
+        shader.end();
     }
     resultFbo.end();
 }
 
-void projectionRainbow::draw() {
+void projectionSimpleShader::draw() {
     ofSetColor(255);
     resultFbo.draw(position[0], position[1]);
 }

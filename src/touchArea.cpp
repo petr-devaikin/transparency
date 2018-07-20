@@ -145,12 +145,13 @@ void touchArea::updateFromCamera() {
     
     // apply filters
     //depthFrame = dec_filter.process(depthFrame);
-    /*
+    
     depthFrame = depth_to_disparity.process(depthFrame);
-    depthFrame = spat_filter.process(depthFrame);
+    //depthFrame = spat_filter.process(depthFrame);
     depthFrame = temp_filter.process(depthFrame);
     depthFrame = disparity_to_depth.process(depthFrame);
-     */
+    
+    depthFrame = hole_filter.process(depthFrame);
     
     // copy depth data
     memcpy(depthCameraData, depthFrame.get_data(), WIDTH * HEIGHT * 2);
