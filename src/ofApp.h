@@ -19,8 +19,8 @@ const string DEPTH_SETTINGS_FILE = "depth_settings.xml";
 
 
 class ofApp : public ofBaseApp{
-    projectionTransparency proj;
-    //projectionRainbow proj;
+    //projectionTransparency proj;
+    projectionSimpleShader proj;
     //projectionFlowers proj = projectionFlowers(100);
     touchArea touch;
     

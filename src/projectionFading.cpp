@@ -79,9 +79,11 @@ void projectionFading::setTouchArea(touchArea * t) {
 }
 
 void projectionFading::drawBorder() {
-    ofSetColor(255, 255, 255);
+    ofSetColor(255, 0, 0);
+    ofSetLineWidth(10);
     ofNoFill();
     ofDrawRectangle(position[0], position[1], size[0], size[1]);
+    ofSetLineWidth(0);
 }
 
 void projectionFading::update() {

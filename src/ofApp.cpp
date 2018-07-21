@@ -4,7 +4,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     // init projection
-    proj.init("img0.jpg", "img1.jpg");
+    //proj.init("img0.jpg", "img1.jpg");
     proj.setTouchArea(&touch);
     
     // gui
@@ -115,6 +115,7 @@ void ofApp::draw(){
             if (showDepthView) {
                 touch.drawImage(10,  (ofGetHeight() - touch.getHeight()) / 2);
                 touch.drawBorder(10, (ofGetHeight() - touch.getHeight()) / 2);
+                proj.drawBorder(); // to easier callibrate touch area to allign it with the projection border
             }
             else {
                 proj.draw();
