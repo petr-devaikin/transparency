@@ -11,8 +11,8 @@ projectionSimpleShader::projectionSimpleShader(string filename) {
     shader.load(filename);
 }
 
-void projectionSimpleShader::setSize(int width, int height) {
-    if ((width != size[0] && width > 0) || (height != size[1] && height > 0)) {
+bool projectionSimpleShader::setSize(int width, int height) {
+    if (projectionFading::setSize(width, height)) {
         
         // reallocate buffer
         resultFbo.allocate(width, height, GL_RGBA);
@@ -21,14 +21,16 @@ void projectionSimpleShader::setSize(int width, int height) {
             ofClear(100, 0, 0, 255);
         }
         resultFbo.end();
+        return true;
     }
-    
-    projectionFading::setSize(width, height);
+    else
+        return false;
 }
 
 
 void projectionSimpleShader::prepareShader() {
     // shader. ... set some params if needed
+    shader.setUniform1f("scaleCoef", 5 / 6); // to start from red and to end with blue (?)
 }
 
 

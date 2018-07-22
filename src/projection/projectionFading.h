@@ -27,12 +27,12 @@ protected:
     ofVec2f size;
     ofFbo maskFbo; // transformed mask from touchArea
 public:
-    const float FADE_PERIOD = 2; // how long white color disappear
+    const float FADE_PERIOD = 3; // how long white color disappear
     
     projectionFading();
     
     void setPosition(int x, int y);
-    void setSize(int width, int height);
+    bool setSize(int width, int height);
     void setX(int x);
     void setY(int y);
     void setWidth(int width);

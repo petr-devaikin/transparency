@@ -5,6 +5,7 @@
 #include "projectionFading.h"
 #include "projectionTransparency.h"
 #include "projectionSimpleShader.h"
+#include "projectionFluctuation.hpp"
 #include "projectionFlowers.h"
 
 #include "touchArea.h"
@@ -20,7 +21,8 @@ const string DEPTH_SETTINGS_FILE = "depth_settings.xml";
 
 class ofApp : public ofBaseApp{
     //projectionTransparency proj;
-    projectionSimpleShader proj;
+    //projectionSimpleShader proj;
+    //projectionFluctuation proj;
     //projectionFlowers proj = projectionFlowers(100);
     touchArea touch;
     

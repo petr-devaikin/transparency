@@ -22,7 +22,7 @@ void projectionFading::setPosition(int x, int y) {
     position.set(x, y);
 }
 
-void projectionFading::setSize(int width, int height) {
+bool projectionFading::setSize(int width, int height) {
     if ((width != size[0] && width > 0) || (height != size[1] && height > 0)) {
         size.set(width, height);
         
@@ -39,7 +39,11 @@ void projectionFading::setSize(int width, int height) {
             ofClear(0, 0, 0, 255);
         }
         tempFbo.end();
+        
+        return true;
     }
+    else
+        return false;
 }
 
 void projectionFading::setX(int x) {

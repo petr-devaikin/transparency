@@ -17,7 +17,7 @@ private:
 protected:
     void prepareShader();
 public:
-    const float FLUCTUATION_PERIOD = 3; // in seconds
+    const float FLUCTUATION_PERIOD = 1; // in seconds
     
     projectionFluctuation();
 };

@@ -12,17 +12,17 @@
 #include "projectionFading.h"
 
 class projectionSimpleShader : public projectionFading {
-private:
-    ofFbo resultFbo;
 protected:
+    ofFbo resultFbo;
+    
     ofShader shader; // to combine two images
-    void prepareShader(); // to pass some parameters, for example
+    virtual void prepareShader(); // to pass some parameters, for example
 public:
     const float FADE_PERIOD = 2; // how long white color disappear
     
     projectionSimpleShader(string filename = "shadersGL3/rainbow_shader");
     
-    void setSize(int width, int height);
+    bool setSize(int width, int height);
     
     void update();
     

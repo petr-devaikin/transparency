@@ -3,6 +3,7 @@
 
 // these are our textures
 uniform sampler2DRect tex0;
+uniform float angle;
 
 // this comes from the vertex shader
 in vec2 texCoordVarying;
@@ -20,8 +21,11 @@ void main()
 {
     // get rgb from tex0
     vec3 picOne = texture(tex0, texCoordVarying).rgb;
+    
+    float v = (cos(angle) * 0.3 + 1) * picOne.r;
+    if (v > 255) v = 255;
 
-    vec3 color = hsv2rgb(vec3(picOne.r * 5 / 6, 1, 1)); // scale hue a bit to end up with purple, not red again
+    vec3 color = hsv2rgb(vec3(v * 5 / 6, 1, 1)); // scale hue a bit to end up with purple, not red again
     
     //mix the rgb from tex0 with the alpha of the mask
     outputColor = vec4(
