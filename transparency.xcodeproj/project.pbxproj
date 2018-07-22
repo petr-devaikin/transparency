@@ -189,6 +189,12 @@
 		6F8F17852104BF6F003F5E7D /* projectionCyclicTransition.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = projectionCyclicTransition.hpp; sourceTree = "<group>"; };
 		6F8F17872104CDD1003F5E7D /* adding_cyclic_shader.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = adding_cyclic_shader.vert; sourceTree = "<group>"; };
 		6F8F17882104CDD1003F5E7D /* adding_cyclic_shader.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = adding_cyclic_shader.frag; sourceTree = "<group>"; };
+		6F8F178A2104E24D003F5E7D /* shaderBlurX.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shaderBlurX.vert; sourceTree = "<group>"; };
+		6F8F178B2104E24D003F5E7D /* shaderBlurY.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shaderBlurY.frag; sourceTree = "<group>"; };
+		6F8F178C2104E24D003F5E7D /* shaderBlurX.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shaderBlurX.frag; sourceTree = "<group>"; };
+		6F8F178D2104E24D003F5E7D /* shaderBlurY.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shaderBlurY.vert; sourceTree = "<group>"; };
+		6F8F178E2104ECD6003F5E7D /* peak_transition_shader.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = peak_transition_shader.frag; sourceTree = "<group>"; };
+		6F8F178F2104ECD6003F5E7D /* peak_transition_shader.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = peak_transition_shader.vert; sourceTree = "<group>"; };
 		70046E043EDDB466ED625C3B /* Tracker.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Tracker.h; path = ../../../addons/ofxCv/libs/ofxCv/include/ofxCv/Tracker.h; sourceTree = SOURCE_ROOT; };
 		7101CF2125B8B2BF46AA2662 /* cxcore.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = cxcore.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv/cxcore.hpp; sourceTree = SOURCE_ROOT; };
 		71C98C3F44D63B39F1482A54 /* background_segm.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = background_segm.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/video/background_segm.hpp; sourceTree = SOURCE_ROOT; };
@@ -642,6 +648,12 @@
 		6F8F1778210285C8003F5E7D /* shadersGL3 */ = {
 			isa = PBXGroup;
 			children = (
+				6F8F178E2104ECD6003F5E7D /* peak_transition_shader.frag */,
+				6F8F178F2104ECD6003F5E7D /* peak_transition_shader.vert */,
+				6F8F178C2104E24D003F5E7D /* shaderBlurX.frag */,
+				6F8F178A2104E24D003F5E7D /* shaderBlurX.vert */,
+				6F8F178B2104E24D003F5E7D /* shaderBlurY.frag */,
+				6F8F178D2104E24D003F5E7D /* shaderBlurY.vert */,
 				6F8F17882104CDD1003F5E7D /* adding_cyclic_shader.frag */,
 				6F8F17872104CDD1003F5E7D /* adding_cyclic_shader.vert */,
 				6F8F1782210289AF003F5E7D /* fluctuation_shader.frag */,

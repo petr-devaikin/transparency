@@ -3,8 +3,6 @@
 
 // these are our textures
 uniform sampler2DRect tex0;
-uniform sampler2DRect currentState;
-uniform float timeCoef;
 
 // this comes from the vertex shader
 in vec2 texCoordVarying;
@@ -16,11 +14,8 @@ void main()
 {
     // get rgb from tex0
     vec3 picOne = texture(tex0, texCoordVarying).rgb;
-    // get rgb from currentState
-    vec3 picCurrentState = texture(currentState, texCoordVarying).rgb;
     
-    float v = picCurrentState.r + timeCoef * picOne.r;
-    v = v - floor(v); // leave only decimal part
+    float v = (1 - cos(2 * 3.1416 * picOne.r)) / 2;
     
     //mix the rgb from tex0 with the alpha of the mask
     outputColor = vec4(

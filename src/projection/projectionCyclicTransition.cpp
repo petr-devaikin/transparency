@@ -10,7 +10,9 @@
 projectionCyclicTransition::projectionCyclicTransition() {
     lastUpdate = 0;
     cyclicShader.load("shadersGL3/adding_cyclic_shader");
-    rainbowShader.load("shadersGL3/rainbow_shader");
+    peakTransitionShader.load("shadersGL3/peak_transition_shader");
+    blurXShader.load("shadersGL3/shaderBlurX");
+    blurYShader.load("shadersGL3/shaderBlurY");
 }
 
 bool projectionCyclicTransition::setSize(int width, int height) {
@@ -61,7 +63,7 @@ void projectionCyclicTransition::update() {
         }
         cyclicShader.end();
     }
-    currentStateFbo.end();
+    resultFbo.end();
     
     // save current state
     currentStateFbo.begin();
@@ -79,7 +81,7 @@ void projectionCyclicTransition::update() {
         
         rainbowShader.begin();
         {
-            rainbowShader.setUniform1f("scaleCoef", 1);
+            //rainbowShader.setUniform1f("scaleCoef", 1);
             currentStateFbo.draw(0, 0);
         }
         rainbowShader.end();

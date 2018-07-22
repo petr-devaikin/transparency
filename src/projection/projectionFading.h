@@ -21,15 +21,20 @@ private:
     ofShader maxShader; // to leave touch trace
     ofShader finalShader; // to combine two images
     
+    ofShader shaderBlurX;
+    ofShader shaderBlurY;
+    
+    float blur;
+    
     float lastMaskUpdate;
 protected:
     ofVec2f position;
     ofVec2f size;
     ofFbo maskFbo; // transformed mask from touchArea
 public:
-    const float FADE_PERIOD = 3; // how long white color disappear
+    const float FADE_PERIOD = 2; // how long white color disappear
     
-    projectionFading();
+    projectionFading(float _blur = 5);
     
     void setPosition(int x, int y);
     bool setSize(int width, int height);

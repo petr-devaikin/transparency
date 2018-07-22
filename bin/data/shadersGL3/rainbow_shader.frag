@@ -21,7 +21,7 @@ void main()
 {
     // get rgb from tex0
     vec3 picOne = texture(tex0, texCoordVarying).rgb;
-
+    
     vec3 color = hsv2rgb(vec3(picOne.r * scaleCoef, 1, 1)); // scale hue a bit to end up with purple, not red again
     
     //mix the rgb from tex0 with the alpha of the mask

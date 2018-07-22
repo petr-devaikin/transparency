@@ -121,6 +121,7 @@ void touchArea::drawDepth(int x, int y) {
     ofSetColor(255);
     rainbowShader.begin();
     {
+        rainbowShader.setUniform1f("scaleCoef", 5.0 / 6);
         depthFbo.draw(x, y);
     }
     rainbowShader.end();

@@ -7,8 +7,10 @@
 
 #include "projectionFading.h"
 
-projectionFading::projectionFading() {
+projectionFading::projectionFading(float _blur) {
     lastMaskUpdate = ofGetElapsedTimef();
+    
+    blur = _blur;
     
     size.set(0, 0);
     position.set(0, 0);
@@ -16,6 +18,11 @@ projectionFading::projectionFading() {
     // load shaders
     maxShader.load("shadersGL3/max_shader");
     finalShader.load("shadersGL3/shader");
+    
+    if (blur > 0) {
+        shaderBlurX.load("shadersGL3/shaderBlurX");
+        shaderBlurY.load("shadersGL3/shaderBlurY");
+    }
 }
 
 void projectionFading::setPosition(int x, int y) {
@@ -101,9 +108,36 @@ void projectionFading::update() {
     {
         ofClear(0, 0, 0, 255);
         ofSetColor(255);
+        
+        if (blur > 0) {
+            shaderBlurX.begin();
+            shaderBlurX.setUniform1f("blurAmnt", blur);
+        }
         maskFbo.draw(0, 0);
+        if (blur > 0) {
+            shaderBlurX.end();
+        }
     }
     tempFbo.end();
+    
+    // do vertical blur if needed
+    if (blur > 0) {
+        maskFbo.begin();
+        {
+            shaderBlurY.begin();
+            shaderBlurY.setUniform1f("blurAmnt", blur);
+            
+            tempFbo.draw(0, 0);
+            
+            shaderBlurY.end();
+        }
+        maskFbo.end();
+        
+        // copy result back
+        tempFbo.begin();
+        maskFbo.draw(0, 0);
+        tempFbo.end();
+    }
     
     // add current touch to mask
     maskFbo.begin();

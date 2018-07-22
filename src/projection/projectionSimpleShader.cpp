@@ -30,7 +30,7 @@ bool projectionSimpleShader::setSize(int width, int height) {
 
 void projectionSimpleShader::prepareShader() {
     // shader. ... set some params if needed
-    shader.setUniform1f("scaleCoef", 5 / 6); // to start from red and to end with blue (?)
+    shader.setUniform1f("scaleCoef", 5.0 / 6); // to start from red and to end with blue (?)
 }
 
 
