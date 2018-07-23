@@ -10,7 +10,6 @@
 
 #include "ofMain.h"
 #include "touchArea.h"
-#include "ofxCv.h"
 
 class projectionFading {
 private:
