@@ -9,9 +9,9 @@
 #define projectionInvertedBrush_hpp
 
 #include "ofMain.h"
-#include "projection.hpp"
+#include "baseProjection.hpp"
 
-class projectionInvertedBrush : public projection {
+class projectionInvertedBrush : public baseProjection {
 private:
     bool touchStarted;
     bool resultColor; // 0 or 1
@@ -30,16 +30,22 @@ private:
     // check if burrer empty
     bool checkIfEmpty(ofFbo * fbo); // check if all pixels are 0;
     bool zeroAllocated;
+    int zeroSize = 0;
     unsigned char * zeroBlock; // to check if zero
     
     // gesture stuff
-    ofFbo gestureFbo; // to store current gesture
-    void cleanGestureBuffer();
-    void addTouchToGesture(ofFbo * touch);
-    void applyGesture();
+    void applyTouch(ofFbo * touch);
+    
+    // images
+    ofImage image1_original, image2_original;
+    ofImage image1, image2;
+    
+    ofShader transpShader; // to combine two images
 public:
-    projectionInvertedBrush(float t1 = 0.5, float t2 = 0.4);
+    projectionInvertedBrush(float t1 = 0.5, float t2 = 0.3);
     ~projectionInvertedBrush();
+    
+    void init(const string& image_1_path, const string& image_2_path);
     
     bool setSize(int width, int height);
     void update();

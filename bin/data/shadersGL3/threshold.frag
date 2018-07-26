@@ -2,7 +2,7 @@
 
 // these are our textures
 uniform sampler2DRect tex0;
-uniform float threshold
+uniform float threshold;
 
 // this comes from the vertex shader
 in vec2 texCoordVarying;

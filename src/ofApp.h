@@ -7,6 +7,7 @@
 #include "projectionSimpleShader.h"
 #include "projectionFluctuation.hpp"
 #include "projectionCyclicTransition.hpp"
+#include "projectionInvertedBrush.hpp"
 #include "projectionFlowers.h"
 
 #include "touchArea.h"
@@ -25,7 +26,8 @@ class ofApp : public ofBaseApp{
     //projectionSimpleShader proj;
     //projectionFluctuation proj;
     //projectionFlowers proj = projectionFlowers(100);
-    projectionCyclicTransition proj;
+    //projectionCyclicTransition proj;
+    projectionInvertedBrush proj;
     touchArea touch;
     
     ofxPanel gui;

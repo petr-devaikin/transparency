@@ -29,7 +29,7 @@
 		6F8F1777210282A3003F5E7D /* projectionFluctuation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F1775210282A3003F5E7D /* projectionFluctuation.cpp */; };
 		6F8F17862104BF6F003F5E7D /* projectionCyclicTransition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F17842104BF6F003F5E7D /* projectionCyclicTransition.cpp */; };
 		6F8F17922106476B003F5E7D /* projectionInvertedBrush.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F17902106476B003F5E7D /* projectionInvertedBrush.cpp */; };
-		6F8F179521064F72003F5E7D /* projection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F179321064F72003F5E7D /* projection.cpp */; };
+		6F8F179A210A38E7003F5E7D /* baseProjection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F1799210A38E7003F5E7D /* baseProjection.cpp */; };
 		7CDAD32BE4FA46701E3552C7 /* RunningBackground.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5CBF6AED6A17AC0C17F63CC4 /* RunningBackground.cpp */; };
 		837220E80EB56CD44AD27F2A /* ofxSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 15F2C6477A769C03A56D1401 /* ofxSlider.cpp */; };
 		856AA354D08AB4B323081444 /* ofxBaseGui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9604B925D32EE39065747725 /* ofxBaseGui.cpp */; };
@@ -199,10 +199,10 @@
 		6F8F178F2104ECD6003F5E7D /* peak_transition_shader.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = peak_transition_shader.vert; sourceTree = "<group>"; };
 		6F8F17902106476B003F5E7D /* projectionInvertedBrush.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = projectionInvertedBrush.cpp; sourceTree = "<group>"; };
 		6F8F17912106476B003F5E7D /* projectionInvertedBrush.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = projectionInvertedBrush.hpp; sourceTree = "<group>"; };
-		6F8F179321064F72003F5E7D /* projection.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = projection.cpp; sourceTree = "<group>"; };
-		6F8F179421064F72003F5E7D /* projection.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = projection.hpp; sourceTree = "<group>"; };
 		6F8F179621065832003F5E7D /* threshold.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = threshold.frag; sourceTree = "<group>"; };
 		6F8F179721065833003F5E7D /* threshold.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = threshold.vert; sourceTree = "<group>"; };
+		6F8F1798210A38E7003F5E7D /* baseProjection.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = baseProjection.hpp; sourceTree = "<group>"; };
+		6F8F1799210A38E7003F5E7D /* baseProjection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = baseProjection.cpp; sourceTree = "<group>"; };
 		70046E043EDDB466ED625C3B /* Tracker.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Tracker.h; path = ../../../addons/ofxCv/libs/ofxCv/include/ofxCv/Tracker.h; sourceTree = SOURCE_ROOT; };
 		7101CF2125B8B2BF46AA2662 /* cxcore.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = cxcore.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv/cxcore.hpp; sourceTree = SOURCE_ROOT; };
 		71C98C3F44D63B39F1482A54 /* background_segm.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = background_segm.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/video/background_segm.hpp; sourceTree = SOURCE_ROOT; };
@@ -682,6 +682,8 @@
 		6F8F17832103625F003F5E7D /* projection */ = {
 			isa = PBXGroup;
 			children = (
+				6F8F1799210A38E7003F5E7D /* baseProjection.cpp */,
+				6F8F1798210A38E7003F5E7D /* baseProjection.hpp */,
 				4620ED54AC693BB612784E40 /* projectionFading.h */,
 				0A8C1ED05BFA23984FB40C73 /* projectionFading.cpp */,
 				6F8F176C20EC17A2003F5E7D /* projectionTransparency.h */,
@@ -696,8 +698,6 @@
 				6F8F17852104BF6F003F5E7D /* projectionCyclicTransition.hpp */,
 				6F8F17902106476B003F5E7D /* projectionInvertedBrush.cpp */,
 				6F8F17912106476B003F5E7D /* projectionInvertedBrush.hpp */,
-				6F8F179321064F72003F5E7D /* projection.cpp */,
-				6F8F179421064F72003F5E7D /* projection.hpp */,
 			);
 			path = projection;
 			sourceTree = "<group>";
@@ -1157,6 +1157,7 @@
 			files = (
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */,
+				6F8F179A210A38E7003F5E7D /* baseProjection.cpp in Sources */,
 				920D95C6627BAAC9D2FE2A0D /* touchArea.cpp in Sources */,
 				B3EFE5455A5F40766489BDCE /* projectionFading.cpp in Sources */,
 				2023EF517ED2D8B397511D4B /* Helpers.cpp in Sources */,
@@ -1180,7 +1181,6 @@
 				B56FE57CC35806596D38118C /* ofxSliderGroup.cpp in Sources */,
 				6F8F1777210282A3003F5E7D /* projectionFluctuation.cpp in Sources */,
 				1CD33E884D9E3358252E82A1 /* ofxToggle.cpp in Sources */,
-				6F8F179521064F72003F5E7D /* projection.cpp in Sources */,
 				5CBB2AB3A60F65431D7B555D /* ofxButton.cpp in Sources */,
 				B266578FC55D23BFEBC042E7 /* ofxGuiGroup.cpp in Sources */,
 				483908258D00B98B4BE69F07 /* ofxLabel.cpp in Sources */,

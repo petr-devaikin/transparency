@@ -5,8 +5,8 @@
 //  Created by Petr Devaikin on 10.02.18.
 //
 
-#ifndef projection_hpp
-#define projection_hpp
+#ifndef projection_fading_hpp
+#define projection_fading_hpp
 
 #include "ofMain.h"
 #include "touchArea.h"
@@ -57,4 +57,4 @@ public:
     void draw();
 };
 
-#endif /* projection_hpp */
+#endif /* projection_fading_hpp */

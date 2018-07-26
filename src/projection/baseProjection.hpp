@@ -11,14 +11,14 @@
 #include "ofMain.h"
 #include "touchArea.h"
 
-class projection {
+class baseProjection {
 private:
 protected:
     ofVec2f position;
     ofVec2f size;
     touchArea * touch;
 public:
-    projection();
+    baseProjection();
     
     bool setPosition(float x, float y);
     bool setSize(int width, int height);

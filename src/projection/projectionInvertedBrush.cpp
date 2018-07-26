@@ -18,10 +18,23 @@ projectionInvertedBrush::projectionInvertedBrush(float t1, float t2) {
     
     // load shaders
     shaderThreshold.load("shadersGL3/threshold");
+    transpShader.load("shadersGL3/shader");
+}
+
+void projectionInvertedBrush::init(const string& img_1_path, const string& img_2_path) {
+    // load images
+    image1_original.load(img_1_path);
+    image2_original.load(img_2_path);
 }
 
 bool projectionInvertedBrush::setSize(int width, int height) {
-    if (projection::setSize(width, height)) {
+    if (baseProjection::setSize(width, height)) {
+        // update image
+        image1.clone(image1_original);
+        image2.clone(image2_original);
+        image1.resize(width, height);
+        image2.resize(width, height);
+        
         // change buffer size
         resultFbo.allocate(width, height, GL_RGBA);
         resultFbo.begin();
@@ -33,16 +46,13 @@ bool projectionInvertedBrush::setSize(int width, int height) {
         ofClear(0);
         workFbo.end();
         
-        gestureFbo.allocate(width, height, GL_RGBA);
-        gestureFbo.begin();
-        ofClear(0);
-        gestureFbo.end();
-        
         // allocate zero bytes for check function
         if (zeroAllocated)
             delete[] zeroBlock;
         zeroAllocated = true;
-        zeroBlock = new unsigned char[4 * width * height]; // rgba * width * height
+        zeroSize = 4 * width * height;
+        zeroBlock = new unsigned char[zeroSize]; // rgba * width * height
+        memset(zeroBlock, 0, zeroSize);
         
         return true;
     }
@@ -61,12 +71,14 @@ projectionInvertedBrush::~projectionInvertedBrush() {
 bool projectionInvertedBrush::checkIfEmpty(ofFbo * fbo) {
     ofPixels pixels;
     fbo->readToPixels(pixels);
-    
-    return memcmp(pixels.getData(), zeroBlock, sizeof(*zeroBlock));
+
+    return memcmp(pixels.getData(), zeroBlock, zeroSize) == 0;
 }
 
 void projectionInvertedBrush::applyThresholdToWorkFbo(float threshold) {
     workFbo.begin();
+    ofSetColor(255);
+    ofClear(0, 0, 0, 0);
     shaderThreshold.begin();
     shaderThreshold.setUniform1f("threshold", threshold);
     (touch->getDepth()).draw(0, 0);
@@ -74,7 +86,10 @@ void projectionInvertedBrush::applyThresholdToWorkFbo(float threshold) {
     workFbo.end();
 }
 
+bool lastColor = true;
 bool projectionInvertedBrush::detectColor(ofFbo * mask) {
+    lastColor = !lastColor;
+    //return lastColor;
     // detects color of the result fbo in mask area
     ofPixels maskPixels;
     ofPixels resultPixels;
@@ -82,8 +97,8 @@ bool projectionInvertedBrush::detectColor(ofFbo * mask) {
     resultFbo.readToPixels(resultPixels);
     mask->readToPixels(maskPixels);
     
-    unsigned char * maskPointer = resultPixels.getData();
-    unsigned char * resultPointer = maskPixels.getData();
+    unsigned char * maskPointer = maskPixels.getData();
+    unsigned char * resultPointer = resultPixels.getData();
     
     int zeroCount = 0;
     int oneCount = 0;
@@ -108,6 +123,7 @@ void projectionInvertedBrush::update() {
     applyThresholdToWorkFbo(thresholdSensetive);
     bool isCurrentlyTouched = !checkIfEmpty(&workFbo);
     
+    
     if (isCurrentlyTouched) { // canvas is touched
         // detect real brush area
         applyThresholdToWorkFbo(thresholdBrush);
@@ -116,18 +132,25 @@ void projectionInvertedBrush::update() {
         if (!touchStarted) {
             touchStarted = true;
             resultColor = !detectColor(&workFbo);
-            cleanGestureBuffer();
+            cout << "delected " << resultColor << "\n";
         }
-        //addTouchToBuffer(&workFbo);
+        applyTouch(&workFbo);
     }
     else if (touchStarted) { // gesture ended
-        applyGesture();
+        touchStarted = false;
     }
 }
 
 void projectionInvertedBrush::draw() {
     ofSetColor(255);
-    resultFbo.draw(position[0], position[1]);
+    
+    transpShader.begin();
+    transpShader.setUniformTexture("bgTex", image1.getTexture(), 1);
+    transpShader.setUniformTexture("maskTex", resultFbo.getTexture(), 2);
+    
+    image2.draw(position[0], position[1]);
+    
+    transpShader.end();
     
     // try to draw brush
     // gestureFbo.draw(0, 0);
@@ -135,26 +158,17 @@ void projectionInvertedBrush::draw() {
 
 // gesture
 
-void projectionInvertedBrush::cleanGestureBuffer() {
-    // Clean the gesture buffer
-    gestureFbo.begin();
-    ofClear(0, 0, 0, 0);
-    gestureFbo.end();
-}
-
-void projectionInvertedBrush::addTouchToGesture(ofFbo * touch) {
-    gestureFbo.begin();
-    touch->draw(0, 0);
-    gestureFbo.end();
-}
-
-void projectionInvertedBrush::applyGesture() {
+void projectionInvertedBrush::applyTouch(ofFbo * touch) {
     resultFbo.begin();
-    if (resultColor)
+    if (resultColor) {
         ofEnableBlendMode(OF_BLENDMODE_ADD);
-    else
+        //cout << "substract\n";
+    }
+    else {
         ofEnableBlendMode(OF_BLENDMODE_SUBTRACT);
-    gestureFbo.draw(0, 0);
+        //cout << "substract\n";
+    }
+    touch->draw(0, 0);
     ofDisableBlendMode();
     resultFbo.end();
 }
