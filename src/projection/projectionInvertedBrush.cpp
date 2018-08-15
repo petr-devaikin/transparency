@@ -7,7 +7,7 @@
 
 #include "projectionInvertedBrush.hpp"
 
-projectionInvertedBrush::projectionInvertedBrush(float t1, float t2) {
+projectionInvertedBrush::projectionInvertedBrush(touchArea * t, const string& img_1_path, const string& img_2_path, float t1, float t2) : baseProjection(t) {
     thresholdSensetive = t1;
     thresholdBrush = t2;
     
@@ -19,9 +19,7 @@ projectionInvertedBrush::projectionInvertedBrush(float t1, float t2) {
     // load shaders
     shaderThreshold.load("shadersGL3/threshold");
     transpShader.load("shadersGL3/shader");
-}
-
-void projectionInvertedBrush::init(const string& img_1_path, const string& img_2_path) {
+    
     // load images
     image1_original.load(img_1_path);
     image2_original.load(img_2_path);
@@ -36,10 +34,10 @@ bool projectionInvertedBrush::setSize(int width, int height) {
         image2.resize(width, height);
         
         // change buffer size
-        resultFbo.allocate(width, height, GL_RGBA);
-        resultFbo.begin();
+        maskFbo.allocate(width, height, GL_RGBA);
+        maskFbo.begin();
         ofClear(0);
-        resultFbo.end();
+        maskFbo.end();
         
         workFbo.allocate(width, height, GL_RGBA);
         workFbo.begin();
@@ -87,26 +85,26 @@ void projectionInvertedBrush::applyThresholdToWorkFbo(float threshold) {
 }
 
 bool lastColor = true;
-bool projectionInvertedBrush::detectColor(ofFbo * mask) {
+bool projectionInvertedBrush::detectColor(ofFbo * checkArea) {
     lastColor = !lastColor;
     //return lastColor;
-    // detects color of the result fbo in mask area
+    // detects color of the mask fbo in check area
     ofPixels maskPixels;
-    ofPixels resultPixels;
+    ofPixels checkAreaPixels;
     
-    resultFbo.readToPixels(resultPixels);
-    mask->readToPixels(maskPixels);
+    maskFbo.readToPixels(maskPixels);
+    checkArea->readToPixels(checkAreaPixels);
     
+    unsigned char * checkAreaPointer = checkAreaPixels.getData();
     unsigned char * maskPointer = maskPixels.getData();
-    unsigned char * resultPointer = resultPixels.getData();
     
     int zeroCount = 0;
     int oneCount = 0;
     
     
     for (int i = 0; i < size[0] * size[1]; i++) { // go through pixels and count 0's and 1's
-        if (* (maskPointer + 4 * i)) { // if mask pixel is not 0
-            if (* (resultPointer + 4 * i)) // if result pixel is not 0
+        if (* (checkAreaPointer + 4 * i)) { // if check area pixel is not 0
+            if (* (maskPointer + 4 * i)) // if mask pixel is not 0
                 oneCount++;
             else
                 zeroCount++;
@@ -146,7 +144,7 @@ void projectionInvertedBrush::draw() {
     
     transpShader.begin();
     transpShader.setUniformTexture("bgTex", image1.getTexture(), 1);
-    transpShader.setUniformTexture("maskTex", resultFbo.getTexture(), 2);
+    transpShader.setUniformTexture("maskTex", maskFbo.getTexture(), 2);
     
     image2.draw(position[0], position[1]);
     
@@ -159,7 +157,7 @@ void projectionInvertedBrush::draw() {
 // gesture
 
 void projectionInvertedBrush::applyTouch(ofFbo * touch) {
-    resultFbo.begin();
+    maskFbo.begin();
     if (resultColor) {
         ofEnableBlendMode(OF_BLENDMODE_ADD);
         //cout << "substract\n";
@@ -170,5 +168,5 @@ void projectionInvertedBrush::applyTouch(ofFbo * touch) {
     }
     touch->draw(0, 0);
     ofDisableBlendMode();
-    resultFbo.end();
+    maskFbo.end();
 }

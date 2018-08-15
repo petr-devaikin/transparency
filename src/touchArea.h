@@ -14,7 +14,7 @@
 
 class touchArea {
 private:
-    bool _testMode;
+    bool testMode;
     
     const int WIDTH = 1280;
     const int HEIGHT = 720;
@@ -36,6 +36,7 @@ private:
     void updateFromCamera(); // ger rgb and depth data from camera
     
     // RealSense
+    bool findCamera();
     rs2::pipeline pipe;
     rs2::frameset frames;
     
@@ -53,35 +54,33 @@ private:
     
     rs2::disparity_transform depth_to_disparity;
     rs2::disparity_transform disparity_to_depth;
-    
-    ofShader rainbowShader; // rainbow output
 public:
-    touchArea(bool testMode = false);
+    touchArea(float _maxDepth, bool _testMode = false); // maxDepth in mm
     ~touchArea();
-    
-    bool findCamera();
     
     int getWidth();
     int getHeight();
     
     vector<ofVec2f> getBorderPoints();
     ofFbo & getDepth();
+    ofImage & getCameraImage();
     
-    void drawBorder(int x, int y);
-    void drawImage(int x, int y);
-    void drawDepth(int x, int y);
-    
-    void imitateTouch(int x, int y);
-    void imitateRelease();
+    //void drawBorder(int x, int y);
+    //void drawImage(int x, int y);
+    //void drawDepth(int x, int y);
     
     void setBorderPoint(int i, float x, float y);
     
-    void updateZeroPixels();
-    void setResultScreenSize(int width, int height);
+    void resetZeroPixels();
+    void setResultScreenSize(ofVec2f screenSize);
     
     void setMaxDepth(float maxDepth); // in mm
     
     void update();
+    
+    // immitation
+    void imitateTouch(int x, int y);
+    void imitateRelease();
 };
 
 #endif /* touchArea_hpp */

@@ -16,12 +16,12 @@ private:
     bool touchStarted;
     bool resultColor; // 0 or 1
     
-    bool detectColor(ofFbo * fbo);
+    bool detectColor(ofFbo * checkArea);
     
     float thresholdSensetive; // to detect touch
     float thresholdBrush; // for real touch area (should be lower)
     
-    ofFbo resultFbo;
+    ofFbo maskFbo;
     ofFbo workFbo;
     void applyThresholdToWorkFbo(float threshold);
     
@@ -42,7 +42,7 @@ private:
     
     ofShader transpShader; // to combine two images
 public:
-    projectionInvertedBrush(float t1 = 0.5, float t2 = 0.3);
+    projectionInvertedBrush(touchArea * t, const string& img_1_path, const string& img_2_path, float t1 = 0.5, float t2 = 0.3);
     ~projectionInvertedBrush();
     
     void init(const string& image_1_path, const string& image_2_path);

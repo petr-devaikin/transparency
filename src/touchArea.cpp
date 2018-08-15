@@ -9,19 +9,14 @@
 
 using namespace cv;
 
-touchArea::touchArea(bool testMode) {
-    _testMode = testMode;
+touchArea::touchArea(float _maxDepth, bool _testMode) {
+    maxDepth = _maxDepth;
+    testMode = _testMode;
     
     //zeroLevelPixels.allocate(WIDTH, HEIGHT, OF_IMAGE_GRAYSCALE);
     //zeroLevelPixels.clear();
     
-    brush.load("brush.png");
-    brush.setImageType(OF_IMAGE_GRAYSCALE);
-    
-    // zeroLevels
     rgbCameraImage.allocate(WIDTH, HEIGHT, OF_IMAGE_COLOR);
-    depthCameraData = new unsigned short [WIDTH * HEIGHT](); // allocate with zeros
-    zeroDepthCameraData = new unsigned short [WIDTH * HEIGHT](); // allocate with zeros
     
     // init border points with 0
     touchBorderPoints.push_back(ofVec2f(0, 0));
@@ -29,27 +24,30 @@ touchArea::touchArea(bool testMode) {
     touchBorderPoints.push_back(ofVec2f(0, 0));
     touchBorderPoints.push_back(ofVec2f(0, 0));
     
-    
     // looking depth camera
-    if (findCamera()) {}
-    else {
-        _testMode = true;
+    if (!testMode && !findCamera())
+        testMode = true;
+    
+    if (testMode) {
+        brush.load("brush.png");
+        brush.setImageType(OF_IMAGE_GRAYSCALE);
     }
-    
-    // init transform matrix
-    transform = ofMatrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-    depthFbo.allocate(10, 10, GL_RGBA);
-    // [? ? 0 ?]
-    // [? ? 0 ?]
-    // [0 0 1 0]
-    // [? ? 0 1]
-    
-    // init filters
-    depth_to_disparity = rs2::disparity_transform(true);
-    disparity_to_depth = rs2::disparity_transform(false);
-    
-    // load shader
-    rainbowShader.load("shadersGL3/rainbow_shader");
+    else {
+        // zeroLevels
+        depthCameraData = new unsigned short [WIDTH * HEIGHT](); // allocate with zeros
+        zeroDepthCameraData = new unsigned short [WIDTH * HEIGHT](); // allocate with zeros
+        
+        // init transform matrix
+        transform = ofMatrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        // [? ? 0 ?]
+        // [? ? 0 ?]
+        // [0 0 1 0]
+        // [? ? 0 1]
+        
+        // init filters
+        depth_to_disparity = rs2::disparity_transform(true);
+        disparity_to_depth = rs2::disparity_transform(false);
+    }
 }
 
 bool touchArea::findCamera() {
@@ -78,57 +76,19 @@ bool touchArea::findCamera() {
 }
 
 touchArea::~touchArea() {
-    pipe.stop();
+    if (!testMode) {
+        pipe.stop();
     
-    delete[] depthCameraData;
-    delete[] zeroDepthCameraData;
+        delete[] depthCameraData;
+        delete[] zeroDepthCameraData;
+    }
 }
 
-void touchArea::updateZeroPixels() {
-    if (!_testMode) {
+void touchArea::resetZeroPixels() {
+    if (!testMode) {
         // copy zero level from current frame
         memcpy(zeroDepthCameraData, depthCameraData, WIDTH * HEIGHT * 2);
     }
-}
-
-void touchArea::drawBorder(int x, int y) {
-    ofSetColor(0, 255, 0);
-    ofNoFill();
-    ofPolyline border;
-    for (int i = 0; i < touchBorderPoints.size(); i++) {
-        border.addVertex(touchBorderPoints[i] + ofVec2f(x, y));
-    }
-    border.close();
-    border.draw();
-    
-    // label the corners
-    ofDrawBitmapString("Top Left", touchBorderPoints[0][0], touchBorderPoints[0][1]);
-    ofDrawBitmapString("Top Right", touchBorderPoints[1][0], touchBorderPoints[1][1]);
-    ofDrawBitmapString("Bottom Right", touchBorderPoints[2][0], touchBorderPoints[2][1]);
-    ofDrawBitmapString("Bottom Left", touchBorderPoints[3][0], touchBorderPoints[3][1]);
-    
-    ofNoFill();
-    ofSetColor(100, 100, 100);
-    ofDrawRectangle(x, y, WIDTH, HEIGHT);
-}
-
-void touchArea::drawImage(int x, int y) {
-    ofSetColor(255, 255, 255, 200);
-    rgbCameraImage.draw(x, y);
-}
-
-void touchArea::drawDepth(int x, int y) {
-    ofSetColor(255);
-    rainbowShader.begin();
-    {
-        rainbowShader.setUniform1f("scaleCoef", 5.0 / 6);
-        depthFbo.draw(x, y);
-    }
-    rainbowShader.end();
-    
-    ofSetColor(0, 0, 255);
-    ofNoFill();
-    ofDrawRectangle(x, y, depthFbo.getWidth(), depthFbo.getHeight());
 }
 
 void touchArea::updateFromCamera() {
@@ -160,7 +120,7 @@ void touchArea::updateFromCamera() {
     // update zero pixels in the very beginning
     if (!isZeroInitialized) {
         isZeroInitialized = true;
-        updateZeroPixels();
+        resetZeroPixels();
     }
     
     // calculate substracted depth result
@@ -203,6 +163,10 @@ ofFbo & touchArea::getDepth() {
     return depthFbo;
 }
 
+ofImage & touchArea::getCameraImage() {
+    return rgbCameraImage;
+}
+
 vector<ofVec2f> touchArea::getBorderPoints() {
     return touchBorderPoints;
 }
@@ -221,6 +185,54 @@ void touchArea::setBorderPoint(int i, float x, float y) {
     boundingArea = ofRectangle(minX, minY, maxX - minX, maxY - minY);
 }
 
+void touchArea::update() {
+    if (!testMode)
+        updateFromCamera();
+}
+
+int touchArea::getWidth() {
+    return WIDTH;
+}
+
+int touchArea::getHeight() {
+    return HEIGHT;
+}
+
+void touchArea::setResultScreenSize(ofVec2f screenSize) {
+    int width = screenSize[0];
+    int height = screenSize[1];
+    
+    // change the result buffer
+    depthFbo.allocate(width, height, GL_RGBA);
+    depthFbo.begin();
+    {
+        ofClear(0);
+    }
+    depthFbo.end();
+    
+    if (!testMode) {
+        // update transformation
+        vector<Point2f> srcPoints, dstPoints;
+        for (int i = 0; i < 4; i++) {
+            srcPoints.push_back(Point2f(touchBorderPoints[i][0], touchBorderPoints[i][1]));
+        }
+        
+        dstPoints.push_back(Point2f(0, 0));
+        dstPoints.push_back(Point2f(width, 0));
+        dstPoints.push_back(Point2f(width, height));
+        dstPoints.push_back(Point2f(0, height));
+        
+        
+        Mat m = findHomography(srcPoints, dstPoints);
+        transform.set(m.at<double>(0, 0), m.at<double>(1, 0), 0, m.at<double>(2, 0),
+                      m.at<double>(0, 1), m.at<double>(1, 1), 0, m.at<double>(2, 1),
+                      0, 0, 1, 0,
+                      m.at<double>(0, 2), m.at<double>(1, 2), 0, 1);
+    }
+}
+
+// immitation
+
 void touchArea::imitateTouch(int x, int y) {
     depthFbo.begin();
     {
@@ -238,50 +250,4 @@ void touchArea::imitateRelease() {
         ofClear(0, 0, 0, 255);
     }
     depthFbo.end();
-}
-
-void touchArea::update() {
-    if (!_testMode)
-        updateFromCamera();
-}
-
-int touchArea::getWidth() {
-    return WIDTH;
-}
-
-int touchArea::getHeight() {
-    return HEIGHT;
-}
-
-void touchArea::setResultScreenSize(int width, int height) {
-    // change the result buffer
-    depthFbo.allocate(width, height, GL_RGBA);
-    depthFbo.begin();
-    {
-        ofClear(0);
-    }
-    depthFbo.end();
-    
-    // update transformation
-
-    vector<Point2f> srcPoints, dstPoints;
-    for (int i = 0; i < 4; i++) {
-        srcPoints.push_back(Point2f(touchBorderPoints[i][0], touchBorderPoints[i][1]));
-    }
-    
-    dstPoints.push_back(Point2f(0, 0));
-    dstPoints.push_back(Point2f(width, 0));
-    dstPoints.push_back(Point2f(width, height));
-    dstPoints.push_back(Point2f(0, height));
-    
-    
-    Mat m = findHomography(srcPoints, dstPoints);
-    transform.set(m.at<double>(0, 0), m.at<double>(1, 0), 0, m.at<double>(2, 0),
-                  m.at<double>(0, 1), m.at<double>(1, 1), 0, m.at<double>(2, 1),
-                  0, 0, 1, 0,
-                  m.at<double>(0, 2), m.at<double>(1, 2), 0, 1);
-}
-
-void touchArea::setMaxDepth(float m) {
-    maxDepth = m;
 }

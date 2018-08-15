@@ -18,7 +18,7 @@ protected:
     ofVec2f size;
     touchArea * touch;
 public:
-    baseProjection();
+    baseProjection(touchArea * t);
     
     bool setPosition(float x, float y);
     bool setSize(int width, int height);
@@ -35,8 +35,6 @@ public:
     float getY();
     float getWidth();
     float getHeight();
-    
-    void setTouchArea(touchArea * t);
     
     virtual void update() = 0;
     

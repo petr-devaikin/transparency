@@ -57,4 +57,4 @@ public:
     void draw();
 };
 
-#endif /* projection_fading_hpp */
+#endif /* projection_hpp */
