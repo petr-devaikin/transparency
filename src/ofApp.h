@@ -2,13 +2,7 @@
 
 #include "ofMain.h"
 
-#include "projectionFading.h"
-#include "projectionTransparency.h"
-#include "projectionSimpleShader.h"
-#include "projectionFluctuation.hpp"
-#include "projectionCyclicTransition.hpp"
 #include "projectionInvertedBrush.hpp"
-#include "projectionFlowers.h"
 
 #include "touchArea.h"
 #include "ofxGui.h"
@@ -22,11 +16,6 @@ const string DEPTH_SETTINGS_FILE = "depth_settings.xml";
 
 class ofApp : public ofBaseApp{
 private:
-    //projectionTransparency proj;
-    //projectionSimpleShader proj;
-    //projectionFluctuation proj;
-    //projectionFlowers proj = projectionFlowers(100);
-    //projectionCyclicTransition proj;
     projectionInvertedBrush * proj;
     touchArea * touch; // 10 cm
     

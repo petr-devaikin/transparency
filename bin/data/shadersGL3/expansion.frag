@@ -1,5 +1,7 @@
 #version 150
 
+// expand area covered by 1 to expansionRadius in all directions
+
 uniform sampler2DRect tex0;
 uniform float expansionRadius;
 
@@ -8,7 +10,7 @@ out vec4 outputColor;
 
 void main()
 {
-    float currentColor = texture(tex0, texCoordVarying).rgb;
+    vec3 currentColor = texture(tex0, texCoordVarying).rgb;
     
     if (currentColor.r == 1) { // nothing to do, already covered
         outputColor = vec4(1, 1, 1, 1);
@@ -26,7 +28,7 @@ void main()
                 if (color.r < 1) continue; // skip if the pixel is not covered in color completely yet
                 
                 int absX = abs(x);
-                int andY = abs(y);
+                int absY = abs(y);
                 
                 // simple cases. on the axis
                 if (absX == 0) {

@@ -5,7 +5,12 @@
 void ofApp::setup(){
     // init touch
     touch = new touchArea(0.1); // 10 cm
-    proj = new projectionInvertedBrush(touch, "img0.jpg", "img1.jpg");
+    proj = new projectionInvertedBrush(touch);
+    proj->addImage("img0.jpg");
+    proj->addImage("img1.jpg");
+    proj->addImage("img2.jpg");
+    proj->addImage("img3.jpg");
+    proj->addImage("img4.jpg");
     
     // gui
     gui.setup();

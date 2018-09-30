@@ -10,42 +10,45 @@
 
 #include "ofMain.h"
 #include "baseProjection.hpp"
+#include "layerWithMask.hpp"
 
 class projectionInvertedBrush : public baseProjection {
 private:
-    bool touchStarted;
-    bool resultColor; // 0 or 1
+    float timer;
     
-    bool detectColor(ofFbo * checkArea);
+    vector<ofImage> originalImages;
+    //vector<ofImage> scaledImages;
+    
+    vector<layerWithMask> layers;
+    void resetLayers(); // clean layers array and add the first image
+    void addImageToLayers(int i); // add new layer based on the i-th image
+    
+    bool touchStarted;
+    int currentlyTouchedLayerIndex;
+    
+    int detectLayerIndex(ofFbo * checkArea); // finds the next level which was touched
     
     float thresholdSensetive; // to detect touch
     float thresholdBrush; // for real touch area (should be lower)
+    float expansionSpeed; // pixels per second
     
-    ofFbo maskFbo;
-    ofFbo workFbo;
-    void applyThresholdToWorkFbo(float threshold);
+    ofFbo workFbo; // used inside applyThreshold
+    ofFbo * applyThresholdToTouchFbo(float threshold); // result workFbo!
     
     ofShader shaderThreshold;
+    ofShader shaderExpansion;
     
-    // check if burrer empty
     bool checkIfEmpty(ofFbo * fbo); // check if all pixels are 0;
-    bool zeroAllocated;
-    int zeroSize = 0;
-    unsigned char * zeroBlock; // to check if zero
-    
-    // gesture stuff
-    void applyTouch(ofFbo * touch);
-    
-    // images
-    ofImage image1_original, image2_original;
-    ofImage image1, image2;
+    bool onesAndZerosAllocated;
+    unsigned char * zerosBlock;
+    unsigned char * onesBlock; // to check if all pixels are 1 inside layerWithMask
     
     ofShader transpShader; // to combine two images
 public:
-    projectionInvertedBrush(touchArea * t, const string& img_1_path, const string& img_2_path, float t1 = 0.5, float t2 = 0.3);
+    projectionInvertedBrush(touchArea * t, float t1 = 0.5, float t2 = 0.3, float expSpeed = 100);
     ~projectionInvertedBrush();
     
-    void init(const string& image_1_path, const string& image_2_path);
+    void addImage(const string& imgPath);
     
     bool setSize(int width, int height);
     void update();

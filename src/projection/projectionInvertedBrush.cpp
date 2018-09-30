@@ -7,50 +7,61 @@
 
 #include "projectionInvertedBrush.hpp"
 
-projectionInvertedBrush::projectionInvertedBrush(touchArea * t, const string& img_1_path, const string& img_2_path, float t1, float t2) : baseProjection(t) {
+
+projectionInvertedBrush::projectionInvertedBrush(touchArea * t, float t1, float t2, float expSpeed) : baseProjection(t) {
+    timer = ofGetElapsedTimef();
+    
     thresholdSensetive = t1;
     thresholdBrush = t2;
+    expansionSpeed = expSpeed;
     
     touchStarted = false;
+    currentlyTouchedLayerIndex = 0;
     
     // zero block
-    zeroAllocated = false;
+    onesAndZerosAllocated = false;
     
     // load shaders
     shaderThreshold.load("shadersGL3/threshold");
-    transpShader.load("shadersGL3/shader");
-    
-    // load images
-    image1_original.load(img_1_path);
-    image2_original.load(img_2_path);
+    shaderExpansion.load("shadersGL3/expansion");
+}
+
+projectionInvertedBrush::~projectionInvertedBrush() {
+    // clean the memory
+    if (onesAndZerosAllocated) {
+        delete[] onesBlock;
+        delete[] zerosBlock;
+    }
+}
+
+void projectionInvertedBrush::addImage(const std::string &imgPath) {
+    ofImage newImg;
+    newImg.load(imgPath);
+    originalImages.push_back(newImg);
 }
 
 bool projectionInvertedBrush::setSize(int width, int height) {
     if (baseProjection::setSize(width, height)) {
-        // update image
-        image1.clone(image1_original);
-        image2.clone(image2_original);
-        image1.resize(width, height);
-        image2.resize(width, height);
+        
+        // allocate one bytes for check function
+        if (onesAndZerosAllocated) {
+            delete[] onesBlock;
+            delete[] zerosBlock;
+        }
+        onesAndZerosAllocated = true;
+        onesBlock = new unsigned char[4 * width * height]; // rgba * width * height
+        zerosBlock = new unsigned char[4 * width * height]; // rgba * width * height
+        memset(onesBlock, 255, 4 * width * height);
+        memset(zerosBlock, 0, 4 * width * height);
         
         // change buffer size
-        maskFbo.allocate(width, height, GL_RGBA);
-        maskFbo.begin();
-        ofClear(0);
-        maskFbo.end();
-        
         workFbo.allocate(width, height, GL_RGBA);
         workFbo.begin();
         ofClear(0);
         workFbo.end();
         
-        // allocate zero bytes for check function
-        if (zeroAllocated)
-            delete[] zeroBlock;
-        zeroAllocated = true;
-        zeroSize = 4 * width * height;
-        zeroBlock = new unsigned char[zeroSize]; // rgba * width * height
-        memset(zeroBlock, 0, zeroSize);
+        // reset layers
+        resetLayers();
         
         return true;
     }
@@ -58,22 +69,10 @@ bool projectionInvertedBrush::setSize(int width, int height) {
         return false;
 }
 
-projectionInvertedBrush::~projectionInvertedBrush() {
-    // clean the memory
-    if (zeroAllocated)
-        delete[] zeroBlock;
-}
-
 // Helpers
 
-bool projectionInvertedBrush::checkIfEmpty(ofFbo * fbo) {
-    ofPixels pixels;
-    fbo->readToPixels(pixels);
-
-    return memcmp(pixels.getData(), zeroBlock, zeroSize) == 0;
-}
-
-void projectionInvertedBrush::applyThresholdToWorkFbo(float threshold) {
+ofFbo * projectionInvertedBrush::applyThresholdToTouchFbo(float threshold) {
+    // why?
     workFbo.begin();
     ofSetColor(255);
     ofClear(0, 0, 0, 0);
@@ -82,91 +81,98 @@ void projectionInvertedBrush::applyThresholdToWorkFbo(float threshold) {
     (touch->getDepth()).draw(0, 0);
     shaderThreshold.end();
     workFbo.end();
+    return &workFbo;
 }
 
-bool lastColor = true;
-bool projectionInvertedBrush::detectColor(ofFbo * checkArea) {
-    lastColor = !lastColor;
-    //return lastColor;
-    // detects color of the mask fbo in check area
-    ofPixels maskPixels;
-    ofPixels checkAreaPixels;
-    
-    maskFbo.readToPixels(maskPixels);
-    checkArea->readToPixels(checkAreaPixels);
-    
-    unsigned char * checkAreaPointer = checkAreaPixels.getData();
-    unsigned char * maskPointer = maskPixels.getData();
-    
-    int zeroCount = 0;
-    int oneCount = 0;
-    
-    
-    for (int i = 0; i < size[0] * size[1]; i++) { // go through pixels and count 0's and 1's
-        if (* (checkAreaPointer + 4 * i)) { // if check area pixel is not 0
-            if (* (maskPointer + 4 * i)) // if mask pixel is not 0
-                oneCount++;
-            else
-                zeroCount++;
-        }
+int projectionInvertedBrush::detectLayerIndex(ofFbo * checkArea) {
+    // check all layers starting from the top one
+    int touchedLayer = 0;
+    for (touchedLayer = layers.size() - 1; touchedLayer > 0; touchedLayer--) {
+        if (layers[touchedLayer].checkIfTouched(checkArea)) break;
     }
     
-    return oneCount > zeroCount;
+    return touchedLayer;
+}
+
+bool projectionInvertedBrush::checkIfEmpty(ofFbo * fbo) {
+    ofPixels pixels;
+    fbo->readToPixels(pixels);
+    
+    // compare with zeros-array
+    return memcmp(pixels.getData(), zerosBlock, 4 * fbo->getWidth() * fbo->getHeight()) == 0;
 }
 
 // Update
 
 void projectionInvertedBrush::update() {
-    // Check if the canvas is touched right now
-    applyThresholdToWorkFbo(thresholdSensetive);
-    bool isCurrentlyTouched = !checkIfEmpty(&workFbo);
+    if (!onesAndZerosAllocated) return; // size is not set. not ready
     
+    // expand touched areas on all layers
+    float currentTime = ofGetElapsedTimef();
+    float expansionRadius = expansionSpeed * (currentTime - timer);
+    timer = currentTime;
+    
+    for (int i = 0; i < layers.size(); i++) {
+        layers[i].expand(expansionRadius);
+    }
+    
+    // Check if the canvas is touched right now
+    ofFbo * sensitiveAreaFbo = applyThresholdToTouchFbo(thresholdSensetive);
+    bool isCurrentlyTouched = !checkIfEmpty(sensitiveAreaFbo);
     
     if (isCurrentlyTouched) { // canvas is touched
         // detect real brush area
-        applyThresholdToWorkFbo(thresholdBrush);
+        ofFbo * brushAreaFbo = applyThresholdToTouchFbo(thresholdBrush);
         
         // check if it's the first touch
         if (!touchStarted) {
             touchStarted = true;
-            resultColor = !detectColor(&workFbo);
-            cout << "delected " << resultColor << "\n";
+            currentlyTouchedLayerIndex = detectLayerIndex(brushAreaFbo);
+            cout << "Layer touched: " << currentlyTouchedLayerIndex << "\n";
+            
+            // if touched the top layer, need to add new empty layer
+            if (currentlyTouchedLayerIndex == layers.size() - 1) {
+                int newLayerImageIndex = (layers[currentlyTouchedLayerIndex].getImageIndex() + 1) % originalImages.size();
+                addImageToLayers(newLayerImageIndex);
+                cout << "New layer " << newLayerImageIndex << " added. Number of layers: " << layers.size() << "\n";
+            }
         }
-        applyTouch(&workFbo);
+        
+        layers[currentlyTouchedLayerIndex].addTouch(brushAreaFbo);
     }
     else if (touchStarted) { // gesture ended
         touchStarted = false;
+        
+        // check if we can remove the last layer
+        if (layers.size() > 1 && layers[0].isFull()) {
+            layers.erase(layers.begin());
+            cout << "Layer removed. Number of layers: " << layers.size() << "\n";
+        }
     }
 }
 
 void projectionInvertedBrush::draw() {
+    if (!onesAndZerosAllocated) return; // size is not set. not ready
+    
     ofSetColor(255);
     
-    transpShader.begin();
-    transpShader.setUniformTexture("bgTex", image1.getTexture(), 1);
-    transpShader.setUniformTexture("maskTex", maskFbo.getTexture(), 2);
-    
-    image2.draw(position[0], position[1]);
-    
-    transpShader.end();
-    
-    // try to draw brush
-    // gestureFbo.draw(0, 0);
+    for (int i = 0; i < layers.size(); i++) {
+        layers[i].draw(position[0], position[1]); // draw with transparency
+    }
 }
 
-// gesture
+void projectionInvertedBrush::resetLayers() {
+    layers.clear(); // need to clean memory?
+    addImageToLayers(0);
+    
+    cout << "Reset layers. Number of layers: " << layers.size() << "\n";
+}
 
-void projectionInvertedBrush::applyTouch(ofFbo * touch) {
-    maskFbo.begin();
-    if (resultColor) {
-        ofEnableBlendMode(OF_BLENDMODE_ADD);
-        //cout << "substract\n";
-    }
-    else {
-        ofEnableBlendMode(OF_BLENDMODE_SUBTRACT);
-        //cout << "substract\n";
-    }
-    touch->draw(0, 0);
-    ofDisableBlendMode();
-    maskFbo.end();
+void projectionInvertedBrush::addImageToLayers(int i) {
+    ofImage resizedImage;
+    resizedImage.clone(originalImages[i]);
+    resizedImage.resize(workFbo.getWidth(), workFbo.getHeight()); // maybe resize earlier?
+    layerWithMask newLayer(resizedImage, i, onesBlock, shaderExpansion);
+    newLayer.setFull();
+    layers.push_back(newLayer);
 }
