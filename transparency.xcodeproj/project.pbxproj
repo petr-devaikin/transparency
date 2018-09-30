@@ -170,6 +170,8 @@
 		6B907CFBB1B0FEDE76C41AA0 /* heap.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = heap.h; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/heap.h; sourceTree = SOURCE_ROOT; };
 		6CEC50DB3D06414010233963 /* Utilities.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = Utilities.cpp; path = ../../../addons/ofxCv/libs/ofxCv/src/Utilities.cpp; sourceTree = SOURCE_ROOT; };
 		6DD5A3CBB6D5BBA1C1354F1B /* flann.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = flann.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/flann.hpp; sourceTree = SOURCE_ROOT; };
+		6F2D352B215FCE2400EF1799 /* expansion.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = expansion.vert; sourceTree = "<group>"; };
+		6F2D352C215FCE2500EF1799 /* expansion.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = expansion.frag; sourceTree = "<group>"; };
 		6F767F8A20CD5F9A00B851D8 /* librealsense2.2.12.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = librealsense2.2.12.0.dylib; path = ../../../../../../../usr/local/lib/librealsense2.2.12.0.dylib; sourceTree = "<group>"; };
 		6F8F176B20EC17A2003F5E7D /* projectionTransparency.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = projectionTransparency.cpp; sourceTree = "<group>"; };
 		6F8F176C20EC17A2003F5E7D /* projectionTransparency.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = projectionTransparency.h; sourceTree = "<group>"; };
@@ -656,6 +658,8 @@
 		6F8F1778210285C8003F5E7D /* shadersGL3 */ = {
 			isa = PBXGroup;
 			children = (
+				6F2D352C215FCE2500EF1799 /* expansion.frag */,
+				6F2D352B215FCE2400EF1799 /* expansion.vert */,
 				6F8F179621065832003F5E7D /* threshold.frag */,
 				6F8F179721065833003F5E7D /* threshold.vert */,
 				6F8F178E2104ECD6003F5E7D /* peak_transition_shader.frag */,
