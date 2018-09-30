@@ -14,7 +14,14 @@ layerWithMask::layerWithMask(ofImage img, int imageIndex, unsigned char * oneBlo
     _imageIndex = imageIndex;
     
     mask.allocate(img.getWidth(), img.getHeight(), GL_RGBA);
+    mask.begin();
+    ofClear(0, 0, 0, 0);
+    mask.end();
+    
     tempFbo.allocate(img.getWidth(), img.getHeight(), GL_RGBA);
+    tempFbo.begin();
+    ofClear(0, 0, 0, 0);
+    tempFbo.end();
     
     shaderExp = shdr;
 }
@@ -30,7 +37,7 @@ bool layerWithMask::isFull() {
     mask.readToPixels(pixels);
     
     // compare with ones-array
-    _isFull = memcmp(pixels.getData(), ones, 4 * mask.getWidth() * 4 * mask.getHeight()) == 0;
+    _isFull = memcmp(pixels.getData(), ones, 4 * mask.getWidth() * mask.getHeight()) == 0;
     return _isFull;
 }
 
@@ -88,6 +95,9 @@ void layerWithMask::expand(float radius) {
 }
 
 void layerWithMask::draw(float x, float y) {
-    //image.getTexture().setAlphaMask(mask.getTexture());
+    //if (!isFull())
+    //    image.getTexture().setAlphaMask(mask.getTexture());
     image.draw(x, y);
+    
+    mask.draw(x + 300, y);
 }

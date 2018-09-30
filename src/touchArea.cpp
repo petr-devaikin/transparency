@@ -238,7 +238,7 @@ void touchArea::imitateTouch(int x, int y) {
     {
         ofClear(0, 0, 0, 255);
         ofSetColor(255);
-        ofSetColor(100);
+        //ofSetColor(100);
         brush.draw(x - brush.getWidth(), y - brush.getHeight(), brush.getWidth() * 2, brush.getHeight() * 2);
     }
     depthFbo.end();

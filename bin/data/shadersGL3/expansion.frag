@@ -25,25 +25,27 @@ void main()
                 if (x == 0 && y == 0) continue; // skip the current pixel
                 
                 vec3 color = texture(tex0, texCoordVarying + vec2(x, y)).rgb;
-                if (color.r < 1) continue; // skip if the pixel is not covered in color completely yet
+                if (color.r == 0) continue; // skip if the pixel is not covered in color completely yet
+                
+                float correctedRadius = expansionRadius * color.r; // activate not only fully covered pixels
                 
                 int absX = abs(x);
                 int absY = abs(y);
                 
                 // simple cases. on the axis
                 if (absX == 0) {
-                    additionalColor = max(additionalColor, expansionRadius - absY + 0.5);
+                    additionalColor = max(additionalColor, correctedRadius - absY + 0.5);
                 }
                 else if (absY == 0) {
-                    additionalColor = max(additionalColor, expansionRadius - absX + 0.5);
+                    additionalColor = max(additionalColor, correctedRadius - absX + 0.5);
                 }
                 else {
                     float distance = sqrt(x * x + y * y);
                     if (absX >= absY) {
-                        additionalColor = max(additionalColor, expansionRadius * absX / distance - absX + 0.5);
+                        additionalColor = max(additionalColor, correctedRadius * absX / distance - absX + 0.5);
                     }
                     else {
-                        additionalColor = max(additionalColor, expansionRadius * absY / distance - absY + 0.5);
+                        additionalColor = max(additionalColor, correctedRadius * absY / distance - absY + 0.5);
                     }
                 }
                 

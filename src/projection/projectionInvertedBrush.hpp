@@ -17,7 +17,7 @@ private:
     float timer;
     
     vector<ofImage> originalImages;
-    //vector<ofImage> scaledImages;
+    vector<ofImage> scaledImages;
     
     vector<layerWithMask> layers;
     void resetLayers(); // clean layers array and add the first image

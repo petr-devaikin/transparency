@@ -10,7 +10,6 @@ void ofApp::setup(){
     proj->addImage("img1.jpg");
     proj->addImage("img2.jpg");
     proj->addImage("img3.jpg");
-    proj->addImage("img4.jpg");
     
     // gui
     gui.setup();

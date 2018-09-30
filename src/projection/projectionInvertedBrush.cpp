@@ -42,6 +42,14 @@ void projectionInvertedBrush::addImage(const std::string &imgPath) {
 
 bool projectionInvertedBrush::setSize(int width, int height) {
     if (baseProjection::setSize(width, height)) {
+        // resize images
+        scaledImages.clear();
+        for (int i = 0; i < originalImages.size(); i++) {
+            ofImage newImage;
+            newImage.clone(originalImages[i]);
+            newImage.resize(width, height);
+            scaledImages.push_back(newImage);
+        }
         
         // allocate one bytes for check function
         if (onesAndZerosAllocated) {
@@ -116,6 +124,12 @@ void projectionInvertedBrush::update() {
         layers[i].expand(expansionRadius);
     }
     
+    // check if we can remove the last layer
+    if (layers.size() > 1 && layers[1].isFull()) {
+        layers.erase(layers.begin());
+        cout << "Layer removed. Number of layers: " << layers.size() << "\n";
+    }
+    
     // Check if the canvas is touched right now
     ofFbo * sensitiveAreaFbo = applyThresholdToTouchFbo(thresholdSensetive);
     bool isCurrentlyTouched = !checkIfEmpty(sensitiveAreaFbo);
@@ -138,16 +152,10 @@ void projectionInvertedBrush::update() {
             }
         }
         
-        layers[currentlyTouchedLayerIndex].addTouch(brushAreaFbo);
+        layers[currentlyTouchedLayerIndex + 1].addTouch(brushAreaFbo);
     }
     else if (touchStarted) { // gesture ended
         touchStarted = false;
-        
-        // check if we can remove the last layer
-        if (layers.size() > 1 && layers[0].isFull()) {
-            layers.erase(layers.begin());
-            cout << "Layer removed. Number of layers: " << layers.size() << "\n";
-        }
     }
 }
 
@@ -159,20 +167,20 @@ void projectionInvertedBrush::draw() {
     for (int i = 0; i < layers.size(); i++) {
         layers[i].draw(position[0], position[1]); // draw with transparency
     }
+    
+    //touch->getDepth().draw(position[0], position[1]);
+    workFbo.draw(position[0], position[1]);
 }
 
 void projectionInvertedBrush::resetLayers() {
     layers.clear(); // need to clean memory?
     addImageToLayers(0);
+    layers[0].setFull();
     
     cout << "Reset layers. Number of layers: " << layers.size() << "\n";
 }
 
 void projectionInvertedBrush::addImageToLayers(int i) {
-    ofImage resizedImage;
-    resizedImage.clone(originalImages[i]);
-    resizedImage.resize(workFbo.getWidth(), workFbo.getHeight()); // maybe resize earlier?
-    layerWithMask newLayer(resizedImage, i, onesBlock, shaderExpansion);
-    newLayer.setFull();
+    layerWithMask newLayer(scaledImages[i], i, onesBlock, shaderExpansion);
     layers.push_back(newLayer);
 }
