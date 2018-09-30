@@ -118,10 +118,12 @@ void projectionInvertedBrush::update() {
     // expand touched areas on all layers
     float currentTime = ofGetElapsedTimef();
     float expansionRadius = expansionSpeed * (currentTime - timer);
-    timer = currentTime;
-    
-    for (int i = 0; i < layers.size(); i++) {
-        layers[i].expand(expansionRadius);
+    if (expansionRadius >= 1) {
+        timer = currentTime;
+        
+        for (int i = 0; i < layers.size(); i++) {
+            layers[i].expand(expansionRadius);
+        }
     }
     
     // check if we can remove the last layer
