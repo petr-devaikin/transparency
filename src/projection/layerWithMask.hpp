@@ -18,16 +18,18 @@ private:
     ofFbo mask;
     ofFbo tempFbo;
     bool _isFull;
+    
     ofShader shaderExp;
+    ofShader shaderExpAdder;
     
     ofFbo touchBrush;
 public:
-    layerWithMask(ofImage img, int imageIndex, unsigned char * oneBlock, ofShader shdr, ofFbo touchBr);
+    layerWithMask(ofImage img, int imageIndex, unsigned char * oneBlock, ofShader shdrE, ofShader shdrA, ofFbo touchBr);
     bool isFull(); // check if the mask covers everything
     void setFull(); // set all mask to 1
     
-    bool checkIfTouched(ofFbo * checkArea); // check if intersection of checkArea and mask is more than 50% of checkArea
-    void addTouch(ofFbo * touch);
+    bool checkIfTouched(ofPoint point); // check if intersection of checkArea and mask is more than 50% of checkArea
+    void addTouch(ofPoint point);
     int getImageIndex(); // index of the image from sourceImage array
     
     void expand(float radius);

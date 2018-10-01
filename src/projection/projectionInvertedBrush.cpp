@@ -8,22 +8,18 @@
 #include "projectionInvertedBrush.hpp"
 
 
-projectionInvertedBrush::projectionInvertedBrush(touchArea * t, float t1, float t2, float expSpeed) : baseProjection(t) {
+projectionInvertedBrush::projectionInvertedBrush(touchArea * t, float t1, float expSpeed) : baseProjection(t) {
     timer = ofGetElapsedTimef();
     
-    thresholdSensetive = t1;
-    thresholdBrush = t2;
+    thresholdSensitive = t1;
     expansionSpeed = expSpeed;
-    
-    touchStarted = false;
-    currentlyTouchedLayerIndex = 0;
     
     // zero block
     onesAndZerosAllocated = false;
     
     // load shaders
-    shaderThreshold.load("shadersGL3/threshold");
     shaderExpansion.load("shadersGL3/expansion");
+    shaderExpansionAdder.load("shadersGL3/expansionMaskAdder");
     
     /*
     ofImage img;
@@ -44,7 +40,6 @@ projectionInvertedBrush::~projectionInvertedBrush() {
     // clean the memory
     if (onesAndZerosAllocated) {
         delete[] onesBlock;
-        delete[] zerosBlock;
     }
 }
 
@@ -68,19 +63,10 @@ bool projectionInvertedBrush::setSize(int width, int height) {
         // allocate one bytes for check function
         if (onesAndZerosAllocated) {
             delete[] onesBlock;
-            delete[] zerosBlock;
         }
         onesAndZerosAllocated = true;
-        onesBlock = new unsigned char[4 * width * height]; // rgba * width * height
-        zerosBlock = new unsigned char[4 * width * height]; // rgba * width * height
-        memset(onesBlock, 255, 4 * width * height);
-        memset(zerosBlock, 0, 4 * width * height);
-        
-        // change buffer size
-        workFbo.allocate(width, height, GL_RGBA);
-        workFbo.begin();
-        ofClear(0);
-        workFbo.end();
+        onesBlock = new unsigned char[width * height]; // only b-channel
+        memset(onesBlock, 255, width * height);
         
         // prepare touch brush
         touchBrushResized.allocate(2 * width + 1, 2 * height + 1, GL_RGBA);
@@ -89,6 +75,9 @@ bool projectionInvertedBrush::setSize(int width, int height) {
         ofSetColor(255);
         touchBrush.draw(width - round(touchBrush.getWidth() / 2) + 1, height - round(touchBrush.getHeight() / 2) + 1);
         touchBrushResized.end();
+        
+        // prepare touch area for blob search
+        touchAreaImage.allocate(width, height);
         
         // reset layers
         resetLayers();
@@ -101,35 +90,23 @@ bool projectionInvertedBrush::setSize(int width, int height) {
 
 // Helpers
 
-ofFbo * projectionInvertedBrush::applyThresholdToTouchFbo(float threshold) {
-    // why?
-    workFbo.begin();
-    ofSetColor(255);
-    ofClear(0, 0, 0, 0);
-    shaderThreshold.begin();
-    shaderThreshold.setUniform1f("threshold", threshold);
-    (touch->getDepth()).draw(0, 0);
-    shaderThreshold.end();
-    workFbo.end();
-    return &workFbo;
+void projectionInvertedBrush::calculateTouchBlobs() {
+    ofPixels touchPixels;
+    (touch->getDepth()).readToPixels(touchPixels);
+    touchAreaImage.setFromPixels(touchPixels.getChannel(0));
+    touchAreaImage.threshold(255 * thresholdSensitive);
+    
+    contourFinder.findContours(touchAreaImage, 4, size[0] * size[1], 4, false);
 }
 
-int projectionInvertedBrush::detectLayerIndex(ofFbo * checkArea) {
+int projectionInvertedBrush::detectLayerIndex(ofPoint point) {
     // check all layers starting from the top one
     int touchedLayer = 0;
     for (touchedLayer = layers.size() - 1; touchedLayer > 0; touchedLayer--) {
-        if (layers[touchedLayer].checkIfTouched(checkArea)) break;
+        if (layers[touchedLayer].checkIfTouched(point)) break;
     }
     
     return touchedLayer;
-}
-
-bool projectionInvertedBrush::checkIfEmpty(ofFbo * fbo) {
-    ofPixels pixels;
-    fbo->readToPixels(pixels);
-    
-    // compare with zeros-array
-    return memcmp(pixels.getData(), zerosBlock, 4 * fbo->getWidth() * fbo->getHeight()) == 0;
 }
 
 // Update
@@ -141,10 +118,11 @@ void projectionInvertedBrush::update() {
     float currentTime = ofGetElapsedTimef();
     float expansionRadius = expansionSpeed * (currentTime - timer);
     if (expansionRadius >= 1) {
-        timer = currentTime;
+        float floorRadius = floor(expansionRadius);
+        timer = currentTime - (expansionRadius - floorRadius) / expansionSpeed;
         
         for (int i = 0; i < layers.size(); i++) {
-            layers[i].expand(expansionRadius);
+            layers[i].expand(floorRadius);
         }
     }
     
@@ -154,33 +132,47 @@ void projectionInvertedBrush::update() {
         cout << "Layer removed. Number of layers: " << layers.size() << "\n";
     }
     
-    // Check if the canvas is touched right now
-    ofFbo * sensitiveAreaFbo = applyThresholdToTouchFbo(thresholdSensetive);
-    bool isCurrentlyTouched = !checkIfEmpty(sensitiveAreaFbo);
+    // Check if the canvas is touched right now and calculate blobs
+    calculateTouchBlobs();
     
-    if (isCurrentlyTouched) { // canvas is touched
-        // detect real brush area
-        ofFbo * brushAreaFbo = applyThresholdToTouchFbo(thresholdBrush);
-        
-        // check if it's the first touch
-        if (!touchStarted) {
-            touchStarted = true;
-            currentlyTouchedLayerIndex = detectLayerIndex(brushAreaFbo);
-            cout << "Layer touched: " << currentlyTouchedLayerIndex << "\n";
-            
-            // if touched the top layer, need to add new empty layer
-            if (currentlyTouchedLayerIndex == layers.size() - 1) {
-                int newLayerImageIndex = (layers[currentlyTouchedLayerIndex].getImageIndex() + 1) % originalImages.size();
-                addImageToLayers(newLayerImageIndex);
-                cout << "New layer " << newLayerImageIndex << " added. Number of layers: " << layers.size() << "\n";
+    // compare new blobs with previous touches
+    vector<layerTouch> newTouches;
+    for (int i = 0; i < contourFinder.nBlobs; i++) {
+        ofxCvBlob blob = contourFinder.blobs[i];
+        bool previousTouchDetected = false;
+        for (int j = 0; j < currentTouches.size(); j++) {
+            if (blob.boundingRect.intersects(currentTouches[j].area)) {
+                // same gesture. Copy layer from the previous touch
+                layerTouch newTouch(currentTouches[j].layer, blob.boundingRect);
+                newTouches.push_back(newTouch);
+                
+                // touch the layer
+                newTouch.layer->addTouch(blob.centroid);
+                
+                previousTouchDetected = true;
+                break;
             }
         }
         
-        layers[currentlyTouchedLayerIndex + 1].addTouch(brushAreaFbo);
+        if (!previousTouchDetected) {
+            // new touch, detect layer
+            int touchedLayerIndex = detectLayerIndex(blob.centroid);
+            cout << "Layer touched: " << touchedLayerIndex << "\n";
+            
+            if (touchedLayerIndex == layers.size() - 1) {
+                int newLayerImageIndex = (layers[touchedLayerIndex].getImageIndex() + 1) % originalImages.size();
+                addImageToLayers(newLayerImageIndex);
+                cout << "New layer " << newLayerImageIndex << " added. Number of layers: " << layers.size() << "\n";
+            }
+            
+            layerTouch newTouch(&(layers[touchedLayerIndex + 1]), blob.boundingRect);
+            newTouches.push_back(newTouch);
+            
+            // touch the layer
+            newTouch.layer->addTouch(blob.centroid);
+        }
     }
-    else if (touchStarted) { // gesture ended
-        touchStarted = false;
-    }
+    currentTouches = newTouches;
 }
 
 void projectionInvertedBrush::draw() {
@@ -192,8 +184,14 @@ void projectionInvertedBrush::draw() {
         layers[i].draw(position[0], position[1]); // draw with transparency
     }
     
-    //touch->getDepth().draw(position[0], position[1]);
-    workFbo.draw(position[0], position[1]);
+    /*
+     // draw blobs
+    for (int i = 0; i < contourFinder.nBlobs; i++) {
+        ofRectangle rect = contourFinder.blobs.at(i).boundingRect;
+        ofSetColor(255, 0, 0);
+        ofDrawRectangle(position[0] + rect.getLeft(), position[1] + rect.getTop(), rect.width, rect.height);
+    }
+     */
 }
 
 void projectionInvertedBrush::resetLayers() {
@@ -205,6 +203,6 @@ void projectionInvertedBrush::resetLayers() {
 }
 
 void projectionInvertedBrush::addImageToLayers(int i) {
-    layerWithMask newLayer(scaledImages[i], i, onesBlock, shaderExpansion, touchBrushResized);
+    layerWithMask newLayer(scaledImages[i], i, onesBlock, shaderExpansion, shaderExpansionAdder, touchBrushResized);
     layers.push_back(newLayer);
 }

@@ -11,8 +11,8 @@ out vec4 outputColor;
 // bytes
 // r - current luminosity / 256
 // g - current luminocity % 256
-// b - processed pixel if 1
-// a - mask pixels
+// b - activated pixel if 1
+// a - not used. always 1
 
 void main()
 {

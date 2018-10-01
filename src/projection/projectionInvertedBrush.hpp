@@ -9,8 +9,10 @@
 #define projectionInvertedBrush_hpp
 
 #include "ofMain.h"
+#include "ofxOpenCv.h"
 #include "baseProjection.hpp"
 #include "layerWithMask.hpp"
+#include "layerTouch.hpp"
 
 class projectionInvertedBrush : public baseProjection {
 private:
@@ -23,30 +25,28 @@ private:
     void resetLayers(); // clean layers array and add the first image
     void addImageToLayers(int i); // add new layer based on the i-th image
     
-    bool touchStarted;
-    int currentlyTouchedLayerIndex;
+    vector<layerTouch> currentTouches;
     
-    int detectLayerIndex(ofFbo * checkArea); // finds the next level which was touched
+    int detectLayerIndex(ofPoint point); // finds the next level which was touched
     
-    float thresholdSensetive; // to detect touch
-    float thresholdBrush; // for real touch area (should be lower)
+    float thresholdSensitive; // to detect touch
     float expansionSpeed; // pixels per second
     
-    ofFbo workFbo; // used inside applyThreshold
-    ofFbo * applyThresholdToTouchFbo(float threshold); // result workFbo!
+    ofxCvContourFinder contourFinder; // to find blobs
+    ofxCvGrayscaleImage touchAreaImage; //
+    void calculateTouchBlobs(); // calculate blobs from touch area
     
-    ofShader shaderThreshold;
     ofShader shaderExpansion;
+    ofShader shaderExpansionAdder;
     
-    bool checkIfEmpty(ofFbo * fbo); // check if all pixels are 0;
     bool onesAndZerosAllocated;
-    unsigned char * zerosBlock;
     unsigned char * onesBlock; // to check if all pixels are 1 inside layerWithMask
     
     ofImage touchBrush; // to initiate trunsition
     ofFbo touchBrushResized; // resized and preprocessed
+    
 public:
-    projectionInvertedBrush(touchArea * t, float t1 = 0.5, float t2 = 0.3, float expSpeed = 50);
+    projectionInvertedBrush(touchArea * t, float t1 = 0.5, float expSpeed = 50);
     ~projectionInvertedBrush();
     
     void addImage(const string& imgPath);

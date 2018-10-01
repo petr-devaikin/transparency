@@ -23,6 +23,7 @@
 		63B57AC5BF4EF088491E0317 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 50DF87D612C5AAE17AAFA6C0 /* ofxXmlSettings.cpp */; };
 		6AABAB39E82AF5CFEA23A205 /* ContourFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5FBB4A8427353AED09174BE5 /* ContourFinder.cpp */; };
 		6F2D352F21610FF400EF1799 /* layerWithMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F2D352D21610FF400EF1799 /* layerWithMask.cpp */; };
+		6F2D35322162D07100EF1799 /* layerTouch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F2D35302162D07100EF1799 /* layerTouch.cpp */; };
 		6F767F8B20CD5F9A00B851D8 /* librealsense2.2.12.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F767F8A20CD5F9A00B851D8 /* librealsense2.2.12.0.dylib */; };
 		6F8F17922106476B003F5E7D /* projectionInvertedBrush.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F17902106476B003F5E7D /* projectionInvertedBrush.cpp */; };
 		6F8F179A210A38E7003F5E7D /* baseProjection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F1799210A38E7003F5E7D /* baseProjection.cpp */; };
@@ -167,6 +168,8 @@
 		6F2D352C215FCE2500EF1799 /* expansion.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = expansion.frag; sourceTree = "<group>"; };
 		6F2D352D21610FF400EF1799 /* layerWithMask.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = layerWithMask.cpp; sourceTree = "<group>"; };
 		6F2D352E21610FF400EF1799 /* layerWithMask.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = layerWithMask.hpp; sourceTree = "<group>"; };
+		6F2D35302162D07100EF1799 /* layerTouch.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = layerTouch.cpp; sourceTree = "<group>"; };
+		6F2D35312162D07100EF1799 /* layerTouch.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = layerTouch.hpp; sourceTree = "<group>"; };
 		6F767F8A20CD5F9A00B851D8 /* librealsense2.2.12.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = librealsense2.2.12.0.dylib; path = ../../../../../../../usr/local/lib/librealsense2.2.12.0.dylib; sourceTree = "<group>"; };
 		6F8F1779210285C8003F5E7D /* rainbow_shader.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = rainbow_shader.frag; sourceTree = "<group>"; };
 		6F8F177B210285C8003F5E7D /* shader.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shader.vert; sourceTree = "<group>"; };
@@ -178,8 +181,8 @@
 		6F8F178D2104E24D003F5E7D /* shaderBlurY.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shaderBlurY.vert; sourceTree = "<group>"; };
 		6F8F17902106476B003F5E7D /* projectionInvertedBrush.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = projectionInvertedBrush.cpp; sourceTree = "<group>"; };
 		6F8F17912106476B003F5E7D /* projectionInvertedBrush.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = projectionInvertedBrush.hpp; sourceTree = "<group>"; };
-		6F8F179621065832003F5E7D /* threshold.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = threshold.frag; sourceTree = "<group>"; };
-		6F8F179721065833003F5E7D /* threshold.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = threshold.vert; sourceTree = "<group>"; };
+		6F8F179621065832003F5E7D /* expansionMaskAdder.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = expansionMaskAdder.frag; sourceTree = "<group>"; };
+		6F8F179721065833003F5E7D /* expansionMaskAdder.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = expansionMaskAdder.vert; sourceTree = "<group>"; };
 		6F8F1798210A38E7003F5E7D /* baseProjection.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = baseProjection.hpp; sourceTree = "<group>"; };
 		6F8F1799210A38E7003F5E7D /* baseProjection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = baseProjection.cpp; sourceTree = "<group>"; };
 		70046E043EDDB466ED625C3B /* Tracker.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Tracker.h; path = ../../../addons/ofxCv/libs/ofxCv/include/ofxCv/Tracker.h; sourceTree = SOURCE_ROOT; };
@@ -637,8 +640,8 @@
 			children = (
 				6F2D352C215FCE2500EF1799 /* expansion.frag */,
 				6F2D352B215FCE2400EF1799 /* expansion.vert */,
-				6F8F179621065832003F5E7D /* threshold.frag */,
-				6F8F179721065833003F5E7D /* threshold.vert */,
+				6F8F179621065832003F5E7D /* expansionMaskAdder.frag */,
+				6F8F179721065833003F5E7D /* expansionMaskAdder.vert */,
 				6F8F178C2104E24D003F5E7D /* shaderBlurX.frag */,
 				6F8F178A2104E24D003F5E7D /* shaderBlurX.vert */,
 				6F8F178B2104E24D003F5E7D /* shaderBlurY.frag */,
@@ -661,6 +664,8 @@
 				6F8F17912106476B003F5E7D /* projectionInvertedBrush.hpp */,
 				6F2D352D21610FF400EF1799 /* layerWithMask.cpp */,
 				6F2D352E21610FF400EF1799 /* layerWithMask.hpp */,
+				6F2D35302162D07100EF1799 /* layerTouch.cpp */,
+				6F2D35312162D07100EF1799 /* layerTouch.hpp */,
 			);
 			path = projection;
 			sourceTree = "<group>";
@@ -1124,6 +1129,7 @@
 				6F2D352F21610FF400EF1799 /* layerWithMask.cpp in Sources */,
 				920D95C6627BAAC9D2FE2A0D /* touchArea.cpp in Sources */,
 				2023EF517ED2D8B397511D4B /* Helpers.cpp in Sources */,
+				6F2D35322162D07100EF1799 /* layerTouch.cpp in Sources */,
 				DBCB84A37F9AECC254870D79 /* Wrappers.cpp in Sources */,
 				7CDAD32BE4FA46701E3552C7 /* RunningBackground.cpp in Sources */,
 				10B69DE456AED1288FC9316B /* Tracker.cpp in Sources */,

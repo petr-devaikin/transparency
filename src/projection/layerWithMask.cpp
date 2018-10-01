@@ -7,7 +7,7 @@
 
 #include "layerWithMask.hpp"
 
-layerWithMask::layerWithMask(ofImage img, int imageIndex, unsigned char * oneBlock, ofShader shdr, ofFbo touchBr) {
+layerWithMask::layerWithMask(ofImage img, int imageIndex, unsigned char * oneBlock, ofShader shdrE, ofShader shdrA, ofFbo touchBr) {
     ones = oneBlock;
     image = img;
     _isFull = false;
@@ -15,16 +15,17 @@ layerWithMask::layerWithMask(ofImage img, int imageIndex, unsigned char * oneBlo
     
     mask.allocate(img.getWidth(), img.getHeight(), GL_RGBA);
     mask.begin();
-    ofClear(0, 0, 0, 0);
+    ofClear(255, 255, 0, 255);
+    // r and g - luminosity
+    // b - if active
+    // a - not used
     mask.end();
     
     tempFbo.allocate(img.getWidth(), img.getHeight(), GL_RGBA);
-    tempFbo.begin();
-    ofClear(0, 0, 0, 0);
-    tempFbo.end();
     
     touchBrush = touchBr;
-    shaderExp = shdr;
+    shaderExp = shdrE;
+    shaderExpAdder = shdrA;
 }
 
 void layerWithMask::setFull() {
@@ -38,45 +39,34 @@ bool layerWithMask::isFull() {
     mask.readToPixels(pixels);
     
     // compare with ones-array
-    _isFull = memcmp(pixels.getData(), ones, 4 * mask.getWidth() * mask.getHeight()) == 0;
+    _isFull = memcmp(pixels.getChannel(2).getData(), ones, mask.getWidth() * mask.getHeight()) == 0;
     return _isFull;
 }
 
-bool layerWithMask::checkIfTouched(ofFbo * checkArea) {
+bool layerWithMask::checkIfTouched(ofPoint point) {
     // detects color of the mask fbo in check area
     ofPixels maskPixels;
-    ofPixels checkAreaPixels;
     
     mask.readToPixels(maskPixels);
-    checkArea->readToPixels(checkAreaPixels);
-    
-    unsigned char * checkAreaPointer = checkAreaPixels.getData();
-    unsigned char * maskPointer = maskPixels.getData();
-    
-    int zeroCount = 0;
-    int oneCount = 0;
-    
-    for (int i = 0; i < mask.getWidth() * mask.getHeight(); i++) { // go through pixels and count 0's and 1's
-        if (* (checkAreaPointer + 4 * i)) { // if check area pixel is not 0
-            if (* (maskPointer + 4 * i)) // if mask pixel is not 0
-                oneCount++;
-            else
-                zeroCount++;
-        }
-    }
-    
-    return oneCount > zeroCount;
+    return maskPixels.getColor(point[0], point[1]).b == 255;
 }
 
-void layerWithMask::addTouch(ofFbo *touch) {
-    // calculate the center of the touch
-    // add using shaders (r and g - max) ...
+void layerWithMask::addTouch(ofPoint point) {
+    tempFbo.begin();
+    ofClear(0, 0, 0, 0);
+    ofSetColor(255, 255, 255, 255);
+    
+    shaderExpAdder.begin();
+    shaderExpAdder.setUniformTexture("mask", mask.getTexture(), 1);
+    shaderExpAdder.setUniform2f("touchPoint", round(point[0] - touchBrush.getWidth() / 2), round(point[1] - touchBrush.getHeight() / 2));
+    touchBrush.draw(0, 0);
+    
+    shaderExpAdder.end();
+    tempFbo.end();
     
     mask.begin();
-    
-    ofSetColor(255);
-    touchBrush.draw((image.getWidth() - touchBrush.getWidth()) / 2, (image.getHeight() - touchBrush.getHeight()) / 2);
-    
+    ofClear(0, 0, 0, 0);
+    tempFbo.draw(0, 0);
     mask.end();
 }
 
@@ -86,8 +76,6 @@ int layerWithMask::getImageIndex() {
 
 void layerWithMask::expand(float radius) {
     if (isFull()) return; // if layer is already full, don't need this step
-    
-    cout << "debug. expand radius " << radius << "\n";
     
     tempFbo.begin();
     ofClear(0, 0, 0, 0);
