@@ -19,8 +19,10 @@ private:
     ofFbo tempFbo;
     bool _isFull;
     ofShader shaderExp;
+    
+    ofFbo touchBrush;
 public:
-    layerWithMask(ofImage img, int imageIndex, unsigned char * oneBlock, ofShader shdr);
+    layerWithMask(ofImage img, int imageIndex, unsigned char * oneBlock, ofShader shdr, ofFbo touchBr);
     bool isFull(); // check if the mask covers everything
     void setFull(); // set all mask to 1
     

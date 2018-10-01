@@ -43,9 +43,10 @@ private:
     unsigned char * zerosBlock;
     unsigned char * onesBlock; // to check if all pixels are 1 inside layerWithMask
     
-    ofShader transpShader; // to combine two images
+    ofImage touchBrush; // to initiate trunsition
+    ofFbo touchBrushResized; // resized and preprocessed
 public:
-    projectionInvertedBrush(touchArea * t, float t1 = 0.5, float t2 = 0.3, float expSpeed = 100);
+    projectionInvertedBrush(touchArea * t, float t1 = 0.5, float t2 = 0.3, float expSpeed = 50);
     ~projectionInvertedBrush();
     
     void addImage(const string& imgPath);

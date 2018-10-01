@@ -7,7 +7,7 @@
 
 #include "layerWithMask.hpp"
 
-layerWithMask::layerWithMask(ofImage img, int imageIndex, unsigned char * oneBlock, ofShader shdr) {
+layerWithMask::layerWithMask(ofImage img, int imageIndex, unsigned char * oneBlock, ofShader shdr, ofFbo touchBr) {
     ones = oneBlock;
     image = img;
     _isFull = false;
@@ -23,6 +23,7 @@ layerWithMask::layerWithMask(ofImage img, int imageIndex, unsigned char * oneBlo
     ofClear(0, 0, 0, 0);
     tempFbo.end();
     
+    touchBrush = touchBr;
     shaderExp = shdr;
 }
 
@@ -68,10 +69,14 @@ bool layerWithMask::checkIfTouched(ofFbo * checkArea) {
 }
 
 void layerWithMask::addTouch(ofFbo *touch) {
+    // calculate the center of the touch
+    // add using shaders (r and g - max) ...
+    
     mask.begin();
-    ofEnableBlendMode(OF_BLENDMODE_ADD);
-    touch->draw(0, 0);
-    ofDisableBlendMode();
+    
+    ofSetColor(255);
+    touchBrush.draw((image.getWidth() - touchBrush.getWidth()) / 2, (image.getHeight() - touchBrush.getHeight()) / 2);
+    
     mask.end();
 }
 
@@ -82,21 +87,27 @@ int layerWithMask::getImageIndex() {
 void layerWithMask::expand(float radius) {
     if (isFull()) return; // if layer is already full, don't need this step
     
+    cout << "debug. expand radius " << radius << "\n";
+    
     tempFbo.begin();
+    ofClear(0, 0, 0, 0);
     shaderExp.begin();
     shaderExp.setUniform1f("expansionRadius", radius);
+    ofSetColor(255);
     mask.draw(0, 0);
     shaderExp.end();
     tempFbo.end();
     
     mask.begin();
+    ofClear(0, 0, 0, 0);
+    ofSetColor(255);
     tempFbo.draw(0, 0);
     mask.end();
 }
 
 void layerWithMask::draw(float x, float y) {
-    //if (!isFull())
-    //    image.getTexture().setAlphaMask(mask.getTexture());
+    if (!isFull())
+        image.getTexture().setAlphaMask(mask.getTexture());
     image.draw(x, y);
     
     mask.draw(x + 300, y);

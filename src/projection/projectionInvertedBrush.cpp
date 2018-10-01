@@ -24,6 +24,20 @@ projectionInvertedBrush::projectionInvertedBrush(touchArea * t, float t1, float 
     // load shaders
     shaderThreshold.load("shadersGL3/threshold");
     shaderExpansion.load("shadersGL3/expansion");
+    
+    /*
+    ofImage img;
+    img.allocate(4001, 4001, OF_IMAGE_COLOR_ALPHA);
+    for (int i = 0; i < 4001; i++)
+        for (int j = 0; j < 4001; j++) {
+            int dist = int(round(sqrt((i - 2001) * (i - 2001) + (j - 2001) * (j - 2001))));
+            img.setColor(i, j, ofColor(dist / 256, dist % 256, 0));
+        }
+    img.update();
+    ofSaveImage(img, "exp_brush_4001.png", OF_IMAGE_QUALITY_BEST);
+    */
+    
+    touchBrush.load("exp_brush_4001.png");
 }
 
 projectionInvertedBrush::~projectionInvertedBrush() {
@@ -67,6 +81,14 @@ bool projectionInvertedBrush::setSize(int width, int height) {
         workFbo.begin();
         ofClear(0);
         workFbo.end();
+        
+        // prepare touch brush
+        touchBrushResized.allocate(2 * width + 1, 2 * height + 1, GL_RGBA);
+        touchBrushResized.begin();
+        ofClear(0);
+        ofSetColor(255);
+        touchBrush.draw(width - round(touchBrush.getWidth() / 2) + 1, height - round(touchBrush.getHeight() / 2) + 1);
+        touchBrushResized.end();
         
         // reset layers
         resetLayers();
@@ -183,6 +205,6 @@ void projectionInvertedBrush::resetLayers() {
 }
 
 void projectionInvertedBrush::addImageToLayers(int i) {
-    layerWithMask newLayer(scaledImages[i], i, onesBlock, shaderExpansion);
+    layerWithMask newLayer(scaledImages[i], i, onesBlock, shaderExpansion, touchBrushResized);
     layers.push_back(newLayer);
 }
