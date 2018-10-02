@@ -31,6 +31,7 @@ private:
     
     float thresholdSensitive; // to detect touch
     float expansionSpeed; // pixels per second
+    float bluredRadius; // blur size
     
     ofxCvContourFinder contourFinder; // to find blobs
     ofxCvGrayscaleImage touchAreaImage; //
@@ -38,6 +39,7 @@ private:
     
     ofShader shaderExpansion;
     ofShader shaderExpansionAdder;
+    ofShader shaderTransparency;
     
     bool onesAndZerosAllocated;
     unsigned char * onesBlock; // to check if all pixels are 1 inside layerWithMask
@@ -46,7 +48,7 @@ private:
     ofFbo touchBrushResized; // resized and preprocessed
     
 public:
-    projectionInvertedBrush(touchArea * t, float t1 = 0.5, float expSpeed = 50);
+    projectionInvertedBrush(touchArea * t, float t1 = 0.5, float expSpeed = 50, float bluredR = 150);
     ~projectionInvertedBrush();
     
     void addImage(const string& imgPath);

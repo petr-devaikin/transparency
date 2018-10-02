@@ -8,11 +8,12 @@
 #include "projectionInvertedBrush.hpp"
 
 
-projectionInvertedBrush::projectionInvertedBrush(touchArea * t, float t1, float expSpeed) : baseProjection(t) {
+projectionInvertedBrush::projectionInvertedBrush(touchArea * t, float t1, float expSpeed, float bluredR) : baseProjection(t) {
     timer = ofGetElapsedTimef();
     
     thresholdSensitive = t1;
     expansionSpeed = expSpeed;
+    bluredRadius = bluredR;
     
     // zero block
     onesAndZerosAllocated = false;
@@ -20,6 +21,7 @@ projectionInvertedBrush::projectionInvertedBrush(touchArea * t, float t1, float 
     // load shaders
     shaderExpansion.load("shadersGL3/expansion");
     shaderExpansionAdder.load("shadersGL3/expansionMaskAdder");
+    shaderTransparency.load("shadersGL3/transparency");
     
     /*
     ofImage img;
@@ -147,7 +149,7 @@ void projectionInvertedBrush::update() {
                 newTouches.push_back(newTouch);
                 
                 // touch the layer
-                newTouch.layer->addTouch(blob.centroid);
+                newTouch.layer->addTouch(blob.centroid, bluredRadius);
                 
                 previousTouchDetected = true;
                 break;
@@ -169,7 +171,7 @@ void projectionInvertedBrush::update() {
             newTouches.push_back(newTouch);
             
             // touch the layer
-            newTouch.layer->addTouch(blob.centroid);
+            newTouch.layer->addTouch(blob.centroid, bluredRadius);
         }
     }
     currentTouches = newTouches;
@@ -179,10 +181,15 @@ void projectionInvertedBrush::draw() {
     if (!onesAndZerosAllocated) return; // size is not set. not ready
     
     ofSetColor(255);
+    shaderTransparency.begin();
+    shaderTransparency.setUniform1i("radius", bluredRadius);
     
     for (int i = 0; i < layers.size(); i++) {
-        layers[i].draw(position[0], position[1]); // draw with transparency
+        shaderTransparency.setUniformTexture("mask", layers[i].getMask().getTexture(), 1);
+        layers[i].getImage().draw(position[0], position[1]);
     }
+    
+    shaderTransparency.end();
     
     /*
      // draw blobs

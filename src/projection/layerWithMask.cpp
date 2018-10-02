@@ -29,7 +29,10 @@ layerWithMask::layerWithMask(ofImage img, int imageIndex, unsigned char * oneBlo
 }
 
 void layerWithMask::setFull() {
-    _isFull = true; // not necessary to really set mask to 1, because this value is checked first in isFull();
+    _isFull = true;
+    mask.begin();
+    ofClear(255, 255, 255, 255);
+    mask.end();
 }
 
 bool layerWithMask::isFull() {
@@ -51,13 +54,14 @@ bool layerWithMask::checkIfTouched(ofPoint point) {
     return maskPixels.getColor(point[0], point[1]).b == 255;
 }
 
-void layerWithMask::addTouch(ofPoint point) {
+void layerWithMask::addTouch(ofPoint point, float blurRadius) {
     tempFbo.begin();
     ofClear(0, 0, 0, 0);
     ofSetColor(255, 255, 255, 255);
     
     shaderExpAdder.begin();
     shaderExpAdder.setUniformTexture("mask", mask.getTexture(), 1);
+    shaderExpAdder.setUniform1f("blurRadius", blurRadius); // to roll back, so it starts from one point
     shaderExpAdder.setUniform2f("touchPoint", round(point[0] - touchBrush.getWidth() / 2), round(point[1] - touchBrush.getHeight() / 2));
     touchBrush.draw(0, 0);
     
@@ -93,10 +97,10 @@ void layerWithMask::expand(float radius) {
     mask.end();
 }
 
-void layerWithMask::draw(float x, float y) {
-    if (!isFull())
-        image.getTexture().setAlphaMask(mask.getTexture());
-    image.draw(x, y);
-    
-    mask.draw(x + 300, y);
+ofImage layerWithMask::getImage() {
+    return image;
+}
+
+ofFbo layerWithMask::getMask() {
+    return mask;
 }

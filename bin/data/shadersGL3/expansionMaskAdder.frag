@@ -6,6 +6,7 @@
 uniform sampler2DRect tex0;
 uniform sampler2DRect mask;
 uniform vec2 touchPoint;
+uniform float blurRadius;
 
 // this comes from the vertex shader
 in vec2 texCoordVarying;
@@ -21,7 +22,7 @@ void main()
     if (maskColor.b == 1) // already active. Cannot really happen
         outputColor = maskColor;
     else {
-        float touchLuminocity = touchColor.r * 256 + touchColor.g;
+        float touchLuminocity = touchColor.r * 256 + touchColor.g + blurRadius / 255;
         float maskLuminocity = maskColor.r * 256 + maskColor.g;
         
         int resultLuminocity = int(min(maskLuminocity, touchLuminocity) * 255);

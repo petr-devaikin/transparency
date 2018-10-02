@@ -29,11 +29,13 @@ public:
     void setFull(); // set all mask to 1
     
     bool checkIfTouched(ofPoint point); // check if intersection of checkArea and mask is more than 50% of checkArea
-    void addTouch(ofPoint point);
+    void addTouch(ofPoint point, float blurRadius);
     int getImageIndex(); // index of the image from sourceImage array
     
     void expand(float radius);
-    void draw(float x, float y);
+    
+    ofImage getImage();
+    ofFbo getMask();
 };
 
 #endif /* layerWithMask_hpp */

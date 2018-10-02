@@ -172,13 +172,9 @@
 		6F2D35312162D07100EF1799 /* layerTouch.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = layerTouch.hpp; sourceTree = "<group>"; };
 		6F767F8A20CD5F9A00B851D8 /* librealsense2.2.12.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = librealsense2.2.12.0.dylib; path = ../../../../../../../usr/local/lib/librealsense2.2.12.0.dylib; sourceTree = "<group>"; };
 		6F8F1779210285C8003F5E7D /* rainbow_shader.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = rainbow_shader.frag; sourceTree = "<group>"; };
-		6F8F177B210285C8003F5E7D /* shader.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shader.vert; sourceTree = "<group>"; };
-		6F8F177C210285C8003F5E7D /* shader.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shader.frag; sourceTree = "<group>"; };
+		6F8F177B210285C8003F5E7D /* transparency.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = transparency.vert; sourceTree = "<group>"; };
+		6F8F177C210285C8003F5E7D /* transparency.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = transparency.frag; sourceTree = "<group>"; };
 		6F8F177E210285C8003F5E7D /* rainbow_shader.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = rainbow_shader.vert; sourceTree = "<group>"; };
-		6F8F178A2104E24D003F5E7D /* shaderBlurX.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shaderBlurX.vert; sourceTree = "<group>"; };
-		6F8F178B2104E24D003F5E7D /* shaderBlurY.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shaderBlurY.frag; sourceTree = "<group>"; };
-		6F8F178C2104E24D003F5E7D /* shaderBlurX.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shaderBlurX.frag; sourceTree = "<group>"; };
-		6F8F178D2104E24D003F5E7D /* shaderBlurY.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shaderBlurY.vert; sourceTree = "<group>"; };
 		6F8F17902106476B003F5E7D /* projectionInvertedBrush.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = projectionInvertedBrush.cpp; sourceTree = "<group>"; };
 		6F8F17912106476B003F5E7D /* projectionInvertedBrush.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = projectionInvertedBrush.hpp; sourceTree = "<group>"; };
 		6F8F179621065832003F5E7D /* expansionMaskAdder.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = expansionMaskAdder.frag; sourceTree = "<group>"; };
@@ -642,14 +638,10 @@
 				6F2D352B215FCE2400EF1799 /* expansion.vert */,
 				6F8F179621065832003F5E7D /* expansionMaskAdder.frag */,
 				6F8F179721065833003F5E7D /* expansionMaskAdder.vert */,
-				6F8F178C2104E24D003F5E7D /* shaderBlurX.frag */,
-				6F8F178A2104E24D003F5E7D /* shaderBlurX.vert */,
-				6F8F178B2104E24D003F5E7D /* shaderBlurY.frag */,
-				6F8F178D2104E24D003F5E7D /* shaderBlurY.vert */,
 				6F8F177E210285C8003F5E7D /* rainbow_shader.vert */,
 				6F8F1779210285C8003F5E7D /* rainbow_shader.frag */,
-				6F8F177B210285C8003F5E7D /* shader.vert */,
-				6F8F177C210285C8003F5E7D /* shader.frag */,
+				6F8F177B210285C8003F5E7D /* transparency.vert */,
+				6F8F177C210285C8003F5E7D /* transparency.frag */,
 			);
 			name = shadersGL3;
 			path = bin/data/shadersGL3;
