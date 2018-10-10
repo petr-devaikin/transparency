@@ -49,7 +49,7 @@ void main()
             
             vec3 hsv = rgb2hsv(vec3(color.r, color.g, color.b));
             //hsv.b /= 1 + 2 * waveEffect;
-            hsv.b -= waveEffect / 2;
+            hsv.b -= waveEffect;
             vec3 rgb = hsv2rgb(hsv);
             
             outputColor = vec4(rgb.r, rgb.g, rgb.b, 1 - v);

@@ -48,7 +48,7 @@ private:
     ofFbo touchBrushResized; // resized and preprocessed
     
 public:
-    projectionInvertedBrush(touchArea * t, float t1 = 0.5, float expSpeed = 50, float bluredR = 150);
+    projectionInvertedBrush(touchArea * t, float t1 = 0.5, float expSpeed = 50, float bluredR = 50);
     ~projectionInvertedBrush();
     
     void addImage(const string& imgPath);
