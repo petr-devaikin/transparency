@@ -24,6 +24,7 @@
 		6AABAB39E82AF5CFEA23A205 /* ContourFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5FBB4A8427353AED09174BE5 /* ContourFinder.cpp */; };
 		6F2D352F21610FF400EF1799 /* layerWithMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F2D352D21610FF400EF1799 /* layerWithMask.cpp */; };
 		6F2D35322162D07100EF1799 /* layerTouch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F2D35302162D07100EF1799 /* layerTouch.cpp */; };
+		6F2D3539216E6DF500EF1799 /* projectionFog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F2D3537216E6DF500EF1799 /* projectionFog.cpp */; };
 		6F767F8B20CD5F9A00B851D8 /* librealsense2.2.12.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F767F8A20CD5F9A00B851D8 /* librealsense2.2.12.0.dylib */; };
 		6F8F17922106476B003F5E7D /* projectionInvertedBrush.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F17902106476B003F5E7D /* projectionInvertedBrush.cpp */; };
 		6F8F179A210A38E7003F5E7D /* baseProjection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F1799210A38E7003F5E7D /* baseProjection.cpp */; };
@@ -170,6 +171,8 @@
 		6F2D352E21610FF400EF1799 /* layerWithMask.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = layerWithMask.hpp; sourceTree = "<group>"; };
 		6F2D35302162D07100EF1799 /* layerTouch.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = layerTouch.cpp; sourceTree = "<group>"; };
 		6F2D35312162D07100EF1799 /* layerTouch.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = layerTouch.hpp; sourceTree = "<group>"; };
+		6F2D3537216E6DF500EF1799 /* projectionFog.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = projectionFog.cpp; sourceTree = "<group>"; };
+		6F2D3538216E6DF500EF1799 /* projectionFog.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = projectionFog.hpp; sourceTree = "<group>"; };
 		6F767F8A20CD5F9A00B851D8 /* librealsense2.2.12.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = librealsense2.2.12.0.dylib; path = ../../../../../../../usr/local/lib/librealsense2.2.12.0.dylib; sourceTree = "<group>"; };
 		6F8F1779210285C8003F5E7D /* rainbow_shader.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = rainbow_shader.frag; sourceTree = "<group>"; };
 		6F8F177B210285C8003F5E7D /* transparency.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = transparency.vert; sourceTree = "<group>"; };
@@ -658,6 +661,8 @@
 				6F2D352E21610FF400EF1799 /* layerWithMask.hpp */,
 				6F2D35302162D07100EF1799 /* layerTouch.cpp */,
 				6F2D35312162D07100EF1799 /* layerTouch.hpp */,
+				6F2D3537216E6DF500EF1799 /* projectionFog.cpp */,
+				6F2D3538216E6DF500EF1799 /* projectionFog.hpp */,
 			);
 			path = projection;
 			sourceTree = "<group>";
@@ -1150,6 +1155,7 @@
 				63020F16C7E8DED980111241 /* ofxCvImage.cpp in Sources */,
 				169D3C72FDE6C5590A1616F5 /* ofxCvFloatImage.cpp in Sources */,
 				FB09C6B2A1DA0EA217240CB8 /* ofxCvGrayscaleImage.cpp in Sources */,
+				6F2D3539216E6DF500EF1799 /* projectionFog.cpp in Sources */,
 				63B57AC5BF4EF088491E0317 /* ofxXmlSettings.cpp in Sources */,
 				5A4349E9754D6FA14C0F2A3A /* tinyxmlparser.cpp in Sources */,
 				9D44DC88EF9E7991B4A09951 /* tinyxmlerror.cpp in Sources */,
