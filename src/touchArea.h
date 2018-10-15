@@ -74,7 +74,7 @@ public:
     void resetZeroPixels();
     void setResultScreenSize(ofVec2f screenSize);
     
-    void setMaxDepth(float maxDepth); // in mm
+    //void setMaxDepth(float maxDepth); // in mm
     
     void update();
     

@@ -115,7 +115,7 @@ int projectionInvertedBrush::detectLayerIndex(ofPoint point) {
 
 void projectionInvertedBrush::update() {
     if (!onesAndZerosAllocated) return; // size is not set. not ready
-    
+    //return;
     // expand touched areas on all layers
     float currentTime = ofGetElapsedTimef();
     float expansionRadius = expansionSpeed * (currentTime - timer);
@@ -159,6 +159,7 @@ void projectionInvertedBrush::update() {
         if (!previousTouchDetected) {
             // new touch, detect layer
             int touchedLayerIndex = detectLayerIndex(blob.centroid);
+            touchedLayerIndex = 0; // only one layer a time
             cout << "Layer touched: " << touchedLayerIndex << "\n";
             
             if (touchedLayerIndex == layers.size() - 1) {

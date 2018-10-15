@@ -4,12 +4,27 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     // init touch
-    touch = new touchArea(0.1); // 10 cm
+    touch = new touchArea(.3); // 30 cm
     proj = new projectionInvertedBrush(touch);
-    proj->addImage("img0.jpg");
-    proj->addImage("img1.jpg");
-    proj->addImage("img2.jpg");
-    proj->addImage("img3.jpg");
+    proj->addImage("surrender_jei_2018/surrender_001.png");
+    proj->addImage("surrender_jei_2018/surrender_002.png");
+    proj->addImage("surrender_jei_2018/surrender_003.png");
+    proj->addImage("surrender_jei_2018/surrender_004.png");
+    proj->addImage("surrender_jei_2018/surrender_005.png");
+    proj->addImage("surrender_jei_2018/surrender_006.png");
+    proj->addImage("surrender_jei_2018/surrender_007.png");
+    proj->addImage("surrender_jei_2018/surrender_008.png");
+    proj->addImage("surrender_jei_2018/surrender_009.png");
+    proj->addImage("surrender_jei_2018/surrender_010.png");
+    proj->addImage("surrender_jei_2018/surrender_011.png");
+    proj->addImage("surrender_jei_2018/surrender_012.png");
+    proj->addImage("surrender_jei_2018/surrender_013.png");
+    proj->addImage("surrender_jei_2018/surrender_014.png");
+    proj->addImage("surrender_jei_2018/surrender_015.png");
+    proj->addImage("surrender_jei_2018/surrender_016.png");
+    proj->addImage("surrender_jei_2018/surrender_017.png");
+    proj->addImage("surrender_jei_2018/surrender_018.png");
+    proj->addImage("surrender_jei_2018/surrender_019.png");
     
     // gui
     gui.setup();
@@ -75,7 +90,7 @@ void ofApp::loadSettings() {
     touch->setBorderPoint(2, depthSettings.getValue("x3", 200), depthSettings.getValue("y3", 500));
     touch->setBorderPoint(3, depthSettings.getValue("x4", 100), depthSettings.getValue("y4", 500));
     
-    //touch.setMaxDepth(0.1); // set 10cm max depth
+    //touch->setMaxDepth(100); // set 10cm max depth
     
     // projection settings
     ofxXmlSettings projectionSettings;
