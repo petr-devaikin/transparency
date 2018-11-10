@@ -81,6 +81,9 @@ public:
     // immitation
     void imitateTouch(int x, int y);
     void imitateRelease();
+    
+    // only to display camera image
+    bool cameraOnlyMode = false;
 };
 
 #endif /* touchArea_hpp */

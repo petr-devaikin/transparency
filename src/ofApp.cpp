@@ -134,8 +134,16 @@ void ofApp::saveSettings() {
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    if (modeNormal || modeDepth)
+        touch->cameraOnlyMode = false;
+    else
+        touch->cameraOnlyMode = true;
+        
     touch->update();
-    proj->update();
+    
+    if (modeNormal || modeDepth) {
+        proj->update();
+    }
 }
 
 //--------------------------------------------------------------

@@ -17,6 +17,7 @@ touchArea::touchArea(float _maxDepth, bool _testMode) {
     //zeroLevelPixels.clear();
     
     rgbCameraImage.allocate(WIDTH, HEIGHT, OF_IMAGE_COLOR);
+    //rgbCameraImage.allocate(WIDTH, HEIGHT, OF_IMAGE_GRAYSCALE);
     
     // init border points with 0
     touchBorderPoints.push_back(ofVec2f(0, 0));
@@ -117,15 +118,29 @@ void touchArea::updateFromCamera() {
     // copy depth data
     memcpy(depthCameraData, depthFrame.get_data(), WIDTH * HEIGHT * 2);
     
+    /*
+    for (int i = 0; i <= WIDTH; i++)
+        for (int j = 0; j <= HEIGHT; j++) {
+            float res = depthCameraData[j * WIDTH + i] / 255;
+            rgbCameraImage.getPixels().getData()[3 * (i + j * WIDTH)] = res;
+            rgbCameraImage.getPixels().getData()[3 * (i + j * WIDTH) + 1] = res;
+            rgbCameraImage.getPixels().getData()[3 * (i + j * WIDTH) + 2] = res;
+        }
+    rgbCameraImage.update();
+     */
+    
     // update zero pixels in the very beginning
     if (!isZeroInitialized) {
         isZeroInitialized = true;
         resetZeroPixels();
     }
     
+    // exit here if we need only picture from camera
+    if (cameraOnlyMode) return;
+    
     // calculate substracted depth result
     ofImage substractedImage;
-    substractedImage.allocate(WIDTH, HEIGHT, OF_IMAGE_GRAYSCALE);
+    substractedImage.allocate(WIDTH, HEIGHT, OF_IMAGE_COLOR);
     
     // iterate only withing the bounding area
     for (int i = floor(boundingArea.x); i <= ceil(boundingArea.x + boundingArea.width); i++)
@@ -140,7 +155,9 @@ void touchArea::updateFromCamera() {
                 if (res < 0) res = 0;
                 if (res > 255) res = 255;
             }
-            substractedImage.getPixels().getData()[(j * WIDTH + i)] = res;
+            substractedImage.getPixels().getData()[3 * (j * WIDTH + i)] = res;
+            substractedImage.getPixels().getData()[3 * (j * WIDTH + i) + 1] = res;
+            substractedImage.getPixels().getData()[3 * (j * WIDTH + i) + 2] = res;
         }
     
     depthFbo.begin();

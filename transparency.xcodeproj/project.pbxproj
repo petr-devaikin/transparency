@@ -24,9 +24,9 @@
 		6AABAB39E82AF5CFEA23A205 /* ContourFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5FBB4A8427353AED09174BE5 /* ContourFinder.cpp */; };
 		6F2D352F21610FF400EF1799 /* layerWithMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F2D352D21610FF400EF1799 /* layerWithMask.cpp */; };
 		6F2D35322162D07100EF1799 /* layerTouch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F2D35302162D07100EF1799 /* layerTouch.cpp */; };
-		6F767F8B20CD5F9A00B851D8 /* librealsense2.2.12.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F767F8A20CD5F9A00B851D8 /* librealsense2.2.12.0.dylib */; };
 		6F8F17922106476B003F5E7D /* projectionInvertedBrush.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F17902106476B003F5E7D /* projectionInvertedBrush.cpp */; };
 		6F8F179A210A38E7003F5E7D /* baseProjection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F1799210A38E7003F5E7D /* baseProjection.cpp */; };
+		6F95411B21974F3200FA8981 /* librealsense2.2.16.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F95411A21974F3200FA8981 /* librealsense2.2.16.1.dylib */; };
 		7CDAD32BE4FA46701E3552C7 /* RunningBackground.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5CBF6AED6A17AC0C17F63CC4 /* RunningBackground.cpp */; };
 		837220E80EB56CD44AD27F2A /* ofxSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 15F2C6477A769C03A56D1401 /* ofxSlider.cpp */; };
 		856AA354D08AB4B323081444 /* ofxBaseGui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9604B925D32EE39065747725 /* ofxBaseGui.cpp */; };
@@ -181,6 +181,8 @@
 		6F8F179721065833003F5E7D /* expansionMaskAdder.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = expansionMaskAdder.vert; sourceTree = "<group>"; };
 		6F8F1798210A38E7003F5E7D /* baseProjection.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = baseProjection.hpp; sourceTree = "<group>"; };
 		6F8F1799210A38E7003F5E7D /* baseProjection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = baseProjection.cpp; sourceTree = "<group>"; };
+		6F9541182197473500FA8981 /* librealsense2.2.13.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = librealsense2.2.13.0.dylib; path = ../../../../../../../usr/local/lib/librealsense2.2.13.0.dylib; sourceTree = "<group>"; };
+		6F95411A21974F3200FA8981 /* librealsense2.2.16.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = librealsense2.2.16.1.dylib; path = ../../../../../../../usr/local/lib/librealsense2.2.16.1.dylib; sourceTree = "<group>"; };
 		70046E043EDDB466ED625C3B /* Tracker.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Tracker.h; path = ../../../addons/ofxCv/libs/ofxCv/include/ofxCv/Tracker.h; sourceTree = SOURCE_ROOT; };
 		7101CF2125B8B2BF46AA2662 /* cxcore.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = cxcore.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv/cxcore.hpp; sourceTree = SOURCE_ROOT; };
 		71C98C3F44D63B39F1482A54 /* background_segm.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = background_segm.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/video/background_segm.hpp; sourceTree = SOURCE_ROOT; };
@@ -342,7 +344,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6F767F8B20CD5F9A00B851D8 /* librealsense2.2.12.0.dylib in Frameworks */,
+				6F95411B21974F3200FA8981 /* librealsense2.2.16.1.dylib in Frameworks */,
 				E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -626,6 +628,8 @@
 		6F8B661520645DDC00808A73 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6F95411A21974F3200FA8981 /* librealsense2.2.16.1.dylib */,
+				6F9541182197473500FA8981 /* librealsense2.2.13.0.dylib */,
 				6F767F8A20CD5F9A00B851D8 /* librealsense2.2.12.0.dylib */,
 			);
 			name = Frameworks;
