@@ -17,8 +17,12 @@ protected:
     ofVec2f position;
     ofVec2f size;
     touchArea * touch;
+    
+    bool started;
 public:
     baseProjection(touchArea * t);
+    void start();
+    void stop();
     
     bool setPosition(float x, float y);
     bool setSize(int width, int height);

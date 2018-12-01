@@ -9,54 +9,37 @@
 #define touchArea_hpp
 
 #include "ofMain.h"
-#include <librealsense2/rs.hpp>
 #include "ofxCv.h"
+#include "cameraManager.hpp"
 
 class touchArea {
 private:
-    bool testMode;
-    
-    const int WIDTH = 1280;
-    const int HEIGHT = 720;
-    
-    float depth_scale = 1; // depth bite to meters
-    
     vector<ofVec2f> touchBorderPoints;
     ofRectangle boundingArea;
-    float maxDepth; // max depth in mm to scale the depth image
+    float maxDepth; // max depth in mm (or meters?) to scale the depth image
     
-    ofFbo depthFbo; // depth points with substracted zero level, transformed to the result screen projection
+    ofImage substractedDepthImage;
+    ofFbo resultFbo; // depth points with substracted zero level, transformed to the result screen projection
     
     ofImage brush; // touch image for imitation
     
-    ofImage rgbCameraImage; // last data from sensor
-    unsigned short * depthCameraData; // last data from sensor
-    unsigned short * zeroDepthCameraData; // zero level pioxels
+    cameraManager * camera;
     
     void updateFromCamera(); // ger rgb and depth data from camera
     
-    // RealSense
-    bool findCamera();
-    rs2::pipeline pipe;
-    rs2::frameset frames;
-    
     // transformation
     ofMatrix4x4 transform;
+    void calculateTransformation();
     
-    // to get zero pixels in the very begining
-    bool isZeroInitialized = false;
-    
-    // filters
-    rs2::decimation_filter dec_filter;
-    rs2::spatial_filter spat_filter;
-    rs2::temporal_filter temp_filter;
-    rs2::hole_filling_filter hole_filter;
-    
-    rs2::disparity_transform depth_to_disparity;
-    rs2::disparity_transform disparity_to_depth;
+    // running indicator
+    bool started;
 public:
-    touchArea(float _maxDepth, bool _testMode = false); // maxDepth in mm
+    touchArea(cameraManager * _camera, float _maxDepth, ofVec2f resultCanvasSize); // maxDepth in meters
     ~touchArea();
+    
+    void start();
+    void stop();
+    bool isRunning();
     
     int getWidth();
     int getHeight();
@@ -65,14 +48,9 @@ public:
     ofFbo & getDepth();
     ofImage & getCameraImage();
     
-    //void drawBorder(int x, int y);
-    //void drawImage(int x, int y);
-    //void drawDepth(int x, int y);
-    
-    void setBorderPoint(int i, float x, float y);
+    void setBorderPoints(vector<ofVec2f> points);
     
     void resetZeroPixels();
-    void setResultScreenSize(ofVec2f screenSize);
     
     //void setMaxDepth(float maxDepth); // in mm
     
@@ -81,9 +59,6 @@ public:
     // immitation
     void imitateTouch(int x, int y);
     void imitateRelease();
-    
-    // only to display camera image
-    bool cameraOnlyMode = false;
 };
 
 #endif /* touchArea_hpp */

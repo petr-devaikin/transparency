@@ -22,6 +22,7 @@
 		63020F16C7E8DED980111241 /* ofxCvImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C6151136D101F857DAE12722 /* ofxCvImage.cpp */; };
 		63B57AC5BF4EF088491E0317 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 50DF87D612C5AAE17AAFA6C0 /* ofxXmlSettings.cpp */; };
 		6AABAB39E82AF5CFEA23A205 /* ContourFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5FBB4A8427353AED09174BE5 /* ContourFinder.cpp */; };
+		6F288F3A21B2B8F800C68FF1 /* cameraManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F288F3821B2B8F800C68FF1 /* cameraManager.cpp */; };
 		6F2D352F21610FF400EF1799 /* layerWithMask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F2D352D21610FF400EF1799 /* layerWithMask.cpp */; };
 		6F2D35322162D07100EF1799 /* layerTouch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F2D35302162D07100EF1799 /* layerTouch.cpp */; };
 		6F8F17922106476B003F5E7D /* projectionInvertedBrush.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6F8F17902106476B003F5E7D /* projectionInvertedBrush.cpp */; };
@@ -164,6 +165,8 @@
 		6B907CFBB1B0FEDE76C41AA0 /* heap.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = heap.h; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/heap.h; sourceTree = SOURCE_ROOT; };
 		6CEC50DB3D06414010233963 /* Utilities.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = Utilities.cpp; path = ../../../addons/ofxCv/libs/ofxCv/src/Utilities.cpp; sourceTree = SOURCE_ROOT; };
 		6DD5A3CBB6D5BBA1C1354F1B /* flann.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = flann.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/flann.hpp; sourceTree = SOURCE_ROOT; };
+		6F288F3821B2B8F800C68FF1 /* cameraManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cameraManager.cpp; sourceTree = "<group>"; };
+		6F288F3921B2B8F800C68FF1 /* cameraManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = cameraManager.hpp; sourceTree = "<group>"; };
 		6F2D352B215FCE2400EF1799 /* expansion.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = expansion.vert; sourceTree = "<group>"; };
 		6F2D352C215FCE2500EF1799 /* expansion.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = expansion.frag; sourceTree = "<group>"; };
 		6F2D352D21610FF400EF1799 /* layerWithMask.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = layerWithMask.cpp; sourceTree = "<group>"; };
@@ -990,6 +993,8 @@
 				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
 				62799397BD7E4118ECA58C63 /* touchArea.h */,
 				720199AB2199DFFDEE08861C /* touchArea.cpp */,
+				6F288F3821B2B8F800C68FF1 /* cameraManager.cpp */,
+				6F288F3921B2B8F800C68FF1 /* cameraManager.hpp */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
@@ -1149,6 +1154,7 @@
 				837220E80EB56CD44AD27F2A /* ofxSlider.cpp in Sources */,
 				250A95BA26587BE85DB0A353 /* ofxCvColorImage.cpp in Sources */,
 				D3301F6A0B43BB293ED97C1D /* ofxCvShortImage.cpp in Sources */,
+				6F288F3A21B2B8F800C68FF1 /* cameraManager.cpp in Sources */,
 				1D5F3298C2FA073628012944 /* ofxCvContourFinder.cpp in Sources */,
 				E212C821D1064B92DD953A42 /* ofxCvHaarFinder.cpp in Sources */,
 				63020F16C7E8DED980111241 /* ofxCvImage.cpp in Sources */,

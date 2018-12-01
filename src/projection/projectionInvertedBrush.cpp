@@ -45,6 +45,12 @@ projectionInvertedBrush::~projectionInvertedBrush() {
     }
 }
 
+projectionInvertedBrush::start() {
+    resetLayers();
+    
+    baseProjection::start();
+}
+
 void projectionInvertedBrush::addImage(const std::string &imgPath) {
     ofImage newImg;
     newImg.load(imgPath);
@@ -81,9 +87,6 @@ bool projectionInvertedBrush::setSize(int width, int height) {
         // prepare touch area for blob search
         touchAreaImage.allocate(width, height);
         
-        // reset layers
-        resetLayers();
-        
         return true;
     }
     else
@@ -114,8 +117,10 @@ int projectionInvertedBrush::detectLayerIndex(ofPoint point) {
 // Update
 
 void projectionInvertedBrush::update() {
-    if (!onesAndZerosAllocated) return; // size is not set. not ready
+    if (!started) return; // not started yet
+    //if (!onesAndZerosAllocated) return; // no zero pixels
     //return;
+    
     // expand touched areas on all layers
     float currentTime = ofGetElapsedTimef();
     float expansionRadius = expansionSpeed * (currentTime - timer);

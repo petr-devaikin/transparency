@@ -11,10 +11,20 @@
 // Initialization
 
 baseProjection::baseProjection(touchArea * t) {
+    started = false;
+    
     touch = t;
     
     size.set(0, 0);
     position.set(0, 0);
+}
+
+void baseProjection::start() {
+    started = true;
+}
+
+void baseProjection::stop() {
+    started = false;
 }
 
 // Size and position setters and getters
@@ -41,7 +51,7 @@ bool baseProjection::setSize(int width, int height) {
         size.set(width, height);
         
         // update result screen size in touch area
-        touch->setResultScreenSize(size);
+        // touch->setResultScreenSize(size);
         
         return true;
     }

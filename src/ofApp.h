@@ -5,6 +5,7 @@
 #include "projectionInvertedBrush.hpp"
 
 #include "touchArea.h"
+#include "cameraManager.hpp"
 #include "ofxGui.h"
 #include "ofxXmlSettings.h"
 
@@ -18,6 +19,7 @@ class ofApp : public ofBaseApp{
 private:
     projectionInvertedBrush * proj;
     touchArea * touch; // 10 cm
+    cameraManager camera;
     
     ofxPanel gui;
     

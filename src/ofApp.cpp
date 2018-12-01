@@ -3,8 +3,12 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    // init camera
+    camera.findCamera();
+    
     // init touch
-    touch = new touchArea(.3); // 30 cm
+    touch = new touchArea(&camera, .3, ofVec2f(1014, 1024)); // 30 cm max dept. Result image 1024x1024
+    
     proj = new projectionInvertedBrush(touch);
     proj->addImage("surrender_jei_2018/surrender_001.png");
     proj->addImage("surrender_jei_2018/surrender_002.png");
@@ -46,6 +50,10 @@ void ofApp::setup(){
     
     // load settings from files
     loadSettings();
+    
+    // start immediately for now
+    touch->start();
+    proj->start();
 }
 
 void ofApp::setNormalMode(bool& toggled) {
@@ -85,10 +93,14 @@ void ofApp::loadSettings() {
     // depth sensor settings
     ofxXmlSettings depthSettings;
     depthSettings.loadFile(DEPTH_SETTINGS_FILE);
-    touch->setBorderPoint(0, depthSettings.getValue("x1", 100), depthSettings.getValue("y1", 100));
-    touch->setBorderPoint(1, depthSettings.getValue("x2", 200), depthSettings.getValue("y2", 100));
-    touch->setBorderPoint(2, depthSettings.getValue("x3", 200), depthSettings.getValue("y3", 500));
-    touch->setBorderPoint(3, depthSettings.getValue("x4", 100), depthSettings.getValue("y4", 500));
+    
+    vector<ofVec2f> newPoints;
+    newPoints.push_back(ofVec2f(depthSettings.getValue("x1", 100), depthSettings.getValue("y1", 100)));
+    newPoints.push_back(ofVec2f(depthSettings.getValue("x2", 200), depthSettings.getValue("y2", 100)));
+    newPoints.push_back(ofVec2f(depthSettings.getValue("x3", 200), depthSettings.getValue("y3", 500)));
+    newPoints.push_back(ofVec2f(depthSettings.getValue("x4", 100), depthSettings.getValue("y4", 500)));
+    
+    touch->setBorderPoints(newPoints);
     
     //touch->setMaxDepth(100); // set 10cm max depth
     
@@ -134,14 +146,11 @@ void ofApp::saveSettings() {
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    if (modeNormal || modeDepth)
-        touch->cameraOnlyMode = false;
-    else
-        touch->cameraOnlyMode = true;
-        
-    touch->update();
+    camera.update();
     
-    if (modeNormal || modeDepth) {
+    if (modeNormal || modeDepth)
+    {
+        touch->update();
         proj->update();
     }
 }
@@ -227,6 +236,8 @@ void ofApp::exit(){
     delete proj;
     cout << "Remove touch class\n";
     delete touch;
+    cout << "Stop camera\n";
+    camera.disconnectCamera();
 }
 
 //--------------------------------------------------------------
@@ -278,7 +289,15 @@ void ofApp::mouseDragged(int x, int y, int button){
     else if (modeInputCalibration) {
         if (dragTouchArea) {
             ofVec2f currentPosition = touch->getBorderPoints()[dragTouchAreaCornerNumber];
-            touch->setBorderPoint(dragTouchAreaCornerNumber, currentPosition[0] + x - dragStart[0], currentPosition[1] + y - dragStart[1]);
+            
+            vector<ofVec2f> newPoints;
+            for (int i = 0; i < 4; i++)
+                if (i == dragTouchAreaCornerNumber)
+                    newPoints.push_back(ofVec2f(currentPosition[0] + x - dragStart[0], currentPosition[1] + y - dragStart[1]));
+                else
+                    newPoints.push_back(touch->getBorderPoints()[i]);
+            touch->setBorderPoints(newPoints);
+            
             dragStart.set(x, y);
         }
     }
