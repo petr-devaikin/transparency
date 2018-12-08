@@ -19,12 +19,22 @@ baseProjection::baseProjection(touchArea * t) {
     position.set(0, 0);
 }
 
-void baseProjection::start() {
-    started = true;
+bool baseProjection::start() {
+    if (!started) {
+        started = true;
+        return true;
+    }
+    else
+        return false;
 }
 
-void baseProjection::stop() {
-    started = false;
+bool baseProjection::stop() {
+    if (started) {
+        started = false;
+        return true;
+    }
+    else
+        return false;
 }
 
 // Size and position setters and getters

@@ -171,7 +171,7 @@ void ofApp::draw(){
         // show current state of touch area
         
         // USE ANOTHER PROJECTION INSTEAD OF THIS!
-        ofFbo depth = touch->getDepth();
+        ofFbo depth = touch->getTransformedTouch();
         depth.draw(proj->getPosition()[0], proj->getPosition()[1]);
         ofSetColor(0, 0, 255);
         // and a border
@@ -202,7 +202,7 @@ void ofApp::draw(){
         // input calibration mode
         
         // show rgb camera image
-        ofImage cameraImage = touch->getCameraImage();
+        ofImage cameraImage = camera.getRGBImage();
         cameraImage.draw(0, 0);
         
         // show touch input area border
@@ -246,7 +246,7 @@ void ofApp::keyPressed(int key){
         showGui = !showGui;
     
     if (modeInputCalibration && key == 'z') {
-        touch->resetZeroPixels();
+        camera.setZeroLevel();
         //touch.setResultScreenSize(proj.getSize()[0], proj.getSize()[1]);
     }
 }

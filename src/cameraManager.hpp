@@ -37,6 +37,7 @@ private:
     bool cameraFound;
 public:
     cameraManager();
+    ~cameraManager();
     
     bool findCamera();
     void disconnectCamera();

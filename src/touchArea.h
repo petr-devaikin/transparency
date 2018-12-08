@@ -35,22 +35,18 @@ private:
     bool started;
 public:
     touchArea(cameraManager * _camera, float _maxDepth, ofVec2f resultCanvasSize); // maxDepth in meters
-    ~touchArea();
     
     void start();
     void stop();
     bool isRunning();
     
-    int getWidth();
-    int getHeight();
+    int getResultWidth();
+    int getResultHeight();
     
     vector<ofVec2f> getBorderPoints();
-    ofFbo & getDepth();
-    ofImage & getCameraImage();
+    ofFbo & getTransformedTouch();
     
     void setBorderPoints(vector<ofVec2f> points);
-    
-    void resetZeroPixels();
     
     //void setMaxDepth(float maxDepth); // in mm
     

@@ -51,9 +51,13 @@ public:
     projectionInvertedBrush(touchArea * t, float t1 = 0.5, float expSpeed = 50, float bluredR = 50);
     ~projectionInvertedBrush();
     
+    bool start();
+    
     void addImage(const string& imgPath);
     
     bool setSize(int width, int height);
+    
+    void updateAllLayers(); // update all layers, increase touch area on each of them
     void update();
     
     void draw();

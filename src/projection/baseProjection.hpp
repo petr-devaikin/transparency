@@ -21,23 +21,21 @@ protected:
     bool started;
 public:
     baseProjection(touchArea * t);
-    void start();
-    void stop();
+    bool start();
+    bool stop();
     
     bool setPosition(float x, float y);
-    bool setSize(int width, int height);
-    
-    bool setX(float x);
-    bool setY(float y);
-    bool setWidth(int width);
-    bool setHeight(int height);
-    
-    ofVec2f getSize();
     ofVec2f getPosition();
-    
+    bool setX(float x);
     float getX();
+    bool setY(float y);
     float getY();
+    
+    bool setSize(int width, int height);
+    bool setWidth(int width);
     float getWidth();
+    bool setHeight(int height);
+    ofVec2f getSize();
     float getHeight();
     
     virtual void update() = 0;

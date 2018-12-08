@@ -14,7 +14,19 @@ cameraManager::cameraManager() {
     // init filters
     depth_to_disparity = rs2::disparity_transform(true);
     disparity_to_depth = rs2::disparity_transform(false);
+    
+    // allocate rgb image
+    rgbCameraImage.allocate(WIDTH, HEIGHT, OF_IMAGE_COLOR);
+    
+    // allocate depth buffers
+    depthCameraData = new unsigned short [WIDTH * HEIGHT](); // allocate with zeros
+    zeroDepthCameraData = new unsigned short [WIDTH * HEIGHT](); // allocate with zeros
 };
+
+cameraManager::~cameraManager() {
+    delete[] depthCameraData;
+    delete[] zeroDepthCameraData;
+}
 
 
 bool cameraManager::findCamera() {
@@ -31,13 +43,6 @@ bool cameraManager::findCamera() {
         
         // get scale from the sensor
         depthScale = depth_sensor.get_depth_scale();
-        
-        // depth buffers
-        depthCameraData = new unsigned short [WIDTH * HEIGHT](); // allocate with zeros
-        zeroDepthCameraData = new unsigned short [WIDTH * HEIGHT](); // allocate with zeros
-        
-        // rgb image
-        rgbCameraImage.allocate(WIDTH, HEIGHT, OF_IMAGE_COLOR);
         
         frames = pipe.wait_for_frames();
         cout << "RealSense found!\n";
@@ -70,11 +75,11 @@ bool cameraManager::isCameraFound() {
 }
 
 void cameraManager::update() {
-    if (cameraFound) {
-        rs2::frameset newFrames;
-        if (pipe.poll_for_frames(&newFrames))
-            frames = newFrames;
-    }
+    if (!cameraFound) return;
+        
+    rs2::frameset newFrames;
+    if (pipe.poll_for_frames(&newFrames))
+        frames = newFrames;
     
     // update rgb picture
     rs2::frame rgbFrame = frames.get_color_frame();

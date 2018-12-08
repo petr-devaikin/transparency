@@ -45,7 +45,7 @@ projectionInvertedBrush::~projectionInvertedBrush() {
     }
 }
 
-projectionInvertedBrush::start() {
+bool projectionInvertedBrush::start() {
     resetLayers();
     
     baseProjection::start();
@@ -85,7 +85,7 @@ bool projectionInvertedBrush::setSize(int width, int height) {
         touchBrushResized.end();
         
         // prepare touch area for blob search
-        touchAreaImage.allocate(width, height);
+        touchAreaImage.allocate(touch->getResultWidth(), touch->getResultHeight());
         
         return true;
     }
@@ -95,9 +95,11 @@ bool projectionInvertedBrush::setSize(int width, int height) {
 
 // Helpers
 
+// calculate touch blobs on touch area
 void projectionInvertedBrush::calculateTouchBlobs() {
     ofPixels touchPixels;
-    (touch->getDepth()).readToPixels(touchPixels);
+    // get current touch canvas
+    (touch->getTransformedTouch()).readToPixels(touchPixels);
     touchAreaImage.setFromPixels(touchPixels.getChannel(0));
     touchAreaImage.threshold(255 * thresholdSensitive);
     
@@ -116,14 +118,12 @@ int projectionInvertedBrush::detectLayerIndex(ofPoint point) {
 
 // Update
 
-void projectionInvertedBrush::update() {
-    if (!started) return; // not started yet
-    //if (!onesAndZerosAllocated) return; // no zero pixels
-    //return;
-    
+void projectionInvertedBrush::updateAllLayers() {
     // expand touched areas on all layers
     float currentTime = ofGetElapsedTimef();
     float expansionRadius = expansionSpeed * (currentTime - timer);
+    
+    // if there was enough time to make the smallest possible step to expand touch
     if (expansionRadius >= 1) {
         float floorRadius = floor(expansionRadius);
         timer = currentTime - (expansionRadius - floorRadius) / expansionSpeed;
@@ -132,6 +132,12 @@ void projectionInvertedBrush::update() {
             layers[i].expand(floorRadius);
         }
     }
+}
+
+void projectionInvertedBrush::update() {
+    if (!started) return; // not started yet
+    
+    updateAllLayers(); // update all areas;
     
     // check if we can remove the last layer
     if (layers.size() > 1 && layers[1].isFull()) {
@@ -139,8 +145,7 @@ void projectionInvertedBrush::update() {
         cout << "Layer removed. Number of layers: " << layers.size() << "\n";
     }
     
-    // Check if the canvas is touched right now and calculate blobs
-    calculateTouchBlobs();
+    calculateTouchBlobs(); // Check if the canvas is touched right now and calculate blobs
     
     // compare new blobs with previous touches
     vector<layerTouch> newTouches;
@@ -163,8 +168,8 @@ void projectionInvertedBrush::update() {
         
         if (!previousTouchDetected) {
             // new touch, detect layer
-            int touchedLayerIndex = detectLayerIndex(blob.centroid);
-            touchedLayerIndex = 0; // only one layer a time
+            int touchedLayerIndex = 0; // only one layer a time – for Jei's project
+            //int touchedLayerIndex = detectLayerIndex(blob.centroid);
             cout << "Layer touched: " << touchedLayerIndex << "\n";
             
             if (touchedLayerIndex == layers.size() - 1) {
@@ -184,6 +189,12 @@ void projectionInvertedBrush::update() {
 }
 
 void projectionInvertedBrush::draw() {
+    if (!started) return; // not started yet
+    
+    // draw touch canvas
+    //(touch->getTransformedTouch()).draw(position[0], position[1]);
+    //return;
+    
     if (!onesAndZerosAllocated) return; // size is not set. not ready
     
     ofSetColor(255);

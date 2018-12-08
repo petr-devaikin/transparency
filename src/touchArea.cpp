@@ -9,7 +9,8 @@
 
 using namespace cv;
 
-touchArea::touchArea(cameraManager * _camera, float _maxDepth, ofVec2f resultCanvasSize) {
+touchArea::touchArea(cameraManager * _camera, float _maxDepth, ofVec2f resultCanvasSize)
+{
     camera = _camera;
     maxDepth = _maxDepth;
     
@@ -30,7 +31,7 @@ touchArea::touchArea(cameraManager * _camera, float _maxDepth, ofVec2f resultCan
     touchBorderPoints.push_back(ofVec2f(0, 0));
     
     // looking for depth camera
-    if (!camera.findCamera()) {
+    if (!camera->isCameraFound()) {
         // camera not found. prepare fake brush
         brush.load("brush.png");
         brush.setImageType(OF_IMAGE_GRAYSCALE);
@@ -45,11 +46,8 @@ touchArea::touchArea(cameraManager * _camera, float _maxDepth, ofVec2f resultCan
     }
 }
 
-touchArea::~touchArea() {
-}
-
 void touchArea::start() {
-    camera.setZeroLevel();
+    //camera->setZeroLevel();
     started = true;
 }
 
@@ -57,11 +55,21 @@ void touchArea::stop() {
     started = false;
 }
 
+int touchArea::getResultWidth() {
+    return resultFbo.getWidth();
+}
+
+int touchArea::getResultHeight() {
+    return resultFbo.getHeight();
+}
+
 void touchArea::updateFromCamera() {
+    // calculate distance between current position and zero level.
+    // transform this value to decrease sensitivity at the beginning of touch
     // iterate only withing the bounding area
     for (int i = floor(boundingArea.x); i <= ceil(boundingArea.x + boundingArea.width); i++)
         for (int j = floor(boundingArea.y); j <= ceil(boundingArea.y + boundingArea.height); j++) {
-            float res = camera.getDistanceChange(i, j) / maxDepth;
+            float res = camera->getDistanceChange(i, j) / maxDepth;
             res = pow(res, 3); // power of 3 to be sensitive more to deep touch
             res *= 255;
             if (res < 0) res = 0;
@@ -77,6 +85,7 @@ void touchArea::updateFromCamera() {
             substractedDepthImage.getPixels().getData()[localPixelNumber + 2] = res;
         }
     
+    // transform resulting picture from camera space to image space
     resultFbo.begin();
     {
         ofClear(0, 0, 0, 255);
@@ -93,7 +102,7 @@ void touchArea::updateFromCamera() {
     resultFbo.end();
 }
 
-ofFbo & touchArea::getDepth() {
+ofFbo & touchArea::getTransformedTouch() {
     return resultFbo;
 }
 
@@ -146,6 +155,11 @@ void touchArea::calculateTransformation() {
                   m.at<double>(0, 1), m.at<double>(1, 1), 0, m.at<double>(2, 1),
                   0, 0, 1, 0,
                   m.at<double>(0, 2), m.at<double>(1, 2), 0, 1);
+}
+
+void touchArea::update() {
+    if (camera->isCameraFound())
+        updateFromCamera();
 }
 
 // immitation
