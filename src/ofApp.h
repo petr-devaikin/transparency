@@ -6,6 +6,7 @@
 
 #include "touchArea.h"
 #include "cameraManager.hpp"
+#include "calibrator.hpp"
 #include "ofxGui.h"
 #include "ofxXmlSettings.h"
 
@@ -17,14 +18,14 @@ const string DEPTH_SETTINGS_FILE = "depth_settings.xml";
 
 class ofApp : public ofBaseApp{
 private:
+    cameraManager * camera;
+    calibrator * calib;
     projectionInvertedBrush * proj;
-    touchArea * touch; // 10 cm
-    cameraManager camera;
+    touchArea * touch;
     
+    /*
     ofxPanel gui;
-    
     ofxToggle showGui;
-    
     ofxToggle modeNormal;
     ofxToggle modeDepth;
     ofxToggle modeOutputCalibration;
@@ -34,16 +35,12 @@ private:
     void setDepthMode(bool& toggled);
     void setOutputCalibrationMode(bool& toggled);
     void setInputCalibrationMode(bool& toggled);
+     */
     
     //ofParameter<int> maxDepth;
     
-    bool dragProjection = false;
-    bool resizeProjectionX = false;
-    bool resizeProjectionY = false;
-    bool dragTouchArea = false;
-    int dragTouchAreaCornerNumber = 0;
-    
-    ofVec2f dragStart;
+    bool dragProjectionCorner = false;
+    int dragCornerNumber = 0;
     
     void calibrationToggleListener(bool &toggleStatus);
     

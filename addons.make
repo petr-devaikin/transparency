@@ -1,4 +1,4 @@
-ofxArtool5
+ofxAruco
 ofxCv
 ofxGui
 ofxOpenCv
