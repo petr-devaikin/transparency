@@ -176,12 +176,12 @@ void projectionInvertedBrush::update() {
 void projectionInvertedBrush::draw() {
     if (!started) return; // not started yet
     
+    ofPushMatrix();
+    ofMultMatrix(transform);
+    
     // draw touch canvas
     //(touch->getTransformedTouch()).draw(0, 0);
     //return;
-    
-    ofPushMatrix();
-    ofMultMatrix(transform);
     
     ofSetColor(255);
     shaderTransparency.begin();

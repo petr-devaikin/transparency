@@ -145,7 +145,7 @@ void ofApp::update(){
     
     if (calib->getState() == done) {
         touch->update();
-        //proj->update();
+        proj->update();
     }
 }
 
