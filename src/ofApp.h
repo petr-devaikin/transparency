@@ -23,23 +23,9 @@ private:
     projectionInvertedBrush * proj;
     touchArea * touch;
     
-    /*
-    ofxPanel gui;
-    ofxToggle showGui;
-    ofxToggle modeNormal;
-    ofxToggle modeDepth;
-    ofxToggle modeOutputCalibration;
-    ofxToggle modeInputCalibration;
-    
-    void setNormalMode(bool& toggled);
-    void setDepthMode(bool& toggled);
-    void setOutputCalibrationMode(bool& toggled);
-    void setInputCalibrationMode(bool& toggled);
-     */
-    
     //ofParameter<int> maxDepth;
     
-    bool dragProjectionCorner = false;
+    bool dragPolygonCorner = false;
     int dragCornerNumber = 0;
     
     void calibrationToggleListener(bool &toggleStatus);

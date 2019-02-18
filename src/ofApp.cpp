@@ -11,7 +11,7 @@ void ofApp::setup(){
     calib = new calibrator(camera);
     
     // init touch
-    touch = new touchArea(camera, .3, ofVec2f(1014, 1024)); // 30 cm max dept. Result image 1024x1024
+    touch = new touchArea(camera, .3, ofVec2f(1024, 1024)); // 30 cm max dept. Result image 1024x1024
     
     proj = new projectionInvertedBrush(touch);
     proj->addImage("surrender_jei_2018/surrender_001.png");
@@ -70,21 +70,31 @@ void ofApp::loadSettings() {
     //ofxXmlSettings depthSettings;
     //depthSettings.loadFile(DEPTH_SETTINGS_FILE);
     
-    
-    
     //touch->setMaxDepth(100); // set 10cm max depth
     
     // projection settings
     ofxXmlSettings projectionSettings;
     projectionSettings.loadFile(PROJ_SETTINGS_FILE);
     
+    // load projection polyline
     ofPolyline projectionPolyline;
-    projectionPolyline.addVertex(projectionSettings.getValue("x1", 100), projectionSettings.getValue("y1", 100));
-    projectionPolyline.addVertex(projectionSettings.getValue("x2", 400), projectionSettings.getValue("y2", 100));
-    projectionPolyline.addVertex(projectionSettings.getValue("x3", 400), projectionSettings.getValue("y3", 400));
-    projectionPolyline.addVertex(projectionSettings.getValue("x4", 100), projectionSettings.getValue("y4", 400));
+    projectionPolyline.addVertex(projectionSettings.getValue("projection_x1", 100), projectionSettings.getValue("projection_y1", 100));
+    projectionPolyline.addVertex(projectionSettings.getValue("projection_x2", 400), projectionSettings.getValue("projection_y2", 100));
+    projectionPolyline.addVertex(projectionSettings.getValue("projection_x3", 400), projectionSettings.getValue("projection_y3", 400));
+    projectionPolyline.addVertex(projectionSettings.getValue("projection_x4", 100), projectionSettings.getValue("projection_y4", 400));
     
-    calib->presetProjectionArea(projectionPolyline);
+    // load camera polyline
+    ofPolyline cameraPolyline;
+    cameraPolyline.addVertex(projectionSettings.getValue("camera_x1", 100), projectionSettings.getValue("camera_y1", 100));
+    cameraPolyline.addVertex(projectionSettings.getValue("camera_x2", 400), projectionSettings.getValue("camera_y2", 100));
+    cameraPolyline.addVertex(projectionSettings.getValue("camera_x3", 400), projectionSettings.getValue("camera_y3", 400));
+    cameraPolyline.addVertex(projectionSettings.getValue("camera_x4", 100), projectionSettings.getValue("camera_y4", 400));
+    
+    projectionPolyline.close();
+    cameraPolyline.close();
+    
+    calib->setProjectionArea(projectionPolyline);
+    calib->setCameraArea(cameraPolyline);
     
     // gui
     // gui.loadFromFile("settings.xml");
@@ -94,15 +104,27 @@ void ofApp::saveSettings() {
     // save projection settings
     ofxXmlSettings projectionSettings;
     
+    // save projection polyline
     ofPolyline projectionPolyline = calib->getProjectionPolyline();
-    projectionSettings.setValue("x1", projectionPolyline.getVertices()[0][0]);
-    projectionSettings.setValue("y1", projectionPolyline.getVertices()[0][1]);
-    projectionSettings.setValue("x2", projectionPolyline.getVertices()[1][0]);
-    projectionSettings.setValue("y2", projectionPolyline.getVertices()[1][1]);
-    projectionSettings.setValue("x3", projectionPolyline.getVertices()[2][0]);
-    projectionSettings.setValue("y3", projectionPolyline.getVertices()[2][1]);
-    projectionSettings.setValue("x4", projectionPolyline.getVertices()[3][0]);
-    projectionSettings.setValue("y4", projectionPolyline.getVertices()[3][1]);
+    projectionSettings.setValue("projection_x1", projectionPolyline.getVertices()[0][0]);
+    projectionSettings.setValue("projection_y1", projectionPolyline.getVertices()[0][1]);
+    projectionSettings.setValue("projection_x2", projectionPolyline.getVertices()[1][0]);
+    projectionSettings.setValue("projection_y2", projectionPolyline.getVertices()[1][1]);
+    projectionSettings.setValue("projection_x3", projectionPolyline.getVertices()[2][0]);
+    projectionSettings.setValue("projection_y3", projectionPolyline.getVertices()[2][1]);
+    projectionSettings.setValue("projection_x4", projectionPolyline.getVertices()[3][0]);
+    projectionSettings.setValue("projection_y4", projectionPolyline.getVertices()[3][1]);
+    
+    // save camera polyline
+    ofPolyline cameraPolyline = calib->getCameraPolyline();
+    projectionSettings.setValue("camera_x1", cameraPolyline.getVertices()[0][0]);
+    projectionSettings.setValue("camera_y1", cameraPolyline.getVertices()[0][1]);
+    projectionSettings.setValue("camera_x2", cameraPolyline.getVertices()[1][0]);
+    projectionSettings.setValue("camera_y2", cameraPolyline.getVertices()[1][1]);
+    projectionSettings.setValue("camera_x3", cameraPolyline.getVertices()[2][0]);
+    projectionSettings.setValue("camera_y3", cameraPolyline.getVertices()[2][1]);
+    projectionSettings.setValue("camera_x4", cameraPolyline.getVertices()[3][0]);
+    projectionSettings.setValue("camera_y4", cameraPolyline.getVertices()[3][1]);
     
     projectionSettings.saveFile(PROJ_SETTINGS_FILE);
     
@@ -123,7 +145,7 @@ void ofApp::update(){
     
     if (calib->getState() == done) {
         touch->update();
-        proj->update();
+        //proj->update();
     }
 }
 
@@ -137,7 +159,8 @@ void ofApp::draw(){
     calib->draw(); // draw calibration process. If done, it draws nothing
     
     if (calib->getState() == done) {
-        proj->draw();
+        (touch->getTransformedTouch()).draw(0, 0);
+        //proj->draw();
     }
     
     //if (showGui)
@@ -164,9 +187,21 @@ void ofApp::exit(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     if (key == ' ') {
-        // TBD go to next calibration step
+        // if projection polygon is set, go to recognition state
+        if (calib->getState() == projectionSetup)
+            calib->recognize();
+        
+        // if camera polygon is set ore recognized correctly, confirm it
+        else if (calib->getState() == showingRecognizedArea) {
+            calib->confirmRecognizedArea();
+            touch->setSensitiveArea(calib->getCameraPolyline());
+            touch->start();
+            //proj->start();
+        }
     }
-    else if (key == 'q') {
+    else if (key == 'r') {
+        touch->stop();
+        //proj->stop();
         calib->startAgain();
     }
 }
@@ -184,11 +219,18 @@ void ofApp::mouseMoved(int x, int y ){
 void ofApp::mouseDragged(int x, int y, int button){
     if (calib->getState() == projectionSetup) {
         // manually setup projection area
-        if (dragProjectionCorner) {
+        if (dragPolygonCorner) {
             ofPolyline projectionPolyline = calib->getProjectionPolyline();
             projectionPolyline.getVertices()[dragCornerNumber].set(x, y);
-            
-            calib->presetProjectionArea(projectionPolyline);
+            calib->setProjectionArea(projectionPolyline);
+        }
+    }
+    else if (calib->getState() == showingRecognizedArea) {
+        // manually setup camera area
+        if (dragPolygonCorner) {
+            ofPolyline cameraPolyline = calib->getCameraPolyline();
+            cameraPolyline.getVertices()[dragCornerNumber].set(x, y);
+            calib->setCameraArea(cameraPolyline);
         }
     }
     else if (calib->getState() == done) {
@@ -206,7 +248,19 @@ void ofApp::mousePressed(int x, int y, int button){
         ofPolyline projectionPolygon = calib->getProjectionPolyline();
         for (int i = 0; i < projectionPolygon.size(); i++) {
             if (projectionPolygon.getVertices()[i].distance(ofVec2f(x, y)) < SENS_RANGE) {
-                dragProjectionCorner = true;
+                dragPolygonCorner = true;
+                dragCornerNumber = i;
+                break;
+            }
+        }
+    }
+    else if (calib->getState() == showingRecognizedArea) {
+        // manually setup camera sensitive area
+        // check if area around on of the corners of camera polygon was touched
+        ofPolyline cameraPolygon = calib->getCameraPolyline();
+        for (int i = 0; i < cameraPolygon.size(); i++) {
+            if (cameraPolygon.getVertices()[i].distance(ofVec2f(x, y)) < SENS_RANGE) {
+                dragPolygonCorner = true;
                 dragCornerNumber = i;
                 break;
             }
@@ -221,8 +275,8 @@ void ofApp::mousePressed(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
-    if (calib->getState() == projectionSetup) {
-        if (dragProjectionCorner) dragProjectionCorner = false;
+    if (calib->getState() == projectionSetup || calib->getState() == showingRecognizedArea) {
+        if (dragPolygonCorner) dragPolygonCorner = false;
     }
     else if (calib->getState() == done)
         touch->imitateRelease();

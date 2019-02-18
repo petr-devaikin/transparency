@@ -28,9 +28,14 @@ calibrator::calibrator(cameraManager * _camera, float qrTimer) {
     //cv::aruco
 }
 
-void calibrator::presetProjectionArea(ofPolyline _preset) {
+void calibrator::setProjectionArea(ofPolyline _preset) {
     if (_preset.size() == 4)
         projectionPolyline = _preset;
+}
+
+void calibrator::setCameraArea(ofPolyline _preset) {
+    if (_preset.size() == 4)
+        cameraPolyline = _preset;
 }
 
 void calibrator::update() {
@@ -42,6 +47,9 @@ void calibrator::update() {
         if (timer < 0) {
             bool recognized = false;
             // TBD start recognition
+            
+            // for now set as recognized
+            recognized = true;
             
             if (recognized) {
                 // cameraPolyline = ...
@@ -67,8 +75,9 @@ void calibrator::recognize() {
     timer = startTimerValue;
 }
 
-void calibrator::confirmedRecognizedArea() {
+void calibrator::confirmRecognizedArea() {
     cout << "Confirm recognition\n";
+    camera->setZeroLevel();
     currentState = done;
 }
 
@@ -88,12 +97,17 @@ CalibratorState calibrator::getState() {
 void calibrator::draw() {
     if (currentState == projectionSetup) {
         ofSetColor(255, 0, 0);
-        projectionPolyline.draw();
+        
+        ofBeginShape();
+        for( int i = 0; i < projectionPolyline.getVertices().size(); i++) {
+            ofVertex(projectionPolyline.getVertices().at(i).x, projectionPolyline.getVertices().at(i).y);
+        }
+        ofEndShape();
         
         ofSetColor(255);
-        ofDrawBitmapString("Move corners to cover all projected area and press Space", 10, 50);
+        ofDrawBitmapString("Move corners to completely cover the flag with projected polygon and press Space", 10, 50);
         if (couldNotRecognize)
-            ofDrawBitmapString("Couldn't recognize marker", 10, 70);
+            ofDrawBitmapString("Couldn't recognize marker!", 10, 80);
     }
     else if (currentState == recognizingQr) {
         // TBD drawing qr
@@ -106,11 +120,13 @@ void calibrator::draw() {
         
         // draw recognized polyline on top
         ofNoFill();
-        ofSetColor(255, 0, 0);
+        ofSetColor(0, 255, 0);
         cameraPolyline.draw();
         ofFill();
         
-        ofDrawBitmapString("Press Space to confirm recognition. Press Q to start again.", 10, 50);
+        ofSetColor(255);
+        ofDrawBitmapString("Move corners to cover the flag on the camera view and press Space", 10, 50);
+        ofDrawBitmapString("Press R to start again.", 10, 70);
     }
     // do nothing if done
 }

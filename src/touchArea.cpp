@@ -16,6 +16,9 @@ touchArea::touchArea(cameraManager * _camera, float _maxDepth, ofVec2f resultCan
     
     started = false;
     
+    // allocate image for substraction
+    substractedDepthImage.allocate(camera->getWidth(), camera->getHeight(), OF_IMAGE_COLOR);
+    
     // allocate result buffer
     resultFbo.allocate(resultCanvasSize[0], resultCanvasSize[1], GL_RGBA);
     resultFbo.begin();
@@ -23,12 +26,6 @@ touchArea::touchArea(cameraManager * _camera, float _maxDepth, ofVec2f resultCan
         ofClear(0);
     }
     resultFbo.end();
-    
-    // init border points with 0
-    touchBorderPoints.push_back(ofVec2f(0, 0));
-    touchBorderPoints.push_back(ofVec2f(0, 0));
-    touchBorderPoints.push_back(ofVec2f(0, 0));
-    touchBorderPoints.push_back(ofVec2f(0, 0));
     
     // looking for depth camera
     if (!camera->isCameraFound()) {
@@ -75,15 +72,14 @@ void touchArea::updateFromCamera() {
             if (res < 0) res = 0;
             if (res > 255) res = 255;
             
-            int localI = i - floor(boundingArea.x);
-            int localJ = j - floor(boundingArea.y);
-            
-            int localPixelNumber = 3 * (localJ * int(substractedDepthImage.getWidth()) + localI);
+            int localPixelNumber = 3 * (j * int(substractedDepthImage.getWidth()) + i);
             
             substractedDepthImage.getPixels().getData()[localPixelNumber] = res;
             substractedDepthImage.getPixels().getData()[localPixelNumber + 1] = res;
             substractedDepthImage.getPixels().getData()[localPixelNumber + 2] = res;
         }
+    
+    substractedDepthImage.update();
     
     // transform resulting picture from camera space to image space
     resultFbo.begin();
@@ -106,49 +102,29 @@ ofFbo & touchArea::getTransformedTouch() {
     return resultFbo;
 }
 
-vector<ofVec2f> touchArea::getBorderPoints() {
-    return touchBorderPoints;
-}
-
-void touchArea::setBorderPoints(vector<ofVec2f> points) {
+void touchArea::setSensitiveArea(ofPolyline points) {
     if (points.size() != 4) {
         cout << "Cannot set depth area. Need 4 points\n";
         return;
     }
     
-    for (int i = 0; i < 4; i++)
-        touchBorderPoints[i].set(points[i]);
-    
     // recalculate bounding rectangle
-    float minX = INFINITY, minY = INFINITY, maxX = 0, maxY = 0;
-    for (int j = 0; j < 4; j++) {
-        if (touchBorderPoints[j][0] < minX) minX = touchBorderPoints[j][0];
-        if (touchBorderPoints[j][1] < minY) minY = touchBorderPoints[j][1];
-        if (touchBorderPoints[j][0] > maxX) maxX = touchBorderPoints[j][0];
-        if (touchBorderPoints[j][1] > maxY) maxY = touchBorderPoints[j][1];
-    }
-    boundingArea = ofRectangle(minX, minY, maxX - minX, maxY - minY);
+    boundingArea = points.getBoundingBox();
     
-    // allocate substracted depth image (not transformed)
-    substractedDepthImage.allocate(int(boundingArea.width) + 1, int(boundingArea.height) + 1, OF_IMAGE_COLOR);
-    calculateTransformation();
+    calculateTransformation(points);
 }
 
-void touchArea::calculateTransformation() {
-    int width = substractedDepthImage.getWidth() - 1; // 1 was added during allocation
-    int height = substractedDepthImage.getHeight() - 1;
-    
+void touchArea::calculateTransformation(ofPolyline sensitiveArea) {
     // update transformation
     vector<Point2f> srcPoints, dstPoints;
     for (int i = 0; i < 4; i++) {
-        srcPoints.push_back(Point2f(touchBorderPoints[i][0], touchBorderPoints[i][1]));
+        srcPoints.push_back(Point2f(sensitiveArea[i][0], sensitiveArea[i][1]));
     }
     
     dstPoints.push_back(Point2f(0, 0));
-    dstPoints.push_back(Point2f(width, 0));
-    dstPoints.push_back(Point2f(width, height));
-    dstPoints.push_back(Point2f(0, height));
-    
+    dstPoints.push_back(Point2f(resultFbo.getWidth(), 0));
+    dstPoints.push_back(Point2f(resultFbo.getWidth(), resultFbo.getHeight()));
+    dstPoints.push_back(Point2f(0, resultFbo.getHeight()));
     
     Mat m = findHomography(srcPoints, dstPoints);
     transform.set(m.at<double>(0, 0), m.at<double>(1, 0), 0, m.at<double>(2, 0),

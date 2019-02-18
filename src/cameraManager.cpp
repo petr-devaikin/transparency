@@ -63,10 +63,6 @@ void cameraManager::disconnectCamera() {
         cameraFound = false;
         cout << "Disconnect Camera";
         pipe.stop();
-        
-        // remove depth buffer
-        delete[] depthCameraData;
-        delete[] zeroDepthCameraData;
     }
 }
 
