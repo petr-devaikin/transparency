@@ -11,12 +11,29 @@
 projectionInvertedBrush::projectionInvertedBrush(touchArea * t, float t1, float expSpeed, float bluredR) : baseProjection(t) {
     timer = ofGetElapsedTimef();
     
+    // set initial size from touchArea
+    width = t->getResultWidth();
+    height = t->getResultHeight();
+    
     thresholdSensitive = t1;
     expansionSpeed = expSpeed;
     bluredRadius = bluredR;
     
     // zero block
-    onesAndZerosAllocated = false;
+    onesBlock = new unsigned char[width * height]; // only b-channel
+    memset(onesBlock, 255, width * height);
+    
+    // prepare touch brush
+    touchBrushResized.allocate(2 * width + 1, 2 * height + 1, GL_RGBA);
+    touchBrushResized.begin();
+    ofClear(0);
+    ofSetColor(255);
+    touchBrush.draw(width - round(touchBrush.getWidth() / 2) + 1, height - round(touchBrush.getHeight() / 2) + 1);
+    touchBrushResized.end();
+    
+    // prepare touch area for blob search
+    touchAreaImage.allocate(t->getResultWidth(), t->getResultHeight());
+    
     
     // load shaders
     shaderExpansion.load("shadersGL3/expansion");
@@ -40,9 +57,7 @@ projectionInvertedBrush::projectionInvertedBrush(touchArea * t, float t1, float 
 
 projectionInvertedBrush::~projectionInvertedBrush() {
     // clean the memory
-    if (onesAndZerosAllocated) {
-        delete[] onesBlock;
-    }
+    delete[] onesBlock;
 }
 
 bool projectionInvertedBrush::start() {
@@ -55,42 +70,12 @@ void projectionInvertedBrush::addImage(const std::string &imgPath) {
     ofImage newImg;
     newImg.load(imgPath);
     originalImages.push_back(newImg);
-}
-
-bool projectionInvertedBrush::setSize(int width, int height) {
-    if (baseProjection::setSize(width, height)) {
-        // resize images
-        scaledImages.clear();
-        for (int i = 0; i < originalImages.size(); i++) {
-            ofImage newImage;
-            newImage.clone(originalImages[i]);
-            newImage.resize(width, height);
-            scaledImages.push_back(newImage);
-        }
-        
-        // allocate one bytes for check function
-        if (onesAndZerosAllocated) {
-            delete[] onesBlock;
-        }
-        onesAndZerosAllocated = true;
-        onesBlock = new unsigned char[width * height]; // only b-channel
-        memset(onesBlock, 255, width * height);
-        
-        // prepare touch brush
-        touchBrushResized.allocate(2 * width + 1, 2 * height + 1, GL_RGBA);
-        touchBrushResized.begin();
-        ofClear(0);
-        ofSetColor(255);
-        touchBrush.draw(width - round(touchBrush.getWidth() / 2) + 1, height - round(touchBrush.getHeight() / 2) + 1);
-        touchBrushResized.end();
-        
-        // prepare touch area for blob search
-        touchAreaImage.allocate(touch->getResultWidth(), touch->getResultHeight());
-        
-        return true;
-    }
-    else
-        return false;
+    
+    // resize
+    ofImage newImage;
+    newImage.clone(newImg);
+    newImage.resize(width, height);
+    scaledImages.push_back(newImage);
 }
 
 // Helpers
@@ -103,7 +88,7 @@ void projectionInvertedBrush::calculateTouchBlobs() {
     touchAreaImage.setFromPixels(touchPixels.getChannel(0));
     touchAreaImage.threshold(255 * thresholdSensitive);
     
-    contourFinder.findContours(touchAreaImage, 4, size[0] * size[1], 4, false);
+    contourFinder.findContours(touchAreaImage, 4, width * height, 4, false);
 }
 
 int projectionInvertedBrush::detectLayerIndex(ofPoint point) {
@@ -192,10 +177,11 @@ void projectionInvertedBrush::draw() {
     if (!started) return; // not started yet
     
     // draw touch canvas
-    //(touch->getTransformedTouch()).draw(position[0], position[1]);
+    //(touch->getTransformedTouch()).draw(0, 0);
     //return;
     
-    if (!onesAndZerosAllocated) return; // size is not set. not ready
+    ofPushMatrix();
+    ofMultMatrix(transform);
     
     ofSetColor(255);
     shaderTransparency.begin();
@@ -203,19 +189,12 @@ void projectionInvertedBrush::draw() {
     
     for (int i = 0; i < layers.size(); i++) {
         shaderTransparency.setUniformTexture("mask", layers[i].getMask().getTexture(), 1);
-        layers[i].getImage().draw(position[0], position[1]);
+        layers[i].getImage().draw(0, 0);
     }
     
     shaderTransparency.end();
     
-    /*
-     // draw blobs
-    for (int i = 0; i < contourFinder.nBlobs; i++) {
-        ofRectangle rect = contourFinder.blobs.at(i).boundingRect;
-        ofSetColor(255, 0, 0);
-        ofDrawRectangle(position[0] + rect.getLeft(), position[1] + rect.getTop(), rect.width, rect.height);
-    }
-     */
+    ofPopMatrix();
 }
 
 void projectionInvertedBrush::resetLayers() {

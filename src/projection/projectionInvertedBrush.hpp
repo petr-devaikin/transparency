@@ -41,7 +41,6 @@ private:
     ofShader shaderExpansionAdder;
     ofShader shaderTransparency;
     
-    bool onesAndZerosAllocated;
     unsigned char * onesBlock; // to check if all pixels are 1 inside layerWithMask
     
     ofImage touchBrush; // to initiate trunsition

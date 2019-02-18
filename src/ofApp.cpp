@@ -159,8 +159,8 @@ void ofApp::draw(){
     calib->draw(); // draw calibration process. If done, it draws nothing
     
     if (calib->getState() == done) {
-        (touch->getTransformedTouch()).draw(0, 0);
-        //proj->draw();
+        //(touch->getTransformedTouch()).draw(0, 0);
+        proj->draw();
     }
     
     //if (showGui)
@@ -195,13 +195,14 @@ void ofApp::keyPressed(int key){
         else if (calib->getState() == showingRecognizedArea) {
             calib->confirmRecognizedArea();
             touch->setSensitiveArea(calib->getCameraPolyline());
+            proj->setOutputPolyline(calib->getProjectionPolyline());
             touch->start();
-            //proj->start();
+            proj->start();
         }
     }
     else if (key == 'r') {
         touch->stop();
-        //proj->stop();
+        proj->stop();
         calib->startAgain();
     }
 }

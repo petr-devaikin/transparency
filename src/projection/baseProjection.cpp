@@ -6,7 +6,9 @@
 //
 
 #include "baseProjection.hpp"
-#include "ofxCv.h"
+#include "ofxOpenCv.h"
+
+using namespace cv;
 
 // Initialization
 
@@ -15,8 +17,33 @@ baseProjection::baseProjection(touchArea * t) {
     
     touch = t;
     
-    size.set(0, 0);
-    position.set(0, 0);
+    //size = _size;
+    
+    transform = ofMatrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+
+void baseProjection::setOutputPolyline(ofPolyline points) {
+    calculateTransformation(points);
+}
+
+void baseProjection::calculateTransformation(ofPolyline outputArea) {
+    // update transformation
+    vector<Point2f> srcPoints, dstPoints;
+    
+    srcPoints.push_back(Point2f(0, 0));
+    srcPoints.push_back(Point2f(width, 0));
+    srcPoints.push_back(Point2f(width, height));
+    srcPoints.push_back(Point2f(0, height));
+    
+    for (int i = 0; i < 4; i++) {
+        dstPoints.push_back(Point2f(outputArea[i][0], outputArea[i][1]));
+    }
+    
+    Mat m = findHomography(srcPoints, dstPoints);
+    transform.set(m.at<double>(0, 0), m.at<double>(1, 0), 0, m.at<double>(2, 0),
+                  m.at<double>(0, 1), m.at<double>(1, 1), 0, m.at<double>(2, 1),
+                  0, 0, 1, 0,
+                  m.at<double>(0, 2), m.at<double>(1, 2), 0, 1);
 }
 
 bool baseProjection::start() {
@@ -35,78 +62,4 @@ bool baseProjection::stop() {
     }
     else
         return false;
-}
-
-// Size and position setters and getters
-
-bool baseProjection::setPosition(float x, float y) {
-    if (x != position[0] || y != position[1]) {
-        position.set(x, y);
-        return true;
-    }
-    else
-        return false;
-}
-
-bool baseProjection::setX(float x) {
-    return setPosition(x, position[1]);
-}
-
-bool baseProjection::setY(float y) {
-    return setPosition(position[0], y);
-}
-
-bool baseProjection::setSize(int width, int height) {
-    if (width != size[0] || height != size[1]) {
-        size.set(width, height);
-        
-        // update result screen size in touch area
-        // touch->setResultScreenSize(size);
-        
-        return true;
-    }
-    else
-        return false;
-}
-
-bool baseProjection::setWidth(int width) {
-    return setSize(width, size[1]);
-}
-
-bool baseProjection::setHeight(int height) {
-    return setSize(size[0], height);
-}
-
-ofVec2f baseProjection::getPosition() {
-    return position;
-}
-
-ofVec2f baseProjection::getSize() {
-    return size;
-}
-
-float baseProjection::getX() {
-    return position[0];
-}
-
-float baseProjection::getY() {
-    return position[1];
-}
-
-float baseProjection::getWidth() {
-    return size[0];
-}
-
-float baseProjection::getHeight() {
-    return size[1];
-}
-
-// Drawing
-
-void baseProjection::drawBorder() {
-    ofSetColor(255, 0, 0);
-    ofNoFill();
-    ofDrawRectangle(position[0], position[1], size[0], size[1]);
-    ofFill();
-    ofSetColor(255);
 }

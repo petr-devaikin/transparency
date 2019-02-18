@@ -14,33 +14,24 @@
 class baseProjection {
 private:
 protected:
-    ofVec2f position;
-    ofVec2f size;
+    int width;
+    int height;
     touchArea * touch;
+    
+    ofMatrix4x4 transform;
+    void calculateTransformation(ofPolyline outputArea);
     
     bool started;
 public:
     baseProjection(touchArea * t);
+    
     bool start();
     bool stop();
     
-    bool setPosition(float x, float y);
-    ofVec2f getPosition();
-    bool setX(float x);
-    float getX();
-    bool setY(float y);
-    float getY();
-    
-    bool setSize(int width, int height);
-    bool setWidth(int width);
-    float getWidth();
-    bool setHeight(int height);
-    ofVec2f getSize();
-    float getHeight();
+    void setOutputPolyline(ofPolyline points);
     
     virtual void update() = 0;
     
-    void drawBorder();
     virtual void draw() = 0;
 };
 
