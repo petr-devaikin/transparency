@@ -23,6 +23,8 @@ projectionInvertedBrush::projectionInvertedBrush(touchArea * t, float t1, float 
     onesBlock = new unsigned char[width * height]; // only b-channel
     memset(onesBlock, 255, width * height);
     
+    touchBrush.load("exp_brush_4001.png");
+    
     // prepare touch brush
     touchBrushResized.allocate(2 * width + 1, 2 * height + 1, GL_RGBA);
     touchBrushResized.begin();
@@ -33,7 +35,6 @@ projectionInvertedBrush::projectionInvertedBrush(touchArea * t, float t1, float 
     
     // prepare touch area for blob search
     touchAreaImage.allocate(t->getResultWidth(), t->getResultHeight());
-    
     
     // load shaders
     shaderExpansion.load("shadersGL3/expansion");
@@ -51,8 +52,6 @@ projectionInvertedBrush::projectionInvertedBrush(touchArea * t, float t1, float 
     img.update();
     ofSaveImage(img, "exp_brush_4001.png", OF_IMAGE_QUALITY_BEST);
     */
-    
-    touchBrush.load("exp_brush_4001.png");
 }
 
 projectionInvertedBrush::~projectionInvertedBrush() {
@@ -184,6 +183,9 @@ void projectionInvertedBrush::draw() {
     //return;
     
     ofSetColor(255);
+    if (layers.size() > 1)
+        layers[1].getMask().draw(0, 0);
+    /*
     shaderTransparency.begin();
     shaderTransparency.setUniform1i("radius", bluredRadius);
     
@@ -193,6 +195,13 @@ void projectionInvertedBrush::draw() {
     }
     
     shaderTransparency.end();
+    */
+    
+    for (int i = 0; i < contourFinder.nBlobs; i++) {
+        ofRectangle rect = contourFinder.blobs.at(i).boundingRect;
+        ofSetColor(255, 0, 0);
+        ofDrawRectangle(rect.getLeft(), rect.getTop(), rect.width, rect.height);
+    }
     
     ofPopMatrix();
 }

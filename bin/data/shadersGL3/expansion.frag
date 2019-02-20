@@ -14,8 +14,7 @@ out vec4 outputColor;
 // b - activated pixel if 1
 // a - not used. always 1
 
-void main()
-{
+void main() {
     vec4 currentColor = texture(tex0, texCoordVarying).rgba;
     
     if (currentColor.b == 1)
