@@ -18,6 +18,9 @@ class projectionInvertedBrush : public baseProjection {
 private:
     float timer;
     
+    ofFbo resultFbo;
+    void drawLayers(); // draw all the layers on resultFbo
+    
     vector<ofImage> originalImages;
     vector<ofImage> scaledImages;
     
@@ -40,6 +43,7 @@ private:
     ofShader shaderExpansion;
     ofShader shaderExpansionAdder;
     ofShader shaderTransparency;
+    ofShader shaderMix2Images;
     
     unsigned char * onesBlock; // to check if all pixels are 1 inside layerWithMask
     

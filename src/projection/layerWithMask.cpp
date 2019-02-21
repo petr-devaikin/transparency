@@ -9,9 +9,13 @@
 
 layerWithMask::layerWithMask(ofImage img, int imageIndex, unsigned char * oneBlock, ofShader shdrE, ofShader shdrA, ofFbo touchBr) {
     ones = oneBlock;
-    image = img;
     _isFull = false;
     _imageIndex = imageIndex;
+    
+    image.allocate(img.getWidth(), img.getHeight(), GL_RGB);
+    image.begin();
+    img.draw(0, 0);
+    image.end();
     
     mask.allocate(img.getWidth(), img.getHeight(), GL_RGBA);
     mask.begin();
@@ -55,7 +59,9 @@ bool layerWithMask::checkIfTouched(ofPoint point) {
 }
 
 void layerWithMask::addTouch(ofPoint point, float blurRadius) {
+    
     tempFbo.begin();
+    
     ofClear(0, 0, 0, 0);
     ofSetColor(255, 255, 255, 255);
     
@@ -66,7 +72,9 @@ void layerWithMask::addTouch(ofPoint point, float blurRadius) {
     touchBrush.draw(0, 0);
     
     shaderExpAdder.end();
+    
     tempFbo.end();
+     
     
     mask.begin();
     ofClear(0, 0, 0, 0);
@@ -97,7 +105,7 @@ void layerWithMask::expand(float radius) {
     mask.end();
 }
 
-ofImage layerWithMask::getImage() {
+ofFbo layerWithMask::getImage() {
     return image;
 }
 

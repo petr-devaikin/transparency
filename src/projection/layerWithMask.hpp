@@ -14,7 +14,7 @@ class layerWithMask {
 private:
     unsigned char * ones;
     int _imageIndex;
-    ofImage image;
+    ofFbo image;
     ofFbo mask;
     ofFbo tempFbo;
     bool _isFull;
@@ -34,7 +34,7 @@ public:
     
     void expand(float radius);
     
-    ofImage getImage();
+    ofFbo getImage();
     ofFbo getMask();
 };
 

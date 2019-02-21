@@ -23,9 +23,13 @@ projectionInvertedBrush::projectionInvertedBrush(touchArea * t, float t1, float 
     onesBlock = new unsigned char[width * height]; // only b-channel
     memset(onesBlock, 255, width * height);
     
-    touchBrush.load("exp_brush_4001.png");
+    // init result fbo
+    resultFbo.allocate(width, height);
     
     // prepare touch brush
+    
+    touchBrush.load("exp_brush_4001.png");
+    
     touchBrushResized.allocate(2 * width + 1, 2 * height + 1, GL_RGBA);
     touchBrushResized.begin();
     ofClear(0);
@@ -40,6 +44,7 @@ projectionInvertedBrush::projectionInvertedBrush(touchArea * t, float t1, float 
     shaderExpansion.load("shadersGL3/expansion");
     shaderExpansionAdder.load("shadersGL3/expansionMaskAdder");
     shaderTransparency.load("shadersGL3/transparency");
+    shaderMix2Images.load("shadersGL3/mix2images");
     
     /*
     ofImage img;
@@ -170,21 +175,29 @@ void projectionInvertedBrush::update() {
         }
     }
     currentTouches = newTouches;
+    
+    drawLayers();
 }
 
-void projectionInvertedBrush::draw() {
-    if (!started) return; // not started yet
-    
-    ofPushMatrix();
-    ofMultMatrix(transform);
-    
-    // draw touch canvas
-    //(touch->getTransformedTouch()).draw(0, 0);
-    //return;
+void projectionInvertedBrush::drawLayers() {
+    resultFbo.begin();
     
     ofSetColor(255);
-    if (layers.size() > 1)
-        layers[1].getMask().draw(0, 0);
+    
+    if (layers.size() == 1) {
+        layers[0].getImage().draw(0, 0);
+    }
+    else {
+        shaderMix2Images.begin();
+        shaderMix2Images.setUniform1i("radius", bluredRadius);
+        shaderMix2Images.setUniformTexture("background", layers[0].getImage().getTexture(), 1);
+        
+        shaderMix2Images.setUniformTexture("mask", layers[1].getMask().getTexture(), 2);
+        layers[1].getImage().draw(0, 0);
+        
+        shaderMix2Images.end();
+    }
+    
     /*
     shaderTransparency.begin();
     shaderTransparency.setUniform1i("radius", bluredRadius);
@@ -195,13 +208,40 @@ void projectionInvertedBrush::draw() {
     }
     
     shaderTransparency.end();
-    */
+     */
     
+    resultFbo.end();
+}
+
+void projectionInvertedBrush::draw() {
+    if (!started) return; // not started yet
+    
+    ofPushMatrix();
+    ofMultMatrix(transform);
+    
+    ofSetColor(255);
+    
+    resultFbo.draw(0, 0);
+    
+    // draw touch canvas
+    //(touch->getTransformedTouch()).draw(0, 0);
+    //return;
+    
+    /*
+    // show masks
+    if (layers.size() > 1)
+        layers[1].getMask().draw(0, 0);
+     */
+    //touch->getTransformedTouch().draw(0, 0);
+    
+    /*
+    // show touch blobs
     for (int i = 0; i < contourFinder.nBlobs; i++) {
         ofRectangle rect = contourFinder.blobs.at(i).boundingRect;
         ofSetColor(255, 0, 0);
         ofDrawRectangle(rect.getLeft(), rect.getTop(), rect.width, rect.height);
     }
+     */
     
     ofPopMatrix();
 }
