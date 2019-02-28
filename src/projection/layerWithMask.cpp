@@ -59,6 +59,7 @@ bool layerWithMask::checkIfTouched(ofPoint point) {
 }
 
 void layerWithMask::addTouch(ofPoint point, float blurRadius) {
+    if (checkIfTouched(point)) return; // if already invisible, skip this
     
     tempFbo.begin();
     

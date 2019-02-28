@@ -2,7 +2,7 @@
 
 
 //--------------------------------------------------------------
-void ofApp::setup(){
+void ofApp::setup() {
     // init camera
     camera = new cameraManager();
     camera->findCamera();
@@ -13,26 +13,26 @@ void ofApp::setup(){
     // init touch
     touch = new touchArea(camera, .3, ofVec2f(1024, 1024)); // 30 cm max dept. Result image 1024x1024
     
-    proj = new projectionInvertedBrush(touch);
-    proj->addImage("surrender_jei_2018/surrender_001.png");
-    proj->addImage("surrender_jei_2018/surrender_002.png");
-    proj->addImage("surrender_jei_2018/surrender_003.png");
-    proj->addImage("surrender_jei_2018/surrender_004.png");
-    proj->addImage("surrender_jei_2018/surrender_005.png");
-    proj->addImage("surrender_jei_2018/surrender_006.png");
-    proj->addImage("surrender_jei_2018/surrender_007.png");
-    proj->addImage("surrender_jei_2018/surrender_008.png");
-    proj->addImage("surrender_jei_2018/surrender_009.png");
-    proj->addImage("surrender_jei_2018/surrender_010.png");
-    proj->addImage("surrender_jei_2018/surrender_011.png");
-    proj->addImage("surrender_jei_2018/surrender_012.png");
-    proj->addImage("surrender_jei_2018/surrender_013.png");
-    proj->addImage("surrender_jei_2018/surrender_014.png");
-    proj->addImage("surrender_jei_2018/surrender_015.png");
-    proj->addImage("surrender_jei_2018/surrender_016.png");
-    proj->addImage("surrender_jei_2018/surrender_017.png");
-    proj->addImage("surrender_jei_2018/surrender_018.png");
-    proj->addImage("surrender_jei_2018/surrender_019.png");
+    proj = new projectionInvertedBrush(BASE_PATH, touch);
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_001.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_002.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_003.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_004.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_005.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_006.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_007.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_008.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_009.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_010.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_011.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_012.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_013.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_014.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_015.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_016.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_017.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_018.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_019.png"));
     
     // gui
     /*
@@ -74,7 +74,7 @@ void ofApp::loadSettings() {
     
     // projection settings
     ofxXmlSettings projectionSettings;
-    projectionSettings.loadFile(PROJ_SETTINGS_FILE);
+    projectionSettings.loadFile(ofFilePath::join(BASE_PATH, PROJ_SETTINGS_FILE));
     
     // load projection polyline
     ofPolyline projectionPolyline;
@@ -126,7 +126,7 @@ void ofApp::saveSettings() {
     projectionSettings.setValue("camera_x4", cameraPolyline.getVertices()[3][0]);
     projectionSettings.setValue("camera_y4", cameraPolyline.getVertices()[3][1]);
     
-    projectionSettings.saveFile(PROJ_SETTINGS_FILE);
+    projectionSettings.saveFile(ofFilePath::join(BASE_PATH, PROJ_SETTINGS_FILE));
     
     // save depth settings
     

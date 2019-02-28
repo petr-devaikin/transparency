@@ -13,8 +13,8 @@
 
 class cameraManager {
 private:
-    const int WIDTH = 1280;
-    const int HEIGHT = 720;
+    const int WIDTH = 640;
+    const int HEIGHT = 360;
     
     ofImage rgbCameraImage; // last data from sensor
     unsigned short * depthCameraData; // last data from sensor

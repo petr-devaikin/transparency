@@ -8,7 +8,7 @@
 #include "projectionInvertedBrush.hpp"
 
 
-projectionInvertedBrush::projectionInvertedBrush(touchArea * t, float t1, float expSpeed, float bluredR) : baseProjection(t) {
+projectionInvertedBrush::projectionInvertedBrush(const string basePath, touchArea * t, float t1, float expSpeed, float bluredR) : baseProjection(t) {
     timer = ofGetElapsedTimef();
     
     // set initial size from touchArea
@@ -28,7 +28,7 @@ projectionInvertedBrush::projectionInvertedBrush(touchArea * t, float t1, float 
     
     // prepare touch brush
     
-    touchBrush.load("exp_brush_4001.png");
+    touchBrush.load(ofFilePath::join(basePath, "exp_brush_4001.png"));
     
     touchBrushResized.allocate(2 * width + 1, 2 * height + 1, GL_RGBA);
     touchBrushResized.begin();
@@ -41,10 +41,10 @@ projectionInvertedBrush::projectionInvertedBrush(touchArea * t, float t1, float 
     touchAreaImage.allocate(t->getResultWidth(), t->getResultHeight());
     
     // load shaders
-    shaderExpansion.load("shadersGL3/expansion");
-    shaderExpansionAdder.load("shadersGL3/expansionMaskAdder");
-    shaderTransparency.load("shadersGL3/transparency");
-    shaderMix2Images.load("shadersGL3/mix2images");
+    shaderExpansion.load(ofFilePath::join(basePath, "shadersGL3/expansion"));
+    shaderExpansionAdder.load(ofFilePath::join(basePath, "shadersGL3/expansionMaskAdder"));
+    shaderTransparency.load(ofFilePath::join(basePath, "shadersGL3/transparency"));
+    shaderMix2Images.load(ofFilePath::join(basePath, "shadersGL3/mix2images"));
     
     /*
     ofImage img;

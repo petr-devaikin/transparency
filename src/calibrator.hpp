@@ -32,7 +32,7 @@ private:
     float timer;
     float startTimerValue;
 public:
-    calibrator(cameraManager * _camera, float qrTimer = 1); // qr timer - for how long to show qr before recognizing
+    calibrator(cameraManager * _camera, float qrTimer = 0.1); // qr timer - for how long to show qr before recognizing
     void setProjectionArea(ofPolyline _preset);
     void setCameraArea(ofPolyline _preset);
     

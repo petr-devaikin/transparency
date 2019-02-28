@@ -28,7 +28,7 @@ public:
     bool isFull(); // check if the mask covers everything
     void setFull(); // set all mask to 1
     
-    bool checkIfTouched(ofPoint point); // check if intersection of checkArea and mask is more than 50% of checkArea
+    bool checkIfTouched(ofPoint point); // check if layer is visible on that point
     void addTouch(ofPoint point, float blurRadius);
     int getImageIndex(); // index of the image from sourceImage array
     

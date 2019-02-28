@@ -12,8 +12,9 @@
 
 const int SENS_RANGE = 5;
 
+const string BASE_PATH = "";
+
 const string PROJ_SETTINGS_FILE = "projection_settings.xml";
-const string DEPTH_SETTINGS_FILE = "depth_settings.xml";
 
 
 class ofApp : public ofBaseApp{
