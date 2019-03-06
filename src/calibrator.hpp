@@ -25,14 +25,19 @@ private:
     
     cameraManager * camera;
     
+    int imageWidth;
+    int imageHeight;
+    
     ofPolyline projectionPolyline;
     ofPolyline cameraPolyline;
+    
+    void calculateTransformation();
     
     float currentTime;
     float timer;
     float startTimerValue;
 public:
-    calibrator(cameraManager * _camera, float qrTimer = 0.1); // qr timer - for how long to show qr before recognizing
+    calibrator(cameraManager * _camera, int _imageWidth, int _imageHeight, float qrTimer = 0.1); // qr timer - for how long to show qr before recognizing
     void setProjectionArea(ofPolyline _preset);
     void setCameraArea(ofPolyline _preset);
     
@@ -49,6 +54,11 @@ public:
     
     ofPolyline getProjectionPolyline();
     ofPolyline getCameraPolyline();
+    ofRectangle getProjectionBox();
+    ofRectangle getCameraBox();
+    
+    ofMatrix4x4 getCamera2ProjectionTransform();
+    ofMatrix4x4 getImage2ProjectionTransform();
 };
 
 #endif /* calibrator_hpp */

@@ -14,12 +14,7 @@
 class baseProjection {
 private:
 protected:
-    int width;
-    int height;
     touchArea * touch;
-    
-    ofMatrix4x4 transform;
-    void calculateTransformation(ofPolyline outputArea);
     
     bool started;
 public:
@@ -27,8 +22,6 @@ public:
     
     bool start();
     bool stop();
-    
-    void setOutputPolyline(ofPolyline points);
     
     virtual void update() = 0;
     

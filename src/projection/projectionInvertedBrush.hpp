@@ -12,7 +12,6 @@
 #include "ofxOpenCv.h"
 #include "baseProjection.hpp"
 #include "layerWithMask.hpp"
-#include "layerTouch.hpp"
 
 class projectionInvertedBrush : public baseProjection {
 private:
@@ -22,13 +21,11 @@ private:
     void drawLayers(); // draw all the layers on resultFbo
     
     vector<ofImage> originalImages;
-    vector<ofImage> scaledImages;
+    vector<ofFbo> transformedImages;
     
     vector<layerWithMask> layers;
     void resetLayers(); // clean layers array and add the first image
     void addImageToLayers(int i); // add new layer based on the i-th image
-    
-    vector<layerTouch> currentTouches;
     
     int detectLayerIndex(ofPoint point); // finds the next level which was touched
     
@@ -50,9 +47,14 @@ private:
     ofImage touchBrush; // to initiate trunsition
     ofFbo touchBrushResized; // resized and preprocessed
     
+    ofMatrix4x4 camera2Projection;
+    ofMatrix4x4 image2Projection;
+    ofRectangle projectionBox;
 public:
-    projectionInvertedBrush(const string basePath, touchArea * t, float t1 = 0.5, float expSpeed = 50, float bluredR = 50);
+    projectionInvertedBrush(const string basePath, touchArea * t, ofMatrix4x4 transformCamera2Projection, ofMatrix4x4 transformImage2Projection, ofRectangle _projectionBox, float _thresholdSensitive = 0.5, float expSpeed = 50, float bluredR = 50);
     ~projectionInvertedBrush();
+    
+    void setTransform(ofMatrix4x4 transformCamera2Projection, ofMatrix4x4 transformImage2Projection, ofRectangle _projectionBox);
     
     bool start();
     

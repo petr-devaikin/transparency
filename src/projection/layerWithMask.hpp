@@ -24,7 +24,7 @@ private:
     
     ofFbo touchBrush;
 public:
-    layerWithMask(ofImage img, int imageIndex, unsigned char * oneBlock, ofShader shdrE, ofShader shdrA, ofFbo touchBr);
+    layerWithMask(ofFbo img, int imageIndex, unsigned char * oneBlock, ofShader shdrE, ofShader shdrA, ofFbo touchBr);
     bool isFull(); // check if the mask covers everything
     void setFull(); // set all mask to 1
     

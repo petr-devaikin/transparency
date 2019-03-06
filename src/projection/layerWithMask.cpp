@@ -7,15 +7,12 @@
 
 #include "layerWithMask.hpp"
 
-layerWithMask::layerWithMask(ofImage img, int imageIndex, unsigned char * oneBlock, ofShader shdrE, ofShader shdrA, ofFbo touchBr) {
+layerWithMask::layerWithMask(ofFbo img, int imageIndex, unsigned char * oneBlock, ofShader shdrE, ofShader shdrA, ofFbo touchBr) {
     ones = oneBlock;
     _isFull = false;
     _imageIndex = imageIndex;
     
-    image.allocate(img.getWidth(), img.getHeight(), GL_RGB);
-    image.begin();
-    img.draw(0, 0);
-    image.end();
+    image = img;
     
     mask.allocate(img.getWidth(), img.getHeight(), GL_RGBA);
     mask.begin();

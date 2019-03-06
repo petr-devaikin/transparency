@@ -9,37 +9,27 @@
 
 using namespace cv;
 
-touchArea::touchArea(cameraManager * _camera, float _maxDepth, ofVec2f resultCanvasSize)
-{
+touchArea::touchArea(cameraManager * _camera, float _maxDepth, ofPolyline _sensitiveArea) {
     camera = _camera;
     maxDepth = _maxDepth;
+    sensitiveArea = _sensitiveArea;
     
     started = false;
     
-    // allocate image for substraction
-    substractedDepthImage.allocate(camera->getWidth(), camera->getHeight(), OF_IMAGE_COLOR);
-    
     // allocate result buffer
-    resultFbo.allocate(resultCanvasSize[0], resultCanvasSize[1], GL_RGBA);
+    resultFbo.allocate(sensitiveArea.getBoundingBox().width, sensitiveArea.getBoundingBox().height, GL_RGBA);
     resultFbo.begin();
-    {
-        ofClear(0);
-    }
+    ofClear(0);
     resultFbo.end();
+    
+    // allocate image for substraction
+    substractedDepthImage.allocate(sensitiveArea.getBoundingBox().width, sensitiveArea.getBoundingBox().height, OF_IMAGE_COLOR);
     
     // looking for depth camera
     if (!camera->isCameraFound()) {
         // camera not found. prepare fake brush
         brush.load("brush.png");
         brush.setImageType(OF_IMAGE_GRAYSCALE);
-    }
-    else {
-        // init transform matrix
-        transform = ofMatrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        // [? ? 0 ?]
-        // [? ? 0 ?]
-        // [0 0 1 0]
-        // [? ? 0 1]
     }
 }
 
@@ -64,15 +54,21 @@ void touchArea::updateFromCamera() {
     // calculate distance between current position and zero level.
     // transform this value to decrease sensitivity at the beginning of touch
     // iterate only withing the bounding area
-    for (int i = floor(boundingArea.x); i <= ceil(boundingArea.x + boundingArea.width); i++)
-        for (int j = floor(boundingArea.y); j <= ceil(boundingArea.y + boundingArea.height); j++) {
-            float res = camera->getDistanceChange(i, j) / maxDepth;
-            res = pow(res, 3); // power of 3 to be sensitive more to deep touch
-            res *= 255;
-            if (res < 0) res = 0;
-            if (res > 255) res = 255;
+    for (int i = 0; i < sensitiveArea.getBoundingBox().width; i++)
+        for (int j = 0; j < sensitiveArea.getBoundingBox().height; j++) {
+            float res = 0;
             
-            int localPixelNumber = 3 * (j * int(substractedDepthImage.getWidth()) + i);
+            // check if pixel is inside sensitive area
+            // get difference from camera
+            if (sensitiveArea.inside(i + sensitiveArea.getBoundingBox().x, j + sensitiveArea.getBoundingBox().y)) {
+                float res = camera->getDistanceChange(i + sensitiveArea.getBoundingBox().x, j + sensitiveArea.getBoundingBox().y) / maxDepth;
+                res = pow(res, 3); // power of 3 to be sensitive more to deep touch
+                res *= 255;
+                if (res < 0) res = 0;
+                if (res > 255) res = 255;
+            }
+                
+            int localPixelNumber = 3 * (j * sensitiveArea.getBoundingBox().width + i);
             
             substractedDepthImage.getPixels().getData()[localPixelNumber] = res;
             substractedDepthImage.getPixels().getData()[localPixelNumber + 1] = res;
@@ -84,53 +80,14 @@ void touchArea::updateFromCamera() {
     // transform resulting picture from camera space to image space
     resultFbo.begin();
     {
-        ofClear(0, 0, 0, 255);
-        
-        ofPushMatrix();
-        
-        ofMultMatrix(transform);
-        
         ofSetColor(255);
         substractedDepthImage.draw(0, 0);
-        
-        ofPopMatrix();
     }
     resultFbo.end();
 }
 
-ofFbo & touchArea::getTransformedTouch() {
+ofFbo & touchArea::getTouch() {
     return resultFbo;
-}
-
-void touchArea::setSensitiveArea(ofPolyline points) {
-    if (points.size() != 4) {
-        cout << "Cannot set depth area. Need 4 points\n";
-        return;
-    }
-    
-    // recalculate bounding rectangle
-    boundingArea = points.getBoundingBox();
-    
-    calculateTransformation(points);
-}
-
-void touchArea::calculateTransformation(ofPolyline sensitiveArea) {
-    // update transformation
-    vector<Point2f> srcPoints, dstPoints;
-    for (int i = 0; i < 4; i++) {
-        srcPoints.push_back(Point2f(sensitiveArea[i][0], sensitiveArea[i][1]));
-    }
-    
-    dstPoints.push_back(Point2f(0, 0));
-    dstPoints.push_back(Point2f(resultFbo.getWidth(), 0));
-    dstPoints.push_back(Point2f(resultFbo.getWidth(), resultFbo.getHeight()));
-    dstPoints.push_back(Point2f(0, resultFbo.getHeight()));
-    
-    Mat m = findHomography(srcPoints, dstPoints);
-    transform.set(m.at<double>(0, 0), m.at<double>(1, 0), 0, m.at<double>(2, 0),
-                  m.at<double>(0, 1), m.at<double>(1, 1), 0, m.at<double>(2, 1),
-                  0, 0, 1, 0,
-                  m.at<double>(0, 2), m.at<double>(1, 2), 0, 1);
 }
 
 void touchArea::update() {

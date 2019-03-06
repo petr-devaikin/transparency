@@ -8,60 +8,10 @@ void ofApp::setup() {
     camera->findCamera();
     
     // init calibrator
-    calib = new calibrator(camera);
-    
-    // init touch
-    touch = new touchArea(camera, .3, ofVec2f(1024, 1024)); // 30 cm max dept. Result image 1024x1024
-    
-    proj = new projectionInvertedBrush(BASE_PATH, touch);
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_001.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_002.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_003.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_004.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_005.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_006.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_007.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_008.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_009.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_010.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_011.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_012.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_013.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_014.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_015.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_016.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_017.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_018.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_019.png"));
-    
-    // gui
-    /*
-    gui.setup();
-    
-    gui.add(showGui.setup("GUI (g)", true));
-    
-    modeNormal.addListener(this, &ofApp::setNormalMode);
-    modeDepth.addListener(this, &ofApp::setDepthMode);
-    modeOutputCalibration.addListener(this, &ofApp::setOutputCalibrationMode);
-    modeInputCalibration.addListener(this, &ofApp::setInputCalibrationMode);
-    
-    gui.add(modeNormal.setup("Normal mode", true));
-    gui.add(modeDepth.setup("Depth mode", false));
-    gui.add(modeOutputCalibration.setup("Output calibration", false));
-    gui.add(modeInputCalibration.setup("Input calibration", false));
-     
-    //set this param in gui!!!
-    //gui.add(maxDepth.set)
-    
-     */
-    
+    calib = new calibrator(camera, 1024, 1024);
     
     // load settings from files
     loadSettings();
-    
-    // start immediately for now
-    //touch->start();
-    //proj->start();
 }
 
 //--------------------------------------------------------------
@@ -133,8 +83,35 @@ void ofApp::saveSettings() {
     //ofxXmlSettings depthSettings;
     //depthSettings.saveFile(DEPTH_SETTINGS_FILE);
     
-    // GUI
-    // gui.saveToFile("settings.xml");
+}
+
+void ofApp::initProjection() {
+    // init proj
+    proj = new projectionInvertedBrush(BASE_PATH, touch, calib->getImage2ProjectionTransform(), calib->getImage2ProjectionTransform(), calib->getProjectionBox());
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_001.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_002.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_003.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_004.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_005.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_006.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_007.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_008.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_009.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_010.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_011.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_012.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_013.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_014.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_015.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_016.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_017.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_018.png"));
+    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_019.png"));
+}
+
+void ofApp::initTouchArea() {
+    // init touch
+    touch = new touchArea(camera, .3, calib->getCameraPolyline()); // 30 cm max dept. Result image 1024x1024
 }
 
 //--------------------------------------------------------------
@@ -194,8 +171,10 @@ void ofApp::keyPressed(int key){
         // if camera polygon is set ore recognized correctly, confirm it
         else if (calib->getState() == showingRecognizedArea) {
             calib->confirmRecognizedArea();
-            touch->setSensitiveArea(calib->getCameraPolyline());
-            proj->setOutputPolyline(calib->getProjectionPolyline());
+            
+            initTouchArea();
+            initProjection();
+            
             touch->start();
             proj->start();
         }

@@ -14,7 +14,7 @@
 
 class touchArea {
 private:
-    ofRectangle boundingArea;
+    ofPolyline sensitiveArea;
     float maxDepth; // max depth in mm (or meters?) to scale the depth image
     
     ofImage substractedDepthImage;
@@ -26,16 +26,10 @@ private:
     
     void updateFromCamera(); // ger rgb and depth data from camera
     
-    // transformation
-    ofMatrix4x4 transform;
-    void calculateTransformation(ofPolyline points);
-    
     // running indicator
     bool started;
 public:
-    touchArea(cameraManager * _camera, float _maxDepth, ofVec2f resultCanvasSize); // maxDepth in meters
-    
-    void setSensitiveArea(ofPolyline points);
+    touchArea(cameraManager * _camera, float _maxDepth, ofPolyline _sensitiveArea); // maxDepth in meters
     
     void start();
     void stop();
@@ -44,7 +38,7 @@ public:
     int getResultWidth();
     int getResultHeight();
     
-    ofFbo & getTransformedTouch();
+    ofFbo & getTouch();
     
     //void setMaxDepth(float maxDepth); // in mm
     

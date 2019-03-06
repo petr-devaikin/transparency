@@ -35,6 +35,9 @@ private:
     void loadSettings();
     void saveSettings();
 
+    //
+    void initProjection();
+    void initTouchArea();
 public:
     void setup();
     void update();

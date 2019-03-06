@@ -8,10 +8,14 @@
 #include "calibrator.hpp"
 #include "ofxOpenCv.h"
 
-calibrator::calibrator(cameraManager * _camera, float qrTimer) {
+using namespace cv;
+
+calibrator::calibrator(cameraManager * _camera, int _imageWidth, int _imageHeight, float qrTimer) {
     currentState = projectionSetup;
     couldNotRecognize = false;
     
+    imageWidth = _imageWidth;
+    imageHeight = _imageHeight;
     currentTime = 0;
     timer = 0;
     startTimerValue = qrTimer;
@@ -137,4 +141,59 @@ ofPolyline calibrator::getProjectionPolyline() {
 
 ofPolyline calibrator::getCameraPolyline() {
     return cameraPolyline;
+}
+
+ofRectangle calibrator::getProjectionBox() {
+    return projectionPolyline.getBoundingBox();
+}
+
+ofRectangle calibrator::getCameraBox() {
+    return cameraPolyline.getBoundingBox();
+}
+
+ofMatrix4x4 calibrator::getCamera2ProjectionTransform() {
+    // update transformation
+    vector<Point2f> srcPoints, dstPoints;
+    for (int i = 0; i < 4; i++) {
+        srcPoints.push_back(Point2f(
+                                    cameraPolyline[i][0] - cameraPolyline.getBoundingBox().x,
+                                    cameraPolyline[i][1] - cameraPolyline.getBoundingBox().y));
+        dstPoints.push_back(Point2f(
+                                    projectionPolyline[i][0] - projectionPolyline.getBoundingBox().x,
+                                    projectionPolyline[i][1] - projectionPolyline.getBoundingBox().y));
+    }
+    
+    Mat m = findHomography(srcPoints, dstPoints);
+    
+    ofMatrix4x4 result;
+    result.set(m.at<double>(0, 0), m.at<double>(1, 0), 0, m.at<double>(2, 0),
+               m.at<double>(0, 1), m.at<double>(1, 1), 0, m.at<double>(2, 1),
+               0, 0, 1, 0,
+               m.at<double>(0, 2), m.at<double>(1, 2), 0, 1);
+    return result;
+}
+
+ofMatrix4x4 calibrator::getImage2ProjectionTransform() {
+    // update transformation
+    vector<Point2f> srcPoints, dstPoints;
+    
+    srcPoints.push_back(Point2f(0, 0));
+    srcPoints.push_back(Point2f(imageWidth, 0));
+    srcPoints.push_back(Point2f(imageWidth, imageHeight));
+    srcPoints.push_back(Point2f(0, imageHeight));
+    
+    for (int i = 0; i < 4; i++) {
+        dstPoints.push_back(Point2f(
+                                    projectionPolyline[i][0] - projectionPolyline.getBoundingBox().x,
+                                    projectionPolyline[i][1] - projectionPolyline.getBoundingBox().y));
+    }
+    
+    Mat m = findHomography(srcPoints, dstPoints);
+    
+    ofMatrix4x4 result;
+    result.set(m.at<double>(0, 0), m.at<double>(1, 0), 0, m.at<double>(2, 0),
+               m.at<double>(0, 1), m.at<double>(1, 1), 0, m.at<double>(2, 1),
+               0, 0, 1, 0,
+               m.at<double>(0, 2), m.at<double>(1, 2), 0, 1);
+    return result;
 }
