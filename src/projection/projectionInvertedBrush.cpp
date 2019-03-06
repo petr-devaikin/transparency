@@ -21,15 +21,14 @@ projectionInvertedBrush::projectionInvertedBrush(const string basePath, touchAre
     expansionSpeed = expSpeed;
     bluredRadius = bluredR;
     
-    // zero block
-    onesBlock = new unsigned char[projectionBoxWidth, projectionBoxHeight]; // only b-channel
-    memset(onesBlock, 255, projectionBoxWidth * projectionBoxHeight);
-    
     // init result fbo
     resultFbo.allocate(projectionBoxWidth, projectionBoxHeight, GL_RGBA);
     
-    // prepare touch brush
+    // zero block
+    onesBlock = new unsigned char[projectionBoxWidth * projectionBoxHeight]; // only b-channel
+    memset(onesBlock, 255, projectionBoxWidth * projectionBoxHeight);
     
+    // prepare touch brush
     touchBrush.load(ofFilePath::join(basePath, "exp_brush_4001.png"));
     
     touchBrushResized.allocate(2 * projectionBoxWidth + 1, 2 * projectionBoxHeight + 1, GL_RGBA);
@@ -38,9 +37,6 @@ projectionInvertedBrush::projectionInvertedBrush(const string basePath, touchAre
     ofSetColor(255);
     touchBrush.draw(projectionBoxWidth - round(touchBrush.getWidth() / 2) + 1, projectionBoxHeight - round(touchBrush.getHeight() / 2) + 1);
     touchBrushResized.end();
-    
-    // prepare touch area for blob search
-    touchAreaImage.allocate(projectionBoxWidth, projectionBoxHeight);
     
     // load shaders
     shaderExpansion.load(ofFilePath::join(basePath, "shadersGL3/expansion"));
@@ -154,7 +150,7 @@ void projectionInvertedBrush::update() {
         ofxCvBlob blob = contourFinder.blobs[i];
         
         // transform touch centroid from camera space to projection space
-        ofVec3f transformedCentroid = camera2Projection * ofVec3f(blob.centroid[0], blob.centroid[1]);
+        ofVec3f transformedCentroid = ofVec3f(blob.centroid[0], blob.centroid[1]) * camera2Projection;
         
         cout << "Layer touched.\n";
         
@@ -209,19 +205,20 @@ void projectionInvertedBrush::draw() {
     if (!started) return; // not started yet
     
     ofSetColor(255);
+    
     resultFbo.draw(projectionBox.x, projectionBox.y);
     
     // draw touch canvas
     //(touch->getTransformedTouch()).draw(0, 0);
     //return;
-    
-    /*
-    // show masks
-    if (layers.size() > 1)
-        layers[1].getMask().draw(0, 0);
-     */
+     
     //touch->getTransformedTouch().draw(0, 0);
     
+    // show masks
+    /*
+    if (layers.size() > 1)
+        layers[1].getMask().draw(projectionBox.x, projectionBox.y);
+     */
     /*
     // show touch blobs
     for (int i = 0; i < contourFinder.nBlobs; i++) {
