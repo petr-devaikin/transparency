@@ -14,10 +14,16 @@
 
 class touchArea {
 private:
+    int width;
+    int height;
+    int x;
+    int y;
+    
     ofPolyline sensitiveArea;
     float maxDepth; // max depth in mm (or meters?) to scale the depth image
     
     ofImage substractedDepthImage;
+    unsigned char * substractedPixels;
     ofFbo resultFbo; // depth points with substracted zero level, transformed to the result screen projection
     
     ofImage brush; // touch image for imitation
@@ -31,6 +37,8 @@ private:
 public:
     touchArea(cameraManager * _camera, float _maxDepth, ofPolyline _sensitiveArea); // maxDepth in meters
     
+    ~touchArea();
+    
     void start();
     void stop();
     bool isRunning();
@@ -39,6 +47,7 @@ public:
     int getResultHeight();
     
     ofFbo & getTouch();
+    unsigned char * getTouchPixels();
     
     //void setMaxDepth(float maxDepth); // in mm
     

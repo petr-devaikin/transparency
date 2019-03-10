@@ -31,6 +31,7 @@
 		63B57AC5BF4EF088491E0317 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 50DF87D612C5AAE17AAFA6C0 /* ofxXmlSettings.cpp */; };
 		6AABAB39E82AF5CFEA23A205 /* ContourFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5FBB4A8427353AED09174BE5 /* ContourFinder.cpp */; };
 		6FFAED322223043A00AF7018 /* librealsense2.2.16.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FFAED312223043A00AF7018 /* librealsense2.2.16.1.dylib */; };
+		6FFAED372235628200AF7018 /* touchDetector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6FFAED352235628200AF7018 /* touchDetector.cpp */; };
 		7A1CB671E44D9B021E4BD765 /* markerdetector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24C01D5F3DE23A3AEF41766E /* markerdetector.cpp */; };
 		7CDAD32BE4FA46701E3552C7 /* RunningBackground.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5CBF6AED6A17AC0C17F63CC4 /* RunningBackground.cpp */; };
 		837220E80EB56CD44AD27F2A /* ofxSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 15F2C6477A769C03A56D1401 /* ofxSlider.cpp */; };
@@ -195,6 +196,8 @@
 		6DD5A3CBB6D5BBA1C1354F1B /* flann.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = flann.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/flann.hpp; sourceTree = SOURCE_ROOT; };
 		6FFAED2B221DF6B700AF7018 /* shadersGL3 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = shadersGL3; path = bin/data/shadersGL3; sourceTree = "<group>"; };
 		6FFAED312223043A00AF7018 /* librealsense2.2.16.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = librealsense2.2.16.1.dylib; path = ../../../../../../../usr/local/lib/librealsense2.2.16.1.dylib; sourceTree = "<group>"; };
+		6FFAED352235628200AF7018 /* touchDetector.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = touchDetector.cpp; sourceTree = "<group>"; };
+		6FFAED362235628200AF7018 /* touchDetector.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = touchDetector.hpp; sourceTree = "<group>"; };
 		70046E043EDDB466ED625C3B /* Tracker.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Tracker.h; path = ../../../addons/ofxCv/libs/ofxCv/include/ofxCv/Tracker.h; sourceTree = SOURCE_ROOT; };
 		7101CF2125B8B2BF46AA2662 /* cxcore.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = cxcore.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv/cxcore.hpp; sourceTree = SOURCE_ROOT; };
 		71C98C3F44D63B39F1482A54 /* background_segm.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = background_segm.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/video/background_segm.hpp; sourceTree = SOURCE_ROOT; };
@@ -1071,6 +1074,8 @@
 				742976D3B768B07D2ECA7769 /* calibrator.cpp */,
 				E959A902CFDBCE0E0507E1AF /* cameraManager.hpp */,
 				C9C60D145A5E9D71B6063091 /* cameraManager.cpp */,
+				6FFAED352235628200AF7018 /* touchDetector.cpp */,
+				6FFAED362235628200AF7018 /* touchDetector.hpp */,
 				DD3C6F2045EADA721936F9C7 /* projection */,
 			);
 			path = src;
@@ -1242,6 +1247,7 @@
 				1CD33E884D9E3358252E82A1 /* ofxToggle.cpp in Sources */,
 				5CBB2AB3A60F65431D7B555D /* ofxButton.cpp in Sources */,
 				B266578FC55D23BFEBC042E7 /* ofxGuiGroup.cpp in Sources */,
+				6FFAED372235628200AF7018 /* touchDetector.cpp in Sources */,
 				483908258D00B98B4BE69F07 /* ofxLabel.cpp in Sources */,
 				F285EB3169F1566CA3D93C20 /* ofxPanel.cpp in Sources */,
 				837220E80EB56CD44AD27F2A /* ofxSlider.cpp in Sources */,

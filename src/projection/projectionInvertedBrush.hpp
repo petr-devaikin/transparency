@@ -12,6 +12,7 @@
 #include "ofxOpenCv.h"
 #include "baseProjection.hpp"
 #include "layerWithMask.hpp"
+#include "touchDetector.hpp"
 
 class projectionInvertedBrush : public baseProjection {
 private:
@@ -27,15 +28,10 @@ private:
     void resetLayers(); // clean layers array and add the first image
     void addImageToLayers(int i); // add new layer based on the i-th image
     
-    int detectLayerIndex(ofPoint point); // finds the next level which was touched
-    
-    float thresholdSensitive; // to detect touch
     float expansionSpeed; // pixels per second
     float bluredRadius; // blur size
     
-    ofxCvContourFinder contourFinder; // to find blobs
-    ofxCvGrayscaleImage touchAreaImage; //
-    void calculateTouchBlobs(); // calculate blobs from touch area
+    touchDetector tDetector;
     
     ofShader shaderExpansion;
     ofShader shaderExpansionAdder;
@@ -51,7 +47,7 @@ private:
     ofMatrix4x4 image2Projection;
     ofRectangle projectionBox;
 public:
-    projectionInvertedBrush(const string basePath, touchArea * t, ofMatrix4x4 transformCamera2Projection, ofMatrix4x4 transformImage2Projection, ofRectangle _projectionBox, float _thresholdSensitive = 0.5, float expSpeed = 50, float bluredR = 50);
+    projectionInvertedBrush(const string basePath, touchArea * t, ofMatrix4x4 transformCamera2Projection, ofMatrix4x4 transformImage2Projection, ofRectangle _projectionBox, float expSpeed = 50, float bluredR = 50);
     ~projectionInvertedBrush();
     
     void setTransform(ofMatrix4x4 transformCamera2Projection, ofMatrix4x4 transformImage2Projection, ofRectangle _projectionBox);

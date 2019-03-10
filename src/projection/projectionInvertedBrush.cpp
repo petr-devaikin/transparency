@@ -8,7 +8,7 @@
 #include "projectionInvertedBrush.hpp"
 
 
-projectionInvertedBrush::projectionInvertedBrush(const string basePath, touchArea * t, ofMatrix4x4 transformCamera2Projection, ofMatrix4x4 transformImage2Projection, ofRectangle _projectionBox, float _thresholdSensitive, float expSpeed, float bluredR) : baseProjection(t) {
+projectionInvertedBrush::projectionInvertedBrush(const string basePath, touchArea * t, ofMatrix4x4 transformCamera2Projection, ofMatrix4x4 transformImage2Projection, ofRectangle _projectionBox, float expSpeed, float bluredR) : baseProjection(t), tDetector(0.5) {
     timer = ofGetElapsedTimef();
     
     camera2Projection = transformCamera2Projection;
@@ -17,7 +17,6 @@ projectionInvertedBrush::projectionInvertedBrush(const string basePath, touchAre
     int projectionBoxWidth = projectionBox.width;
     int projectionBoxHeight = projectionBox.height;
     
-    thresholdSensitive = _thresholdSensitive;
     expansionSpeed = expSpeed;
     bluredRadius = bluredR;
     
@@ -64,7 +63,6 @@ projectionInvertedBrush::~projectionInvertedBrush() {
 
 bool projectionInvertedBrush::start() {
     resetLayers();
-    
     baseProjection::start();
 }
 
@@ -91,29 +89,6 @@ void projectionInvertedBrush::addImage(const std::string &imgPath) {
 }
 
 // Helpers
-
-// calculate touch blobs on touch area
-void projectionInvertedBrush::calculateTouchBlobs() {
-    ofPixels touchPixels;
-    // get current touch canvas
-    
-    // ! improve here asking for unsigned char array instead of ofImage!
-    (touch->getTouch()).readToPixels(touchPixels);
-    touchAreaImage.setFromPixels(touchPixels.getChannel(0));
-    touchAreaImage.threshold(255 * thresholdSensitive);
-    
-    contourFinder.findContours(touchAreaImage, 4, projectionBox.width * projectionBox.height, 4, false);
-}
-
-int projectionInvertedBrush::detectLayerIndex(ofPoint point) {
-    // check all layers starting from the top one
-    int touchedLayer = 0;
-    for (touchedLayer = layers.size() - 1; touchedLayer > 0; touchedLayer--) {
-        if (layers[touchedLayer].checkIfTouched(point)) break;
-    }
-    
-    return touchedLayer;
-}
 
 // Update
 
@@ -144,13 +119,12 @@ void projectionInvertedBrush::update() {
         cout << "Layer removed. Number of layers: " << layers.size() << "\n";
     }
     
-    calculateTouchBlobs(); // Check if the canvas is touched right now and calculate blobs
+    // Check if the canvas is touched right now and calculate blobs
+    vector<ofPoint> touches = tDetector.detect(touch);
     
-    for (int i = 0; i < contourFinder.nBlobs; i++) {
-        ofxCvBlob blob = contourFinder.blobs[i];
-        
+    for (int i = 0; i < touches.size(); i++) {
         // transform touch centroid from camera space to projection space
-        ofVec3f transformedCentroid = ofVec3f(blob.centroid[0], blob.centroid[1]) * camera2Projection;
+        ofVec3f transformedCentroid = touches[i] * camera2Projection;
         
         cout << "Layer touched.\n";
         

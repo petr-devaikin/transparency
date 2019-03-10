@@ -16,14 +16,23 @@ touchArea::touchArea(cameraManager * _camera, float _maxDepth, ofPolyline _sensi
     
     started = false;
     
+    width = sensitiveArea.getBoundingBox().width;
+    height = sensitiveArea.getBoundingBox().height;
+    x = sensitiveArea.getBoundingBox().x;
+    y = sensitiveArea.getBoundingBox().y;
+    
     // allocate result buffer
     resultFbo.allocate(sensitiveArea.getBoundingBox().width, sensitiveArea.getBoundingBox().height, GL_RGBA);
     resultFbo.begin();
     ofClear(0);
     resultFbo.end();
     
+    // allocate buffer for substraction
+    substractedPixels = new unsigned char[width * height];
+    substractedDepthImage.allocate(width, height, OF_IMAGE_GRAYSCALE);
+    
     // allocate image for substraction
-    substractedDepthImage.allocate(sensitiveArea.getBoundingBox().width, sensitiveArea.getBoundingBox().height, OF_IMAGE_COLOR);
+    substractedDepthImage.allocate(width, height, OF_IMAGE_COLOR);
     
     // looking for depth camera
     if (!camera->isCameraFound()) {
@@ -31,6 +40,10 @@ touchArea::touchArea(cameraManager * _camera, float _maxDepth, ofPolyline _sensi
         brush.load("brush.png");
         brush.setImageType(OF_IMAGE_GRAYSCALE);
     }
+}
+
+touchArea::~touchArea() {
+    delete [] substractedPixels;
 }
 
 void touchArea::start() {
@@ -43,38 +56,36 @@ void touchArea::stop() {
 }
 
 int touchArea::getResultWidth() {
-    return resultFbo.getWidth();
+    return width;
 }
 
 int touchArea::getResultHeight() {
-    return resultFbo.getHeight();
+    return height;
 }
 
 void touchArea::updateFromCamera() {
     // calculate distance between current position and zero level.
     // transform this value to decrease sensitivity at the beginning of touch
     // iterate only withing the bounding area
-    for (int i = 0; i < sensitiveArea.getBoundingBox().width; i++)
-        for (int j = 0; j < sensitiveArea.getBoundingBox().height; j++) {
+    for (int i = 0; i < width; i++)
+        for (int j = 0; j < height; j++) {
             float res = 0;
             
             // check if pixel is inside sensitive area
             // get difference from camera
-            if (sensitiveArea.inside(i + sensitiveArea.getBoundingBox().x, j + sensitiveArea.getBoundingBox().y)) {
-                float res = camera->getDistanceChange(i + sensitiveArea.getBoundingBox().x, j + sensitiveArea.getBoundingBox().y) / maxDepth;
+            if (sensitiveArea.inside(i + x, j + y)) {
+                float res = camera->getDistanceChange(i + x, j + y) / maxDepth;
                 res = pow(res, 3); // power of 3 to be sensitive more to deep touch
                 res *= 255;
                 if (res < 0) res = 0;
                 if (res > 255) res = 255;
             }
-                
-            int localPixelNumber = 3 * (j * sensitiveArea.getBoundingBox().width + i);
             
-            substractedDepthImage.getPixels().getData()[localPixelNumber] = res;
-            substractedDepthImage.getPixels().getData()[localPixelNumber + 1] = res;
-            substractedDepthImage.getPixels().getData()[localPixelNumber + 2] = res;
+            substractedPixels[j * width + i] = res;
         }
     
+    // create image based on substractedPixels
+    memcpy(substractedPixels, substractedDepthImage.getPixels().getData(), width * height);
     substractedDepthImage.update();
     
     // transform resulting picture from camera space to image space
@@ -88,6 +99,10 @@ void touchArea::updateFromCamera() {
 
 ofFbo & touchArea::getTouch() {
     return resultFbo;
+}
+
+unsigned char * touchArea::getTouchPixels() {
+    return substractedPixels;
 }
 
 void touchArea::update() {
