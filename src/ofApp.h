@@ -16,7 +16,7 @@ const string BASE_PATH = "";
 
 const string PROJ_SETTINGS_FILE = "projection_settings.xml";
 
-const float CAMERA_MAX_DEPTH = .3; // in meters
+const float CAMERA_MAX_DEPTH = .5; // in meters
 const int CAMERA_WIDTH = 1280;
 const int CAMERA_HEIGHT = 720;
 

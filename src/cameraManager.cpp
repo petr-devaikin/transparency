@@ -107,8 +107,9 @@ void cameraManager::update() {
     if (zeroLevelSet) {
         tmpImage = zeroImage;
         tmpImage -= lastImage;
-        tmpImage.convertToRange(0, 65535 * maxDepth / depthScale);
         resultImage = tmpImage;
+        //resultImage.convertToRange(0, 255 * 65535 / maxDepth * depthScale);
+        //tmpImage.convertToRange(0, 255 * 10);
     }
 }
 
