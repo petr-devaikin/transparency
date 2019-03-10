@@ -4,11 +4,11 @@
 //--------------------------------------------------------------
 void ofApp::setup() {
     // init camera
-    camera = new cameraManager();
+    camera = new cameraManager(CAMERA_MAX_DEPTH, CAMERA_WIDTH, CAMERA_HEIGHT);
     camera->findCamera();
     
     // init calibrator
-    calib = new calibrator(camera, 1024, 1024);
+    calib = new calibrator(camera, IMAGE_WIDTH, IMAGE_HEIGHT);
     
     // load settings from files
     loadSettings();
@@ -111,7 +111,7 @@ void ofApp::initProjection() {
 
 void ofApp::initTouchArea() {
     // init touch
-    touch = new touchArea(camera, .3, calib->getCameraPolyline()); // 30 cm max dept. Result image 1024x1024
+    touch = new touchArea(camera, calib->getCameraPolyline(), .5); // .5 (15cm) sensitive area
 }
 
 //--------------------------------------------------------------
@@ -137,7 +137,8 @@ void ofApp::draw(){
     
     if (calib->getState() == done) {
         //(touch->getTransformedTouch()).draw(0, 0);
-        proj->draw();
+        //proj->draw();
+        (camera->getSubstractedImage()).draw(10, 10);
     }
     
     //if (showGui)

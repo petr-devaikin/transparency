@@ -8,7 +8,7 @@
 #include "projectionInvertedBrush.hpp"
 
 
-projectionInvertedBrush::projectionInvertedBrush(const string basePath, touchArea * t, ofMatrix4x4 transformCamera2Projection, ofMatrix4x4 transformImage2Projection, ofRectangle _projectionBox, float expSpeed, float bluredR) : baseProjection(t), tDetector(0.5) {
+projectionInvertedBrush::projectionInvertedBrush(const string basePath, touchArea * t, ofMatrix4x4 transformCamera2Projection, ofMatrix4x4 transformImage2Projection, ofRectangle _projectionBox, float expSpeed, float bluredR) : baseProjection(t) {
     timer = ofGetElapsedTimef();
     
     camera2Projection = transformCamera2Projection;
@@ -120,7 +120,7 @@ void projectionInvertedBrush::update() {
     }
     
     // Check if the canvas is touched right now and calculate blobs
-    vector<ofPoint> touches = tDetector.detect(touch);
+    vector<ofPoint> touches = touch->detectTouch();
     
     for (int i = 0; i < touches.size(); i++) {
         // transform touch centroid from camera space to projection space

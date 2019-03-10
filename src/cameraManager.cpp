@@ -7,7 +7,11 @@
 
 #include "cameraManager.hpp"
 
-cameraManager::cameraManager() {
+cameraManager::cameraManager(float maxDepth, int width, int height) {
+    this->maxDepth = maxDepth;
+    this->width = width;
+    this->height = height;
+    
     cameraFound = false;
     depthScale = 1;
     
@@ -16,24 +20,24 @@ cameraManager::cameraManager() {
     disparity_to_depth = rs2::disparity_transform(false);
     
     // allocate rgb image
-    rgbCameraImage.allocate(WIDTH, HEIGHT, OF_IMAGE_COLOR);
+    rgbCameraImage.allocate(width, height, OF_IMAGE_COLOR);
     
-    // allocate depth buffers
-    depthCameraData = new unsigned short [WIDTH * HEIGHT](); // allocate with zeros
-    zeroDepthCameraData = new unsigned short [WIDTH * HEIGHT](); // allocate with zeros
+    // allocate depth images
+    zeroImage.setUseTexture(false);
+    zeroImage.allocate(width, height);
+    lastImage.setUseTexture(false);
+    lastImage.allocate(width, height);
 };
 
 cameraManager::~cameraManager() {
-    delete[] depthCameraData;
-    delete[] zeroDepthCameraData;
 }
 
 
 bool cameraManager::findCamera() {
     cout << "Looking for RealSense\n";
     rs2::config cfg;
-    cfg.enable_stream(RS2_STREAM_DEPTH, WIDTH, HEIGHT);
-    cfg.enable_stream(RS2_STREAM_COLOR, WIDTH, HEIGHT);
+    cfg.enable_stream(RS2_STREAM_DEPTH, width, height);
+    cfg.enable_stream(RS2_STREAM_COLOR, width, height);
     rs2::context ctx;
     auto device_list = ctx.query_devices();
     
@@ -79,7 +83,7 @@ void cameraManager::update() {
     
     // update rgb picture
     rs2::frame rgbFrame = frames.get_color_frame();
-    memcpy(rgbCameraImage.getPixels().getData(), rgbFrame.get_data(), WIDTH * HEIGHT * 3);
+    memcpy(rgbCameraImage.getPixels().getData(), rgbFrame.get_data(), width * height * 3);
     rgbCameraImage.update();
     
     // update depth buffer
@@ -96,29 +100,43 @@ void cameraManager::update() {
     depthFrame = hole_filter.process(depthFrame);
     
     // copy depth data
-    memcpy(depthCameraData, depthFrame.get_data(), WIDTH * HEIGHT * 2);
+    memcpy((lastImage.getShortPixelsRef()).getData(), depthFrame.get_data(), width * height * 2);
+    lastImage.flagImageChanged();
+    
+    // if zero level is set, substract it
+    if (zeroLevelSet) {
+        tmpImage = zeroImage;
+        tmpImage -= lastImage;
+        tmpImage.convertToRange(0, 65535 * maxDepth / depthScale);
+        resultImage = tmpImage;
+    }
 }
 
 void cameraManager::setZeroLevel() {
-    memcpy(zeroDepthCameraData, depthCameraData, WIDTH * HEIGHT * 2);
+    zeroLevelSet = true;
+    zeroImage = lastImage;
 }
 
 ofImage cameraManager::getRGBImage() {
     return rgbCameraImage;
 }
 
-float cameraManager::getDistanceChange(int i, int j) {
-    if (depthCameraData[j * WIDTH + i] == 0 || zeroDepthCameraData[j * WIDTH + i] == 0)
-        return 0;
-    else {
-        return (zeroDepthCameraData[j * WIDTH + i] - depthCameraData[j * WIDTH + i]) * depthScale;
-    }
+void cameraManager::setRoi(ofRectangle roi) {
+    lastImage.setROI(roi);
+    zeroImage.setROI(roi);
+    resultImage.allocate(roi.width, roi.height);
+    tmpImage.setUseTexture(false);
+    tmpImage.allocate(roi.width, roi.height);
+}
+
+ofxCvGrayscaleImage & cameraManager::getSubstractedImage() {
+    return resultImage;
 }
 
 int cameraManager::getWidth() {
-    return WIDTH;
+    return width;
 }
 
 int cameraManager::getHeight() {
-    return HEIGHT;
+    return height;
 }

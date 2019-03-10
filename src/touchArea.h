@@ -20,24 +20,22 @@ private:
     int y;
     
     ofPolyline sensitiveArea;
-    float maxDepth; // max depth in mm (or meters?) to scale the depth image
+    float threshold;
     
-    ofImage substractedDepthImage;
-    unsigned char * substractedPixels;
     ofFbo resultFbo; // depth points with substracted zero level, transformed to the result screen projection
     
     ofImage brush; // touch image for imitation
     
     cameraManager * camera;
     
+    ofxCvContourFinder contourFinder;
+    
     void updateFromCamera(); // ger rgb and depth data from camera
     
     // running indicator
     bool started;
 public:
-    touchArea(cameraManager * _camera, float _maxDepth, ofPolyline _sensitiveArea); // maxDepth in meters
-    
-    ~touchArea();
+    touchArea(cameraManager * _camera, ofPolyline _sensitiveArea, float threshold); // threshold to detect touch from 0 to 1
     
     void start();
     void stop();
@@ -46,8 +44,8 @@ public:
     int getResultWidth();
     int getResultHeight();
     
-    ofFbo & getTouch();
-    unsigned char * getTouchPixels();
+    ofFbo & getTouchImage();
+    vector<ofPoint> detectTouch();
     
     //void setMaxDepth(float maxDepth); // in mm
     

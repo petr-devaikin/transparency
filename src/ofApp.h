@@ -10,12 +10,18 @@
 #include "ofxGui.h"
 #include "ofxXmlSettings.h"
 
-const int SENS_RANGE = 5;
+const int SENS_RANGE = 5; // to map areas with mouse
 
 const string BASE_PATH = "";
 
 const string PROJ_SETTINGS_FILE = "projection_settings.xml";
 
+const float CAMERA_MAX_DEPTH = .3; // in meters
+const int CAMERA_WIDTH = 1280;
+const int CAMERA_HEIGHT = 720;
+
+const int IMAGE_WIDTH = 1024; // projected image original size
+const int IMAGE_HEIGHT = 1024;
 
 class ofApp : public ofBaseApp{
 private:

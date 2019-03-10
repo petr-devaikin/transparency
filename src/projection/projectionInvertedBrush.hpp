@@ -12,7 +12,6 @@
 #include "ofxOpenCv.h"
 #include "baseProjection.hpp"
 #include "layerWithMask.hpp"
-#include "touchDetector.hpp"
 
 class projectionInvertedBrush : public baseProjection {
 private:
@@ -30,8 +29,6 @@ private:
     
     float expansionSpeed; // pixels per second
     float bluredRadius; // blur size
-    
-    touchDetector tDetector;
     
     ofShader shaderExpansion;
     ofShader shaderExpansionAdder;

@@ -82,6 +82,7 @@ void calibrator::recognize() {
 void calibrator::confirmRecognizedArea() {
     cout << "Confirm recognition\n";
     camera->setZeroLevel();
+    camera->setRoi(cameraPolyline.getBoundingBox());
     currentState = done;
 }
 

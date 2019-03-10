@@ -9,10 +9,10 @@
 
 using namespace cv;
 
-touchArea::touchArea(cameraManager * _camera, float _maxDepth, ofPolyline _sensitiveArea) {
+touchArea::touchArea(cameraManager * _camera, ofPolyline _sensitiveArea, float threshold) {
     camera = _camera;
-    maxDepth = _maxDepth;
     sensitiveArea = _sensitiveArea;
+    this->threshold = threshold;
     
     started = false;
     
@@ -27,23 +27,12 @@ touchArea::touchArea(cameraManager * _camera, float _maxDepth, ofPolyline _sensi
     ofClear(0);
     resultFbo.end();
     
-    // allocate buffer for substraction
-    substractedPixels = new unsigned char[width * height];
-    substractedDepthImage.allocate(width, height, OF_IMAGE_GRAYSCALE);
-    
-    // allocate image for substraction
-    substractedDepthImage.allocate(width, height, OF_IMAGE_COLOR);
-    
     // looking for depth camera
     if (!camera->isCameraFound()) {
         // camera not found. prepare fake brush
         brush.load("brush.png");
         brush.setImageType(OF_IMAGE_GRAYSCALE);
     }
-}
-
-touchArea::~touchArea() {
-    delete [] substractedPixels;
 }
 
 void touchArea::start() {
@@ -64,45 +53,34 @@ int touchArea::getResultHeight() {
 }
 
 void touchArea::updateFromCamera() {
-    // calculate distance between current position and zero level.
-    // transform this value to decrease sensitivity at the beginning of touch
-    // iterate only withing the bounding area
-    for (int i = 0; i < width; i++)
-        for (int j = 0; j < height; j++) {
-            float res = 0;
-            
-            // check if pixel is inside sensitive area
-            // get difference from camera
-            if (sensitiveArea.inside(i + x, j + y)) {
-                float res = camera->getDistanceChange(i + x, j + y) / maxDepth;
-                res = pow(res, 3); // power of 3 to be sensitive more to deep touch
-                res *= 255;
-                if (res < 0) res = 0;
-                if (res > 255) res = 255;
-            }
-            
-            substractedPixels[j * width + i] = res;
-        }
+    // drawing substracted pixels on resultFbo
     
-    // create image based on substractedPixels
-    memcpy(substractedPixels, substractedDepthImage.getPixels().getData(), width * height);
-    substractedDepthImage.update();
-    
-    // transform resulting picture from camera space to image space
     resultFbo.begin();
     {
         ofSetColor(255);
-        substractedDepthImage.draw(0, 0);
+        (camera->getSubstractedImage()).draw(0, 0);
     }
     resultFbo.end();
 }
 
-ofFbo & touchArea::getTouch() {
-    return resultFbo;
+vector<ofPoint> touchArea::detectTouch() {
+    vector<ofPoint> result;
+    
+    ofxCvGrayscaleImage img = camera->getSubstractedImage();
+    img.threshold(255 * threshold);
+    
+    contourFinder.findContours(img, 4, img.getWidth() * img.getHeight(), 4, false);
+    
+    for (int i = 0; i < contourFinder.nBlobs; i++) {
+        ofxCvBlob blob = contourFinder.blobs[i];
+        result.push_back(blob.centroid);
+    }
+    
+    return result;
 }
 
-unsigned char * touchArea::getTouchPixels() {
-    return substractedPixels;
+ofFbo & touchArea::getTouchImage() {
+    return resultFbo;
 }
 
 void touchArea::update() {

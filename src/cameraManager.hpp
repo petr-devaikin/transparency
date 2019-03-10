@@ -10,20 +10,26 @@
 
 #include "ofMain.h"
 #include <librealsense2/rs.hpp>
+#include "ofxOpenCv.h"
 
 class cameraManager {
 private:
-    const int WIDTH = 640;
-    const int HEIGHT = 360;
+    int width;
+    int height;
     
     ofImage rgbCameraImage; // last data from sensor
-    unsigned short * depthCameraData; // last data from sensor
-    unsigned short * zeroDepthCameraData; // zero level pioxels
+    
+    bool zeroLevelSet = false;
+    ofxCvShortImage tmpImage;
+    ofxCvShortImage zeroImage;
+    ofxCvShortImage lastImage;
+    ofxCvGrayscaleImage resultImage;
     
     rs2::pipeline pipe;
     rs2::frameset frames;
     
     float depthScale; // depth bite to meters
+    float maxDepth; // max depth
     
     // Filters
     rs2::decimation_filter dec_filter;
@@ -36,7 +42,7 @@ private:
     
     bool cameraFound;
 public:
-    cameraManager();
+    cameraManager(float maxDepth, int width = 640, int height = 360);
     ~cameraManager();
     
     bool findCamera();
@@ -50,8 +56,9 @@ public:
     int getWidth();
     int getHeight();
     ofImage getRGBImage();
+    ofxCvGrayscaleImage & getSubstractedImage(); // return last - zero image in ROI; maxDepth in mm
     
-    float getDistanceChange(int i, int j); // return distance from the zero level in meters
+    void setRoi(ofRectangle roi);
 };
 
 #endif /* cameraManager_hpp */
