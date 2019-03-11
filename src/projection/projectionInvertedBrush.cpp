@@ -8,11 +8,13 @@
 #include "projectionInvertedBrush.hpp"
 
 
-projectionInvertedBrush::projectionInvertedBrush(const string basePath, touchArea * t, calibrator * calib, float expSpeed, float bluredR) : baseProjection(t) {
+projectionInvertedBrush::projectionInvertedBrush(const string basePath, cameraManager * camera, touchArea * t, calibrator * calib, bool liveAnimation, float expSpeed, float bluredR) : baseProjection(t) {
     timer = ofGetElapsedTimef();
     
     this->basePath = basePath;
+    this->camera = camera;
     this->calib = calib;
+    this->liveAnimation = liveAnimation;
     this->expansionSpeed = expSpeed;
     this->bluredRadius = bluredR;
     
@@ -21,6 +23,12 @@ projectionInvertedBrush::projectionInvertedBrush(const string basePath, touchAre
     
     // init result fbo
     resultFbo.allocate(projectionWidth, projectionHeight, GL_RGBA);
+    
+    // if live animation is activated, init transformed mask
+    if (liveAnimation) {
+        transformedMask.allocate(projectionWidth, projectionHeight, GL_RGBA);
+        tempFbo.allocate(projectionWidth, projectionHeight, GL_RGBA);
+    }
     
     // zero block
     onesBlock = new unsigned char[projectionWidth * projectionHeight]; // only b-channel
@@ -40,7 +48,7 @@ void projectionInvertedBrush::loadShaders() {
     shaderExpansion.load(ofFilePath::join(basePath, "shadersGL3/expansion"));
     shaderExpansionAdder.load(ofFilePath::join(basePath, "shadersGL3/expansionMaskAdder"));
     shaderMix2Images.load(ofFilePath::join(basePath, "shadersGL3/mix2images"));
-    shaderBrightnessTuner.load(ofFilePath::join(basePath, "shadersGL3/brightnessTuner"));
+    shaderSaturationTuner.load(ofFilePath::join(basePath, "shadersGL3/brightnessTuner"));
 }
 
 void projectionInvertedBrush::prepareBrush() {
@@ -119,7 +127,22 @@ void projectionInvertedBrush::updateAllLayers() {
 void projectionInvertedBrush::update() {
     if (!started) return; // not started yet
     
-    updateAllLayers(); // update all areas;
+    // transform mask
+    
+    if (liveAnimation) {
+        transformedMask.begin();
+        ofSetColor(255);
+        ofClear(0);
+        ofPushMatrix();
+        ofMultMatrix(calib->getCamera2ProjectionTransform());
+        (camera->getSubstractedImage())->draw(0, 0);
+        ofPopMatrix();
+        transformedMask.end();
+    }
+    
+    // work with layers
+    
+    updateAllLayers();
     
     // check if we can remove the last layer
     if (layers.size() > 1 && layers[1].isFull()) {
@@ -168,12 +191,32 @@ void projectionInvertedBrush::drawLayers() {
         shaderMix2Images.setUniformTexture("background", layers[0].getImage().getTexture(), 1);
         
         shaderMix2Images.setUniformTexture("mask", layers[1].getMask().getTexture(), 2);
+        
         layers[1].getImage().draw(0, 0);
         
         shaderMix2Images.end();
     }
     
     resultFbo.end();
+    
+    // if live animation is on apply another shader
+    if (liveAnimation) {
+        tempFbo.begin();
+        resultFbo.draw(0, 0);
+        tempFbo.end();
+        
+        resultFbo.begin();
+        
+        shaderSaturationTuner.begin();
+        shaderSaturationTuner.setUniform1f("k", .5);
+        shaderSaturationTuner.setUniformTexture("mask", transformedMask.getTexture(), 1);
+        
+        tempFbo.draw(0, 0);
+        
+        shaderSaturationTuner.end();
+        
+        resultFbo.end();
+    }
 }
 
 void projectionInvertedBrush::draw() {

@@ -13,6 +13,7 @@
 #include "baseProjection.hpp"
 #include "layerWithMask.hpp"
 #include "calibrator.hpp"
+#include "cameraManager.hpp"
 
 class projectionInvertedBrush : public baseProjection {
 private:
@@ -33,9 +34,13 @@ private:
     float expansionSpeed; // pixels per second
     float bluredRadius; // blur size
     
+    ofFbo transformedMask;
+    ofFbo tempFbo;
+    bool liveAnimation; // change saturation by depth mask
+    
     ofShader shaderExpansion;
     ofShader shaderExpansionAdder;
-    ofShader shaderBrightnessTuner;
+    ofShader shaderSaturationTuner;
     ofShader shaderMix2Images;
     void loadShaders();
     
@@ -47,8 +52,9 @@ private:
     void prepareBrush();
     
     calibrator * calib;
+    cameraManager * camera;
 public:
-    projectionInvertedBrush(const string basePath, touchArea * t, calibrator * calib, float expSpeed = 50, float bluredR = 50);
+    projectionInvertedBrush(const string basePath, cameraManager * camera, touchArea * t, calibrator * calib, bool liveAnimation = true, float expSpeed = 50, float bluredR = 50);
     ~projectionInvertedBrush();
     
     bool start();

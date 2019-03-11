@@ -87,7 +87,7 @@ void ofApp::saveSettings() {
 
 void ofApp::initProjection() {
     // init proj
-    proj = new projectionInvertedBrush(BASE_PATH, touch, calib);
+    proj = new projectionInvertedBrush(BASE_PATH, camera, touch, calib, PROJ_ANIMATE_DEPTH, PROJ_SPEED, PROJ_BLUR_RADIUS);
     proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_001.png"));
     proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_002.png"));
     proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_003.png"));

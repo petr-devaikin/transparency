@@ -34,9 +34,11 @@ void main()
 {
     vec4 maskColor = texture(mask, texCoordVarying).rgba;
     vec4 color = texture(tex0, texCoordVarying).rgba;
-
+    
     vec3 hsv = rgb2hsv(vec3(color.r, color.g, color.b));
-    hsv[1] += maskColor[1] * k;
+    hsv[0] += maskColor[0] * k;
+    //hsv[2] = 0.01;
     vec3 rgb = hsv2rgb(hsv);
-    outputColor = vec4(rgb.r, rgb.g, rgb.b, 1);
+    
+    outputColor = vec4(rgb[0], rgb[1], rgb[2], 1);
 }
