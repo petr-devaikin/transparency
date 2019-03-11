@@ -14,6 +14,7 @@ cameraManager::cameraManager(float maxDepth, int width, int height) {
     
     cameraFound = false;
     depthScale = 1;
+    rangeK = 65535;
     
     // init filters
     depth_to_disparity = rs2::disparity_transform(true);
@@ -47,6 +48,9 @@ bool cameraManager::findCamera() {
         
         // get scale from the sensor
         depthScale = depth_sensor.get_depth_scale();
+        
+        // calculate scale coefficient
+        rangeK = 65535 / depthScale * maxDepth;
         
         frames = pipe.wait_for_frames();
         cout << "RealSense found!\n";
@@ -107,9 +111,8 @@ void cameraManager::update() {
     if (zeroLevelSet) {
         tmpImage = zeroImage;
         tmpImage -= lastImage;
+        tmpImage.convertToRange(0, rangeK);
         resultImage = tmpImage;
-        //resultImage.convertToRange(0, 255 * 65535 / maxDepth * depthScale);
-        //tmpImage.convertToRange(0, 255 * 10);
     }
 }
 

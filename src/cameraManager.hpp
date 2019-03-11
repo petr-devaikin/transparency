@@ -30,6 +30,7 @@ private:
     
     float depthScale; // depth bite to meters
     float maxDepth; // max depth
+    float rangeK; // to "scale" depth pixels
     
     // Filters
     rs2::decimation_filter dec_filter;
