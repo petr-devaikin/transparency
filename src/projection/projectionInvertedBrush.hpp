@@ -35,7 +35,7 @@ private:
     
     ofShader shaderExpansion;
     ofShader shaderExpansionAdder;
-    ofShader shaderTransparency;
+    ofShader shaderBrightnessTuner;
     ofShader shaderMix2Images;
     void loadShaders();
     

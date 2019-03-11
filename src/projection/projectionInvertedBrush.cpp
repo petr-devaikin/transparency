@@ -39,8 +39,8 @@ projectionInvertedBrush::~projectionInvertedBrush() {
 void projectionInvertedBrush::loadShaders() {
     shaderExpansion.load(ofFilePath::join(basePath, "shadersGL3/expansion"));
     shaderExpansionAdder.load(ofFilePath::join(basePath, "shadersGL3/expansionMaskAdder"));
-    shaderTransparency.load(ofFilePath::join(basePath, "shadersGL3/transparency"));
     shaderMix2Images.load(ofFilePath::join(basePath, "shadersGL3/mix2images"));
+    shaderBrightnessTuner.load(ofFilePath::join(basePath, "shadersGL3/brightnessTuner"));
 }
 
 void projectionInvertedBrush::prepareBrush() {
@@ -172,18 +172,6 @@ void projectionInvertedBrush::drawLayers() {
         
         shaderMix2Images.end();
     }
-    
-    /*
-    shaderTransparency.begin();
-    shaderTransparency.setUniform1i("radius", bluredRadius);
-    
-    for (int i = 0; i < layers.size(); i++) {
-        shaderTransparency.setUniformTexture("mask", layers[i].getMask().getTexture(), 1);
-        layers[i].getImage().draw(0, 0);
-    }
-    
-    shaderTransparency.end();
-     */
     
     resultFbo.end();
 }
