@@ -17,6 +17,7 @@ const string BASE_PATH = "";
 const string PROJ_SETTINGS_FILE = "projection_settings.xml";
 
 const float CAMERA_MAX_DEPTH = .5; // in meters
+const float TOUCH_THRESHOLD = .5; // value from 0 to 1
 const int CAMERA_WIDTH = 1280;
 const int CAMERA_HEIGHT = 720;
 

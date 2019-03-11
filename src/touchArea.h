@@ -14,42 +14,18 @@
 
 class touchArea {
 private:
-    int width;
-    int height;
-    int x;
-    int y;
-    
-    ofPolyline sensitiveArea;
     float threshold;
     
-    ofFbo resultFbo; // depth points with substracted zero level, transformed to the result screen projection
-    
-    ofImage brush; // touch image for imitation
+    //ofImage brush; // touch image for imitation
     
     cameraManager * camera;
     
+    ofxCvGrayscaleImage thresholdImage;
     ofxCvContourFinder contourFinder;
-    
-    void updateFromCamera(); // ger rgb and depth data from camera
-    
-    // running indicator
-    bool started;
 public:
-    touchArea(cameraManager * _camera, ofPolyline _sensitiveArea, float threshold); // threshold to detect touch from 0 to 1
+    touchArea(cameraManager * _camera, float threshold); // threshold to detect touch from 0 to 1
     
-    void start();
-    void stop();
-    bool isRunning();
-    
-    int getResultWidth();
-    int getResultHeight();
-    
-    ofFbo & getTouchImage();
     vector<ofPoint> detectTouch();
-    
-    //void setMaxDepth(float maxDepth); // in mm
-    
-    void update();
     
     // immitation
     void imitateTouch(int x, int y);

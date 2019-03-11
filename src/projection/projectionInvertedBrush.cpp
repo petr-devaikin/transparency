@@ -8,52 +8,27 @@
 #include "projectionInvertedBrush.hpp"
 
 
-projectionInvertedBrush::projectionInvertedBrush(const string basePath, touchArea * t, ofMatrix4x4 transformCamera2Projection, ofMatrix4x4 transformImage2Projection, ofRectangle _projectionBox, float expSpeed, float bluredR) : baseProjection(t) {
+projectionInvertedBrush::projectionInvertedBrush(const string basePath, touchArea * t, calibrator * calib, float expSpeed, float bluredR) : baseProjection(t) {
     timer = ofGetElapsedTimef();
     
-    camera2Projection = transformCamera2Projection;
-    image2Projection = transformImage2Projection;
-    projectionBox = _projectionBox;
-    int projectionBoxWidth = projectionBox.width;
-    int projectionBoxHeight = projectionBox.height;
+    this->basePath = basePath;
+    this->calib = calib;
+    this->expansionSpeed = expSpeed;
+    this->bluredRadius = bluredR;
     
-    expansionSpeed = expSpeed;
-    bluredRadius = bluredR;
+    int projectionWidth = calib->getProjectionBox().getWidth();
+    int projectionHeight = calib->getProjectionBox().getHeight();
     
     // init result fbo
-    resultFbo.allocate(projectionBoxWidth, projectionBoxHeight, GL_RGBA);
+    resultFbo.allocate(projectionWidth, projectionHeight, GL_RGBA);
     
     // zero block
-    onesBlock = new unsigned char[projectionBoxWidth * projectionBoxHeight]; // only b-channel
-    memset(onesBlock, 255, projectionBoxWidth * projectionBoxHeight);
+    onesBlock = new unsigned char[projectionWidth * projectionHeight]; // only b-channel
+    memset(onesBlock, 255, projectionWidth * projectionHeight);
     
-    // prepare touch brush
-    touchBrush.load(ofFilePath::join(basePath, "exp_brush_4001.png"));
     
-    touchBrushResized.allocate(2 * projectionBoxWidth + 1, 2 * projectionBoxHeight + 1, GL_RGBA);
-    touchBrushResized.begin();
-    ofClear(0);
-    ofSetColor(255);
-    touchBrush.draw(projectionBoxWidth - round(touchBrush.getWidth() / 2) + 1, projectionBoxHeight - round(touchBrush.getHeight() / 2) + 1);
-    touchBrushResized.end();
-    
-    // load shaders
-    shaderExpansion.load(ofFilePath::join(basePath, "shadersGL3/expansion"));
-    shaderExpansionAdder.load(ofFilePath::join(basePath, "shadersGL3/expansionMaskAdder"));
-    shaderTransparency.load(ofFilePath::join(basePath, "shadersGL3/transparency"));
-    shaderMix2Images.load(ofFilePath::join(basePath, "shadersGL3/mix2images"));
-    
-    /*
-    ofImage img;
-    img.allocate(4001, 4001, OF_IMAGE_COLOR_ALPHA);
-    for (int i = 0; i < 4001; i++)
-        for (int j = 0; j < 4001; j++) {
-            int dist = int(round(sqrt((i - 2001) * (i - 2001) + (j - 2001) * (j - 2001))));
-            img.setColor(i, j, ofColor(dist / 256, dist % 256, 0));
-        }
-    img.update();
-    ofSaveImage(img, "exp_brush_4001.png", OF_IMAGE_QUALITY_BEST);
-    */
+    prepareBrush(); // prepare touch brush
+    loadShaders(); // load shaders
 }
 
 projectionInvertedBrush::~projectionInvertedBrush() {
@@ -61,9 +36,42 @@ projectionInvertedBrush::~projectionInvertedBrush() {
     delete[] onesBlock;
 }
 
+void projectionInvertedBrush::loadShaders() {
+    shaderExpansion.load(ofFilePath::join(basePath, "shadersGL3/expansion"));
+    shaderExpansionAdder.load(ofFilePath::join(basePath, "shadersGL3/expansionMaskAdder"));
+    shaderTransparency.load(ofFilePath::join(basePath, "shadersGL3/transparency"));
+    shaderMix2Images.load(ofFilePath::join(basePath, "shadersGL3/mix2images"));
+}
+
+void projectionInvertedBrush::prepareBrush() {
+    int projectionWidth = calib->getProjectionBox().getWidth();
+    int projectionHeight = calib->getProjectionBox().getHeight();
+    
+    touchBrush.load(ofFilePath::join(basePath, "exp_brush_4001.png"));
+    
+    touchBrushResized.allocate(2 * projectionWidth + 1, 2 * projectionHeight + 1, GL_RGBA);
+    touchBrushResized.begin();
+    ofClear(0);
+    ofSetColor(255);
+    touchBrush.draw(projectionWidth - round(touchBrush.getWidth() / 2) + 1, projectionHeight - round(touchBrush.getHeight() / 2) + 1);
+    touchBrushResized.end();
+}
+
+void projectionInvertedBrush::generateBrush() {
+     ofImage img;
+     img.allocate(4001, 4001, OF_IMAGE_COLOR_ALPHA);
+     for (int i = 0; i < 4001; i++)
+     for (int j = 0; j < 4001; j++) {
+     int dist = int(round(sqrt((i - 2001) * (i - 2001) + (j - 2001) * (j - 2001))));
+     img.setColor(i, j, ofColor(dist / 256, dist % 256, 0));
+     }
+     img.update();
+     ofSaveImage(img, "exp_brush_4001.png", OF_IMAGE_QUALITY_BEST);
+}
+
 bool projectionInvertedBrush::start() {
     resetLayers();
-    baseProjection::start();
+    return baseProjection::start();
 }
 
 void projectionInvertedBrush::addImage(const std::string &imgPath) {
@@ -73,13 +81,13 @@ void projectionInvertedBrush::addImage(const std::string &imgPath) {
     
     // transform
     ofFbo transformedImage;
-    transformedImage.allocate(projectionBox.width, projectionBox.height, GL_RGB);
+    transformedImage.allocate(calib->getProjectionBox().getWidth(), calib->getProjectionBox().getHeight(), GL_RGB);
     transformedImage.begin();
     {
         ofSetColor(255);
         ofClear(0);
         ofPushMatrix();
-        ofMultMatrix(image2Projection);
+        ofMultMatrix(calib->getImage2ProjectionTransform());
         newImg.draw(0, 0);
         ofPopMatrix();
     }
@@ -124,7 +132,12 @@ void projectionInvertedBrush::update() {
     
     for (int i = 0; i < touches.size(); i++) {
         // transform touch centroid from camera space to projection space
-        ofVec3f transformedCentroid = touches[i] * camera2Projection;
+        ofVec3f transformedCentroid = touches[i] * calib->getCamera2ProjectionTransform();
+        
+        if (transformedCentroid[0] < 0 || transformedCentroid[0] >= calib->getProjectionBox().getWidth() || transformedCentroid[1] < 0 || transformedCentroid[1] >= calib->getProjectionBox().getHeight()) {
+            cout << "transformed touch centroid out of projection area " << transformedCentroid << "\n";
+            continue;
+        }
         
         cout << "Layer touched.\n";
         
@@ -180,7 +193,7 @@ void projectionInvertedBrush::draw() {
     
     ofSetColor(255);
     
-    resultFbo.draw(projectionBox.x, projectionBox.y);
+    resultFbo.draw(calib->getProjectionBox());
     
     // draw touch canvas
     //(touch->getTransformedTouch()).draw(0, 0);

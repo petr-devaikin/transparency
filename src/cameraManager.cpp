@@ -50,7 +50,7 @@ bool cameraManager::findCamera() {
         depthScale = depth_sensor.get_depth_scale();
         
         // calculate scale coefficient
-        rangeK = 65535 / depthScale * maxDepth;
+        rangeK = 65535.0 * 65535.0 * depthScale / maxDepth;
         
         frames = pipe.wait_for_frames();
         cout << "RealSense found!\n";
@@ -133,8 +133,8 @@ void cameraManager::setRoi(ofRectangle roi) {
     tmpImage.allocate(roi.width, roi.height);
 }
 
-ofxCvGrayscaleImage & cameraManager::getSubstractedImage() {
-    return resultImage;
+ofxCvGrayscaleImage * cameraManager::getSubstractedImage() {
+    return &resultImage;
 }
 
 int cameraManager::getWidth() {

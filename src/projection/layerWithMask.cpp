@@ -52,7 +52,7 @@ bool layerWithMask::checkIfTouched(ofPoint point) {
     ofPixels maskPixels;
     
     mask.readToPixels(maskPixels);
-    return maskPixels.getColor(point[0], point[1]).b == 255;
+    return maskPixels.getColor(round(point[0]), round(point[1])).b == 255;
 }
 
 void layerWithMask::addTouch(ofPoint point, float blurRadius) {

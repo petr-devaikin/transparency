@@ -87,7 +87,7 @@ void ofApp::saveSettings() {
 
 void ofApp::initProjection() {
     // init proj
-    proj = new projectionInvertedBrush(BASE_PATH, touch, calib->getImage2ProjectionTransform(), calib->getImage2ProjectionTransform(), calib->getProjectionBox());
+    proj = new projectionInvertedBrush(BASE_PATH, touch, calib);
     proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_001.png"));
     proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_002.png"));
     proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_003.png"));
@@ -111,17 +111,15 @@ void ofApp::initProjection() {
 
 void ofApp::initTouchArea() {
     // init touch
-    touch = new touchArea(camera, calib->getCameraPolyline(), .5); // .5 (15cm) sensitive area
+    touch = new touchArea(camera, TOUCH_THRESHOLD);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     camera->update();
-    
     calib->update();
     
     if (calib->getState() == done) {
-        touch->update();
         proj->update();
     }
 }
@@ -133,12 +131,12 @@ void ofApp::draw(){
     ofSetColor(255);
     ofFill();
     
-    calib->draw(); // draw calibration process. If done, it draws nothing
     
     if (calib->getState() == done) {
-        //(touch->getTransformedTouch()).draw(0, 0);
-        //proj->draw();
-        (camera->getSubstractedImage()).draw(10, 10);
+        proj->draw();
+    }
+    else {
+        calib->draw();
     }
     
     //if (showGui)
@@ -176,12 +174,10 @@ void ofApp::keyPressed(int key){
             initTouchArea();
             initProjection();
             
-            touch->start();
             proj->start();
         }
     }
     else if (key == 'r') {
-        touch->stop();
         proj->stop();
         calib->startAgain();
     }

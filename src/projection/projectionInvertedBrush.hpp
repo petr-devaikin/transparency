@@ -12,9 +12,12 @@
 #include "ofxOpenCv.h"
 #include "baseProjection.hpp"
 #include "layerWithMask.hpp"
+#include "calibrator.hpp"
 
 class projectionInvertedBrush : public baseProjection {
 private:
+    string basePath;
+    
     float timer;
     
     ofFbo resultFbo;
@@ -34,20 +37,19 @@ private:
     ofShader shaderExpansionAdder;
     ofShader shaderTransparency;
     ofShader shaderMix2Images;
+    void loadShaders();
     
     unsigned char * onesBlock; // to check if all pixels are 1 inside layerWithMask
     
     ofImage touchBrush; // to initiate trunsition
     ofFbo touchBrushResized; // resized and preprocessed
+    void generateBrush();
+    void prepareBrush();
     
-    ofMatrix4x4 camera2Projection;
-    ofMatrix4x4 image2Projection;
-    ofRectangle projectionBox;
+    calibrator * calib;
 public:
-    projectionInvertedBrush(const string basePath, touchArea * t, ofMatrix4x4 transformCamera2Projection, ofMatrix4x4 transformImage2Projection, ofRectangle _projectionBox, float expSpeed = 50, float bluredR = 50);
+    projectionInvertedBrush(const string basePath, touchArea * t, calibrator * calib, float expSpeed = 50, float bluredR = 50);
     ~projectionInvertedBrush();
-    
-    void setTransform(ofMatrix4x4 transformCamera2Projection, ofMatrix4x4 transformImage2Projection, ofRectangle _projectionBox);
     
     bool start();
     

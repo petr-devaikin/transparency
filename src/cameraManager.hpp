@@ -57,7 +57,7 @@ public:
     int getWidth();
     int getHeight();
     ofImage getRGBImage();
-    ofxCvGrayscaleImage & getSubstractedImage(); // return last - zero image in ROI; maxDepth in mm
+    ofxCvGrayscaleImage * getSubstractedImage(); // return last - zero image in ROI; maxDepth in mm
     
     void setRoi(ofRectangle roi);
 };
