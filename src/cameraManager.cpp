@@ -7,18 +7,20 @@
 
 #include "cameraManager.hpp"
 
-cameraManager::cameraManager(float maxDepth, int width, int height) {
+cameraManager::cameraManager(int width, int height, float maxDepth, float exposure, int downsampling) {
     this->maxDepth = maxDepth;
     this->width = width;
     this->height = height;
+    this->exposure = exposure;
+    this->downsampling = downsampling;
     
     cameraFound = false;
     depthScale = 1;
     rangeK = 65535;
     
     // init filters
-    depth_to_disparity = rs2::disparity_transform(true);
-    disparity_to_depth = rs2::disparity_transform(false);
+    //depth_to_disparity = rs2::disparity_transform(true);
+    //disparity_to_depth = rs2::disparity_transform(false);
     
     // allocate rgb image
     rgbCameraImage.allocate(width, height, OF_IMAGE_COLOR);
@@ -34,7 +36,7 @@ cameraManager::~cameraManager() {
 }
 
 
-bool cameraManager::findCamera() {
+bool cameraManager::findCamera(float laserPower) {
     cout << "Looking for RealSense\n";
     rs2::config cfg;
     cfg.enable_stream(RS2_STREAM_DEPTH, width, height);
@@ -43,8 +45,15 @@ bool cameraManager::findCamera() {
     auto device_list = ctx.query_devices();
     
     if (device_list.size() > 0) {
-        rs2::pipeline_profile profile = pipe.start(cfg);
+        profile = pipe.start(cfg);
         auto depth_sensor = profile.get_device().first<rs2::depth_sensor>();
+        
+        cameraName = depth_sensor.get_info(RS2_CAMERA_INFO_NAME);
+        
+        // depth sensor settings
+        depth_sensor.set_option(RS2_OPTION_VISUAL_PRESET, RS2_RS400_VISUAL_PRESET_DEFAULT);
+        depth_sensor.set_option(RS2_OPTION_ENABLE_AUTO_EXPOSURE, 0.f);
+        depth_sensor.set_option(RS2_OPTION_EXPOSURE, exposure);
         
         // get scale from the sensor
         depthScale = depth_sensor.get_depth_scale();
@@ -64,6 +73,26 @@ bool cameraManager::findCamera() {
         cameraFound = false;
         return false;
     }
+}
+
+void cameraManager::setExposure(float e) {
+    if (!cameraFound) return;
+    
+    exposure = e;
+    auto depth_sensor = profile.get_device().first<rs2::depth_sensor>();
+    depth_sensor.set_option(RS2_OPTION_EXPOSURE, exposure);
+}
+
+float cameraManager::getExposure() {
+    return exposure;
+}
+
+string cameraManager::getCameraName() {
+    return cameraName;
+}
+
+float cameraManager::getMaxDepth() {
+    return maxDepth;
 }
 
 void cameraManager::disconnectCamera() {
@@ -94,12 +123,10 @@ void cameraManager::update() {
     rs2::depth_frame depthFrame = frames.get_depth_frame();
     
     // apply filters
-    //depthFrame = dec_filter.process(depthFrame);
-    
-    depthFrame = depth_to_disparity.process(depthFrame);
+    //depthFrame = depth_to_disparity.process(depthFrame);
     //depthFrame = spat_filter.process(depthFrame);
     depthFrame = temp_filter.process(depthFrame);
-    depthFrame = disparity_to_depth.process(depthFrame);
+    //depthFrame = disparity_to_depth.process(depthFrame);
     
     depthFrame = hole_filter.process(depthFrame);
     

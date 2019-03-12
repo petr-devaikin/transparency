@@ -23,9 +23,12 @@ private:
     ofxCvGrayscaleImage thresholdImage;
     ofxCvContourFinder contourFinder;
 public:
-    touchArea(cameraManager * _camera, float threshold); // threshold to detect touch from 0 to 1
+    touchArea(cameraManager * _camera, float threshold = 0.5); // threshold to detect touch from 0 to 1
     
     vector<ofPoint> detectTouch();
+    
+    void setThreshold(float threshold);
+    float getThreshold();
     
     // immitation
     void imitateTouch(int x, int y);

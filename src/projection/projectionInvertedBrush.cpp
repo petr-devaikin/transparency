@@ -8,10 +8,9 @@
 #include "projectionInvertedBrush.hpp"
 
 
-projectionInvertedBrush::projectionInvertedBrush(const string basePath, cameraManager * camera, touchArea * t, calibrator * calib, bool liveAnimation, float expSpeed, float bluredR) : baseProjection(t) {
+projectionInvertedBrush::projectionInvertedBrush(cameraManager * camera, touchArea * t, calibrator * calib, bool liveAnimation, float expSpeed, float bluredR) : baseProjection(t) {
     timer = ofGetElapsedTimef();
     
-    this->basePath = basePath;
     this->camera = camera;
     this->calib = calib;
     this->liveAnimation = liveAnimation;
@@ -45,17 +44,17 @@ projectionInvertedBrush::~projectionInvertedBrush() {
 }
 
 void projectionInvertedBrush::loadShaders() {
-    shaderExpansion.load(ofFilePath::join(basePath, "shadersGL3/expansion"));
-    shaderExpansionAdder.load(ofFilePath::join(basePath, "shadersGL3/expansionMaskAdder"));
-    shaderMix2Images.load(ofFilePath::join(basePath, "shadersGL3/mix2images"));
-    shaderSaturationTuner.load(ofFilePath::join(basePath, "shadersGL3/brightnessTuner"));
+    shaderExpansion.load("shadersGL3/expansion");
+    shaderExpansionAdder.load("shadersGL3/expansionMaskAdder");
+    shaderMix2Images.load("shadersGL3/mix2images");
+    shaderSaturationTuner.load("shadersGL3/brightnessTuner");
 }
 
 void projectionInvertedBrush::prepareBrush() {
     int projectionWidth = calib->getProjectionBox().getWidth();
     int projectionHeight = calib->getProjectionBox().getHeight();
     
-    touchBrush.load(ofFilePath::join(basePath, "exp_brush_4001.png"));
+    touchBrush.load("exp_brush_4001.png");
     
     touchBrushResized.allocate(2 * projectionWidth + 1, 2 * projectionHeight + 1, GL_RGBA);
     touchBrushResized.begin();
@@ -85,6 +84,7 @@ bool projectionInvertedBrush::start() {
 void projectionInvertedBrush::addImage(const std::string &imgPath) {
     ofImage newImg;
     newImg.load(imgPath);
+    newImg.mirror(false, true);
     originalImages.push_back(newImg);
     
     // transform

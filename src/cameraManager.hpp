@@ -26,29 +26,41 @@ private:
     ofxCvGrayscaleImage resultImage;
     
     rs2::pipeline pipe;
+    rs2::pipeline_profile profile;
     rs2::frameset frames;
+    
+    float exposure;
+    int downsampling; // to reduce resolution
     
     float depthScale; // depth bite to meters
     float maxDepth; // max depth
     float rangeK; // to "scale" depth pixels
     
     // Filters
-    rs2::decimation_filter dec_filter;
-    rs2::spatial_filter spat_filter;
+    //rs2::decimation_filter dec_filter;
+    //rs2::spatial_filter spat_filter;
     rs2::temporal_filter temp_filter;
     rs2::hole_filling_filter hole_filter;
     
     rs2::disparity_transform depth_to_disparity;
     rs2::disparity_transform disparity_to_depth;
     
+    string cameraName = "";
     bool cameraFound;
 public:
-    cameraManager(float maxDepth, int width = 640, int height = 360);
+    cameraManager(int width = 1280, int height = 720, float maxDepth = .5, float exposure = 33000, int downsampling = 2);
     ~cameraManager();
     
-    bool findCamera();
+    bool findCamera(float laserPower = 150);
     void disconnectCamera();
     bool isCameraFound();
+    
+    void setExposure(float e);
+    float getExposure();
+    
+    float getMaxDepth();
+    
+    string getCameraName();
     
     void setZeroLevel(); // update zero level from current depth buffer
     

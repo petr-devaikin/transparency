@@ -31,6 +31,9 @@ private:
     ofPolyline projectionPolyline;
     ofPolyline cameraPolyline;
     
+    float maxDepth = .5;
+    float threshold = .5;
+    
     void calculateTransformation();
     
     float currentTime;
@@ -40,6 +43,8 @@ public:
     calibrator(cameraManager * _camera, int _imageWidth, int _imageHeight, float qrTimer = 0.1); // qr timer - for how long to show qr before recognizing
     void setProjectionArea(ofPolyline _preset);
     void setCameraArea(ofPolyline _preset);
+    void setMaxDepth(float maxDepth);
+    void setThreshold(float threshold);
     
     void update();
     
@@ -56,6 +61,9 @@ public:
     ofPolyline getCameraPolyline();
     ofRectangle getProjectionBox();
     ofRectangle getCameraBox();
+    
+    float getMaxDepth();
+    float getThreshold();
     
     ofMatrix4x4 getCamera2ProjectionTransform();
     ofMatrix4x4 getImage2ProjectionTransform();

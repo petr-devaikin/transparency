@@ -29,7 +29,7 @@ vector<ofPoint> touchArea::detectTouch() {
     thresholdImage = *(camera->getSubstractedImage());
     thresholdImage.threshold(255 * threshold);
     
-    contourFinder.findContours(thresholdImage, 4, thresholdImage.getWidth() * thresholdImage.getHeight() / 4, 4, false);
+    contourFinder.findContours(thresholdImage, thresholdImage.getWidth() * thresholdImage.getHeight() / 36, thresholdImage.getWidth() * thresholdImage.getHeight() / 4, 4, false);
     
     for (int i = 0; i < contourFinder.nBlobs; i++) {
         ofxCvBlob blob = contourFinder.blobs[i];
@@ -37,6 +37,14 @@ vector<ofPoint> touchArea::detectTouch() {
     }
     
     return result;
+}
+
+void touchArea::setThreshold(float threshold) {
+    this->threshold = threshold;
+}
+
+float touchArea::getThreshold() {
+    return threshold;
 }
 
 // immitation

@@ -81,8 +81,8 @@ void calibrator::recognize() {
 
 void calibrator::confirmRecognizedArea() {
     cout << "Confirm recognition\n";
-    camera->setZeroLevel();
     camera->setRoi(cameraPolyline.getBoundingBox());
+    camera->setZeroLevel();
     currentState = done;
 }
 
@@ -197,4 +197,20 @@ ofMatrix4x4 calibrator::getImage2ProjectionTransform() {
                0, 0, 1, 0,
                m.at<double>(0, 2), m.at<double>(1, 2), 0, 1);
     return result;
+}
+
+void calibrator::setMaxDepth(float maxDepth) {
+    this->maxDepth = maxDepth;
+}
+
+void calibrator::setThreshold(float threshold) {
+    this->threshold = threshold;
+}
+
+float calibrator::getMaxDepth() {
+    return maxDepth;
+}
+
+float calibrator::getThreshold() {
+    return threshold;
 }

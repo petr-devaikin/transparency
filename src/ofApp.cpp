@@ -3,12 +3,11 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-    // init camera
-    camera = new cameraManager(CAMERA_MAX_DEPTH, CAMERA_WIDTH, CAMERA_HEIGHT);
+    camera = new cameraManager(CAMERA_WIDTH, CAMERA_HEIGHT);
     camera->findCamera();
     
-    // init calibrator
     calib = new calibrator(camera, IMAGE_WIDTH, IMAGE_HEIGHT);
+    touch = new touchArea(camera); // init touch recogniser
     
     // load settings from files
     loadSettings();
@@ -16,15 +15,14 @@ void ofApp::setup() {
 
 //--------------------------------------------------------------
 void ofApp::loadSettings() {
-    // depth sensor settings
-    //ofxXmlSettings depthSettings;
-    //depthSettings.loadFile(DEPTH_SETTINGS_FILE);
-    
-    //touch->setMaxDepth(100); // set 10cm max depth
-    
     // projection settings
     ofxXmlSettings projectionSettings;
-    projectionSettings.loadFile(ofFilePath::join(BASE_PATH, PROJ_SETTINGS_FILE));
+    projectionSettings.loadFile(PROJ_SETTINGS_FILE);
+    
+    // camera and touch detector settings
+    camera->setExposure(projectionSettings.getValue("camera_exposure", 33000.f));
+    //camera->setMaxDepth();
+    touch->setThreshold(projectionSettings.getValue("touch_threshold", .5));
     
     // load projection polyline
     ofPolyline projectionPolyline;
@@ -54,6 +52,11 @@ void ofApp::saveSettings() {
     // save projection settings
     ofxXmlSettings projectionSettings;
     
+    // save camera exposure and touch detection sensitivity
+    projectionSettings.setValue("camera_exposure", camera->getExposure());
+    projectionSettings.setValue("touch_max_depth", camera->getMaxDepth());
+    projectionSettings.setValue("touch_threshold", touch->getThreshold());
+    
     // save projection polyline
     ofPolyline projectionPolyline = calib->getProjectionPolyline();
     projectionSettings.setValue("projection_x1", projectionPolyline.getVertices()[0][0]);
@@ -76,51 +79,42 @@ void ofApp::saveSettings() {
     projectionSettings.setValue("camera_x4", cameraPolyline.getVertices()[3][0]);
     projectionSettings.setValue("camera_y4", cameraPolyline.getVertices()[3][1]);
     
-    projectionSettings.saveFile(ofFilePath::join(BASE_PATH, PROJ_SETTINGS_FILE));
-    
-    // save depth settings
-    
-    //ofxXmlSettings depthSettings;
-    //depthSettings.saveFile(DEPTH_SETTINGS_FILE);
-    
+    projectionSettings.saveFile(PROJ_SETTINGS_FILE);
 }
 
 void ofApp::initProjection() {
     // init proj
-    proj = new projectionInvertedBrush(BASE_PATH, camera, touch, calib, PROJ_ANIMATE_DEPTH, PROJ_SPEED, PROJ_BLUR_RADIUS);
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_001.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_002.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_003.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_004.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_005.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_006.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_007.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_008.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_009.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_010.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_011.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_012.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_013.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_014.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_015.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_016.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_017.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_018.png"));
-    proj->addImage(ofFilePath::join(BASE_PATH, "surrender_jei_2018/surrender_019.png"));
-}
-
-void ofApp::initTouchArea() {
-    // init touch
-    touch = new touchArea(camera, TOUCH_THRESHOLD);
+    proj = new projectionInvertedBrush(camera, touch, calib, PROJ_ANIMATE_DEPTH, PROJ_SPEED, PROJ_BLUR_RADIUS);
+    proj->addImage("surrender_jei_2018/surrender_001.png");
+    proj->addImage("surrender_jei_2018/surrender_002.png");
+    proj->addImage("surrender_jei_2018/surrender_003.png");
+    proj->addImage("surrender_jei_2018/surrender_004.png");
+    proj->addImage("surrender_jei_2018/surrender_005.png");
+    proj->addImage("surrender_jei_2018/surrender_006.png");
+    proj->addImage("surrender_jei_2018/surrender_007.png");
+    proj->addImage("surrender_jei_2018/surrender_008.png");
+    proj->addImage("surrender_jei_2018/surrender_009.png");
+    proj->addImage("surrender_jei_2018/surrender_010.png");
+    proj->addImage("surrender_jei_2018/surrender_011.png");
+    proj->addImage("surrender_jei_2018/surrender_012.png");
+    proj->addImage("surrender_jei_2018/surrender_013.png");
+    proj->addImage("surrender_jei_2018/surrender_014.png");
+    proj->addImage("surrender_jei_2018/surrender_015.png");
+    proj->addImage("surrender_jei_2018/surrender_016.png");
+    proj->addImage("surrender_jei_2018/surrender_017.png");
+    proj->addImage("surrender_jei_2018/surrender_018.png");
+    proj->addImage("surrender_jei_2018/surrender_019.png");
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     camera->update();
-    calib->update();
     
     if (calib->getState() == done) {
         proj->update();
+    }
+    else {
+        calib->update();
     }
 }
 
@@ -134,6 +128,7 @@ void ofApp::draw(){
     
     if (calib->getState() == done) {
         proj->draw();
+        //(camera->getSubstractedImage())->draw(0, 0);
     }
     else {
         calib->draw();
@@ -171,9 +166,7 @@ void ofApp::keyPressed(int key){
         else if (calib->getState() == showingRecognizedArea) {
             calib->confirmRecognizedArea();
             
-            initTouchArea();
             initProjection();
-            
             proj->start();
         }
     }

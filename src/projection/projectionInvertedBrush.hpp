@@ -17,8 +17,6 @@
 
 class projectionInvertedBrush : public baseProjection {
 private:
-    string basePath;
-    
     float timer;
     
     ofFbo resultFbo;
@@ -54,7 +52,7 @@ private:
     calibrator * calib;
     cameraManager * camera;
 public:
-    projectionInvertedBrush(const string basePath, cameraManager * camera, touchArea * t, calibrator * calib, bool liveAnimation = true, float expSpeed = 50, float bluredR = 50);
+    projectionInvertedBrush(cameraManager * camera, touchArea * t, calibrator * calib, bool liveAnimation = true, float expSpeed = 50, float bluredR = 50);
     ~projectionInvertedBrush();
     
     bool start();
