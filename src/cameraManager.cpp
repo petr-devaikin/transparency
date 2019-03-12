@@ -30,6 +30,10 @@ cameraManager::cameraManager(int width, int height, float maxDepth, float exposu
     zeroImage.allocate(width, height);
     lastImage.setUseTexture(false);
     lastImage.allocate(width, height);
+    lastImageScaled.setUseTexture(false);
+    lastImageScaled.allocate(width, height);
+    
+    depthImage.allocate(width, height);
 };
 
 cameraManager::~cameraManager() {
@@ -127,12 +131,15 @@ void cameraManager::update() {
     //depthFrame = spat_filter.process(depthFrame);
     depthFrame = temp_filter.process(depthFrame);
     //depthFrame = disparity_to_depth.process(depthFrame);
-    
     depthFrame = hole_filter.process(depthFrame);
     
     // copy depth data
     memcpy((lastImage.getShortPixelsRef()).getData(), depthFrame.get_data(), width * height * 2);
     lastImage.flagImageChanged();
+    depthScaled = false;
+    
+    memcpy((lastImageScaled.getShortPixelsRef()).getData(), depthFrame.get_data(), width * height * 2);
+    lastImageScaled.flagImageChanged();
     
     // if zero level is set, substract it
     if (zeroLevelSet) {
@@ -150,6 +157,15 @@ void cameraManager::setZeroLevel() {
 
 ofImage cameraManager::getRGBImage() {
     return rgbCameraImage;
+}
+
+ofxCvGrayscaleImage * cameraManager::getDepthImage() {
+    if (!depthScaled) {
+        depthScaled = true;
+        lastImageScaled.convertToRange(0, 65535.0 * 65535.0 * depthScale / 4); // from 0 to 4 meters
+    }
+    depthImage = lastImageScaled;
+    return &depthImage;
 }
 
 void cameraManager::setRoi(ofRectangle roi) {

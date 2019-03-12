@@ -10,11 +10,14 @@
 
 #include "cameraManager.hpp"
 #include "ofMain.h"
+#include "ofxGui.h"
 
 enum CalibratorState {
+    exposureSetup,
     projectionSetup,
     recognizingQr,
     showingRecognizedArea,
+    thresholdSetup,
     done
 };
 
@@ -39,6 +42,11 @@ private:
     float currentTime;
     float timer;
     float startTimerValue;
+    
+    ofxPanel gui;
+    ofxFloatSlider exposureSlider;
+    
+    void exposureChanged(float &newExposure);
 public:
     calibrator(cameraManager * _camera, int _imageWidth, int _imageHeight, float qrTimer = 0.1); // qr timer - for how long to show qr before recognizing
     void setProjectionArea(ofPolyline _preset);
@@ -50,6 +58,7 @@ public:
     
     void recognize();
     
+    void confirmExposure();
     void confirmRecognizedArea();
     void startAgain();
     

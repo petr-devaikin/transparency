@@ -11,7 +11,7 @@
 using namespace cv;
 
 calibrator::calibrator(cameraManager * _camera, int _imageWidth, int _imageHeight, float qrTimer) {
-    currentState = projectionSetup;
+    currentState = exposureSetup;
     couldNotRecognize = false;
     
     imageWidth = _imageWidth;
@@ -30,6 +30,11 @@ calibrator::calibrator(cameraManager * _camera, int _imageWidth, int _imageHeigh
     
     // generate ArUco markers
     //cv::aruco
+    
+    // setup GUI
+    gui.setup();
+    gui.add(exposureSlider.setup("Exposure", camera->getExposure(), 20, 150000));
+    exposureSlider.addListener(this, &calibrator::exposureChanged);
 }
 
 void calibrator::setProjectionArea(ofPolyline _preset) {
@@ -79,6 +84,11 @@ void calibrator::recognize() {
     timer = startTimerValue;
 }
 
+void calibrator::confirmExposure() {
+    cout << "Confirm exposure\n";
+    currentState = projectionSetup;
+}
+
 void calibrator::confirmRecognizedArea() {
     cout << "Confirm recognition\n";
     camera->setRoi(cameraPolyline.getBoundingBox());
@@ -88,7 +98,7 @@ void calibrator::confirmRecognizedArea() {
 
 void calibrator::startAgain() {
     cout << "Start calibration again\n";
-    currentState = projectionSetup;
+    currentState = exposureSetup;
     couldNotRecognize = false;
 }
 
@@ -100,7 +110,14 @@ CalibratorState calibrator::getState() {
 
 
 void calibrator::draw() {
-    if (currentState == projectionSetup) {
+    if (currentState == exposureSetup) {
+        ofSetColor(255);
+        (camera->getDepthImage())->draw(0, 0);
+        ofDrawBitmapString("Camera: " + camera->getCameraName(), 10, 80);
+        ofDrawBitmapString("Set exposure and press Space", 10, 110);
+        gui.draw();
+    }
+    else if (currentState == projectionSetup) {
         ofSetColor(255, 0, 0);
         
         ofBeginShape();
@@ -213,4 +230,8 @@ float calibrator::getMaxDepth() {
 
 float calibrator::getThreshold() {
     return threshold;
+}
+
+void calibrator::exposureChanged(float &newExposure){
+    camera->setExposure(newExposure);
 }

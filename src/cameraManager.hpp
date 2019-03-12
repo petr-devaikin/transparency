@@ -18,11 +18,13 @@ private:
     int height;
     
     ofImage rgbCameraImage; // last data from sensor
+    ofxCvGrayscaleImage depthImage;
     
     bool zeroLevelSet = false;
     ofxCvShortImage tmpImage;
     ofxCvShortImage zeroImage;
     ofxCvShortImage lastImage;
+    ofxCvShortImage lastImageScaled; // from 0 to 4 meters
     ofxCvGrayscaleImage resultImage;
     
     rs2::pipeline pipe;
@@ -47,6 +49,8 @@ private:
     
     string cameraName = "";
     bool cameraFound;
+    
+    bool depthScaled; // if already transformed after fetching
 public:
     cameraManager(int width = 1280, int height = 720, float maxDepth = .5, float exposure = 33000, int downsampling = 2);
     ~cameraManager();
@@ -69,6 +73,7 @@ public:
     int getWidth();
     int getHeight();
     ofImage getRGBImage();
+    ofxCvGrayscaleImage * getDepthImage();
     ofxCvGrayscaleImage * getSubstractedImage(); // return last - zero image in ROI; maxDepth in mm
     
     void setRoi(ofRectangle roi);
