@@ -20,7 +20,7 @@ void ofApp::loadSettings() {
     projectionSettings.loadFile(PROJ_SETTINGS_FILE);
     
     // camera and touch detector settings
-    camera->setExposure(projectionSettings.getValue("camera_exposure", 33000.f));
+    calib->setExposure(projectionSettings.getValue("camera_exposure", 33000.f));
     //camera->setMaxDepth();
     touch->setThreshold(projectionSettings.getValue("touch_threshold", .5));
     
@@ -161,6 +161,10 @@ void ofApp::keyPressed(int key){
         // if projection polygon is set, go to recognition state
         if (calib->getState() == projectionSetup)
             calib->recognize();
+        
+        else if (calib->getState() == exposureSetup) {
+            calib->confirmExposure();
+        }
         
         // if camera polygon is set ore recognized correctly, confirm it
         else if (calib->getState() == showingRecognizedArea) {

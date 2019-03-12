@@ -53,6 +53,7 @@ public:
     void setCameraArea(ofPolyline _preset);
     void setMaxDepth(float maxDepth);
     void setThreshold(float threshold);
+    void setExposure(float e);
     
     void update();
     

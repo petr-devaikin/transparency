@@ -224,6 +224,10 @@ void calibrator::setThreshold(float threshold) {
     this->threshold = threshold;
 }
 
+void calibrator::setExposure(float e) {
+    exposureSlider = e;
+}
+
 float calibrator::getMaxDepth() {
     return maxDepth;
 }
