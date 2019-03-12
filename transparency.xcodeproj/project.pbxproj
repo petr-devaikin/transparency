@@ -30,6 +30,7 @@
 		63020F16C7E8DED980111241 /* ofxCvImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C6151136D101F857DAE12722 /* ofxCvImage.cpp */; };
 		63B57AC5BF4EF088491E0317 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 50DF87D612C5AAE17AAFA6C0 /* ofxXmlSettings.cpp */; };
 		6AABAB39E82AF5CFEA23A205 /* ContourFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5FBB4A8427353AED09174BE5 /* ContourFinder.cpp */; };
+		6F1F16BB22385636003D8D59 /* librealsense2.2.19.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F1F16BA22385635003D8D59 /* librealsense2.2.19.0.dylib */; };
 		7A1CB671E44D9B021E4BD765 /* markerdetector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24C01D5F3DE23A3AEF41766E /* markerdetector.cpp */; };
 		7CDAD32BE4FA46701E3552C7 /* RunningBackground.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5CBF6AED6A17AC0C17F63CC4 /* RunningBackground.cpp */; };
 		837220E80EB56CD44AD27F2A /* ofxSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 15F2C6477A769C03A56D1401 /* ofxSlider.cpp */; };
@@ -220,7 +221,7 @@
 		6F1F16B4223853A9003D8D59 /* rs_option.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rs_option.h; sourceTree = "<group>"; };
 		6F1F16B5223853A9003D8D59 /* rsutil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rsutil.h; sourceTree = "<group>"; };
 		6F1F16B6223853A9003D8D59 /* rs_advanced_mode.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = rs_advanced_mode.hpp; sourceTree = "<group>"; };
-		6F1F16B922385403003D8D59 /* librealsense2.2.19.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = librealsense2.2.19.0.dylib; sourceTree = "<group>"; };
+		6F1F16BA22385635003D8D59 /* librealsense2.2.19.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = librealsense2.2.19.0.dylib; path = "../../../../librealsense-2.19.0/build/Debug/librealsense2.2.19.0.dylib"; sourceTree = "<group>"; };
 		6FFAED2B221DF6B700AF7018 /* shadersGL3 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = shadersGL3; path = bin/data/shadersGL3; sourceTree = "<group>"; };
 		70046E043EDDB466ED625C3B /* Tracker.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Tracker.h; path = ../../../addons/ofxCv/libs/ofxCv/include/ofxCv/Tracker.h; sourceTree = SOURCE_ROOT; };
 		7101CF2125B8B2BF46AA2662 /* cxcore.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = cxcore.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv/cxcore.hpp; sourceTree = SOURCE_ROOT; };
@@ -404,6 +405,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */,
+				6F1F16BB22385636003D8D59 /* librealsense2.2.19.0.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1116,6 +1118,7 @@
 		E4B69B4A0A3A1720003C02F2 = {
 			isa = PBXGroup;
 			children = (
+				6F1F16BA22385635003D8D59 /* librealsense2.2.19.0.dylib */,
 				6FFAED2B221DF6B700AF7018 /* shadersGL3 */,
 				E4B6FCAD0C3E899E008CF71C /* openFrameworks-Info.plist */,
 				E4EB6923138AFD0F00A09F29 /* Project.xcconfig */,
@@ -1124,7 +1127,6 @@
 				BB4B014C10F69532006C3DED /* addons */,
 				6948EE371B920CB800B5AC1A /* local_addons */,
 				E4B69B5B0A3A1756003C02F2 /* transparencyDebug.app */,
-				6F1F16B922385403003D8D59 /* librealsense2.2.19.0.dylib */,
 			);
 			sourceTree = "<group>";
 		};

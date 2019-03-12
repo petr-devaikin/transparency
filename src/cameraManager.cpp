@@ -52,7 +52,7 @@ bool cameraManager::findCamera(float laserPower) {
         profile = pipe.start(cfg);
         auto depth_sensor = profile.get_device().first<rs2::depth_sensor>();
         
-        cameraName = depth_sensor.get_info(RS2_CAMERA_INFO_NAME);
+        cameraName = depth_sensor.get_info(RS2_CAMERA_INFO_USB_TYPE_DESCRIPTOR);
         
         // depth sensor settings
         depth_sensor.set_option(RS2_OPTION_VISUAL_PRESET, RS2_RS400_VISUAL_PRESET_DEFAULT);
