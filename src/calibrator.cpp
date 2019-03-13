@@ -112,7 +112,7 @@ CalibratorState calibrator::getState() {
 void calibrator::draw() {
     if (currentState == exposureSetup) {
         ofSetColor(255);
-        (camera->getDepthImage())->draw(0, 0);
+        (camera->getDepthVisualizationImage()).draw(0, 0);
         ofDrawBitmapString("Camera: " + camera->getCameraName(), 10, 80);
         ofDrawBitmapString("Set exposure and press Space", 10, 110);
         gui.draw();
@@ -137,8 +137,7 @@ void calibrator::draw() {
     else if (currentState == showingRecognizedArea) {
         // draw camera image
         ofSetColor(255);
-        ofImage rgb = camera->getRGBImage();
-        rgb.draw(0, 0);
+        (camera->getRGBImage()).draw(0, 0);
         
         // draw recognized polyline on top
         ofNoFill();

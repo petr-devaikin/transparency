@@ -26,7 +26,7 @@ vector<ofPoint> touchArea::detectTouch() {
     
     if (!camera->isCameraFound()) return result;
     
-    thresholdImage = *(camera->getSubstractedImage());
+    thresholdImage = camera->getSubstractedImage();
     thresholdImage.threshold(255 * threshold);
     
     contourFinder.findContours(thresholdImage, thresholdImage.getWidth() * thresholdImage.getHeight() / 36, thresholdImage.getWidth() * thresholdImage.getHeight() / 4, 4, false);

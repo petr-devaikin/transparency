@@ -7,12 +7,16 @@
 
 #include "cameraManager.hpp"
 
-cameraManager::cameraManager(int width, int height, float maxDepth, float exposure, int downsampling) {
+cameraManager::cameraManager(int cameraWidth, int cameraHeight, float maxDepth, float exposure, int downsampling) {
     this->maxDepth = maxDepth;
-    this->width = width;
-    this->height = height;
+    this->cameraWidth = cameraWidth;
+    this->cameraHeight = cameraHeight;
+    width = cameraWidth / downsampling;
+    height = cameraHeight / downsampling;
     this->exposure = exposure;
     this->downsampling = downsampling;
+    
+    roi.set(0, 0, width, height);
     
     cameraFound = false;
     depthScale = 1;
@@ -23,17 +27,19 @@ cameraManager::cameraManager(int width, int height, float maxDepth, float exposu
     //disparity_to_depth = rs2::disparity_transform(false);
     
     // allocate rgb image
-    rgbCameraImage.allocate(width, height, OF_IMAGE_COLOR);
+    rgbCameraImage.allocate(cameraWidth, cameraHeight);
+    rgbCameraImageResized.allocate(width, height);
     
     // allocate depth images
+    depthImage.setUseTexture(false);
+    depthImage.allocate(cameraWidth, cameraHeight);
+    
     zeroImage.setUseTexture(false);
     zeroImage.allocate(width, height);
-    lastImage.setUseTexture(false);
-    lastImage.allocate(width, height);
-    lastImageScaled.setUseTexture(false);
-    lastImageScaled.allocate(width, height);
     
-    depthImage.allocate(width, height);
+    lastImageReranged.setUseTexture(false);
+    lastImageReranged.allocate(width, height);
+    depthVisualizationImage.allocate(width, height);
 };
 
 cameraManager::~cameraManager() {
@@ -43,8 +49,8 @@ cameraManager::~cameraManager() {
 bool cameraManager::findCamera(float laserPower) {
     cout << "Looking for RealSense\n";
     rs2::config cfg;
-    cfg.enable_stream(RS2_STREAM_DEPTH, width, height);
-    cfg.enable_stream(RS2_STREAM_COLOR, width, height);
+    cfg.enable_stream(RS2_STREAM_DEPTH, cameraWidth, cameraHeight);
+    cfg.enable_stream(RS2_STREAM_COLOR, cameraWidth, cameraHeight);
     rs2::context ctx;
     auto device_list = ctx.query_devices();
     
@@ -120,8 +126,9 @@ void cameraManager::update() {
     
     // update rgb picture
     rs2::frame rgbFrame = frames.get_color_frame();
-    memcpy(rgbCameraImage.getPixels().getData(), rgbFrame.get_data(), width * height * 3);
-    rgbCameraImage.update();
+    memcpy(rgbCameraImage.getPixels().getData(), rgbFrame.get_data(), cameraWidth * cameraHeight * 3);
+    rgbCameraImage.flagImageChanged();
+    rgbCameraImageResized.scaleIntoMe(rgbCameraImage);
     
     // update depth buffer
     rs2::depth_frame depthFrame = frames.get_depth_frame();
@@ -134,50 +141,56 @@ void cameraManager::update() {
     depthFrame = hole_filter.process(depthFrame);
     
     // copy depth data
-    memcpy((lastImage.getShortPixelsRef()).getData(), depthFrame.get_data(), width * height * 2);
-    lastImage.flagImageChanged();
-    depthScaled = false;
+    memcpy((depthImage.getShortPixelsRef()).getData(), depthFrame.get_data(), cameraWidth * cameraHeight * 2);
+    depthImage.flagImageChanged();
     
-    memcpy((lastImageScaled.getShortPixelsRef()).getData(), depthFrame.get_data(), width * height * 2);
-    lastImageScaled.flagImageChanged();
+    lastImageReranged.scaleIntoMe(depthImage); // copy depth values
+    depthVisualizationCalculated = false;
     
     // if zero level is set, substract it
     if (zeroLevelSet) {
         tmpImage = zeroImage;
-        tmpImage -= lastImage;
+        
+        lastImageReranged.setROI(roi); // use that picture to calculate substracted image
+        tmpImage -= lastImageReranged;
         tmpImage.convertToRange(0, rangeK);
-        resultImage = tmpImage;
+        substractedImage = tmpImage; // convert to grayscale
+        
+        lastImageReranged.resetROI(); // substracted image calculated, reset roi (to calibrate exposure only)
     }
 }
 
 void cameraManager::setZeroLevel() {
     zeroLevelSet = true;
-    zeroImage = lastImage;
-}
-
-ofImage cameraManager::getRGBImage() {
-    return rgbCameraImage;
-}
-
-ofxCvGrayscaleImage * cameraManager::getDepthImage() {
-    if (!depthScaled) {
-        depthScaled = true;
-        lastImageScaled.convertToRange(0, 65535.0 * 65535.0 * depthScale / 4); // from 0 to 4 meters
-    }
-    depthImage = lastImageScaled;
-    return &depthImage;
+    zeroImage.resetROI();
+    zeroImage = depthImage;
+    zeroImage.setROI(roi);
 }
 
 void cameraManager::setRoi(ofRectangle roi) {
-    lastImage.setROI(roi);
+    this->roi = roi;
     zeroImage.setROI(roi);
-    resultImage.allocate(roi.width, roi.height);
+    substractedImage.allocate(roi.width, roi.height);
+    
     tmpImage.setUseTexture(false);
     tmpImage.allocate(roi.width, roi.height);
 }
 
-ofxCvGrayscaleImage * cameraManager::getSubstractedImage() {
-    return &resultImage;
+ofxCvColorImage & cameraManager::getRGBImage() {
+    return rgbCameraImageResized;
+}
+
+ofxCvGrayscaleImage & cameraManager::getSubstractedImage() {
+    return substractedImage;
+}
+
+ofxCvGrayscaleImage & cameraManager::getDepthVisualizationImage() {
+    if (!depthVisualizationCalculated) {
+        depthVisualizationCalculated = true;
+        lastImageReranged.convertToRange(0, 65535.0 * 65535.0 * depthScale / 4); // from 0 to 4 meters
+    }
+    depthVisualizationImage = lastImageReranged;
+    return depthVisualizationImage;
 }
 
 int cameraManager::getWidth() {

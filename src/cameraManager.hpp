@@ -14,18 +14,22 @@
 
 class cameraManager {
 private:
+    int cameraWidth;
+    int cameraHeight;
     int width;
     int height;
     
-    ofImage rgbCameraImage; // last data from sensor
-    ofxCvGrayscaleImage depthImage;
+    ofRectangle roi;
+    
+    ofxCvColorImage rgbCameraImage; // last data from sensor
+    ofxCvColorImage rgbCameraImageResized; // last data from sensor
     
     bool zeroLevelSet = false;
-    ofxCvShortImage tmpImage;
+    ofxCvShortImage depthImage; // latest depth pixels
+    
+    ofxCvShortImage tmpImage; // to calculate difference
     ofxCvShortImage zeroImage;
-    ofxCvShortImage lastImage;
-    ofxCvShortImage lastImageScaled; // from 0 to 4 meters
-    ofxCvGrayscaleImage resultImage;
+    ofxCvGrayscaleImage substractedImage;
     
     rs2::pipeline pipe;
     rs2::pipeline_profile profile;
@@ -50,9 +54,11 @@ private:
     string cameraName = "";
     bool cameraFound;
     
-    bool depthScaled; // if already transformed after fetching
+    ofxCvShortImage lastImageReranged; // from 0 to 4 meters
+    ofxCvGrayscaleImage depthVisualizationImage; // converted to grayscale
+    bool depthVisualizationCalculated; // if already transformed after fetching
 public:
-    cameraManager(int width = 1280, int height = 720, float maxDepth = .5, float exposure = 33000, int downsampling = 2);
+    cameraManager(int cameraWidth = 1280, int cameraHeight = 720, float maxDepth = .5, float exposure = 33000, int downsampling = 2);
     ~cameraManager();
     
     bool findCamera(float laserPower = 150);
@@ -72,9 +78,9 @@ public:
     
     int getWidth();
     int getHeight();
-    ofImage getRGBImage();
-    ofxCvGrayscaleImage * getDepthImage();
-    ofxCvGrayscaleImage * getSubstractedImage(); // return last - zero image in ROI; maxDepth in mm
+    ofxCvColorImage & getRGBImage();
+    ofxCvGrayscaleImage & getDepthVisualizationImage();
+    ofxCvGrayscaleImage & getSubstractedImage(); // return last - zero image in ROI; maxDepth in mm
     
     void setRoi(ofRectangle roi);
 };

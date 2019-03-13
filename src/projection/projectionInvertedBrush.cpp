@@ -135,7 +135,7 @@ void projectionInvertedBrush::update() {
         ofClear(0);
         ofPushMatrix();
         ofMultMatrix(calib->getCamera2ProjectionTransform());
-        (camera->getSubstractedImage())->draw(0, 0);
+        (camera->getSubstractedImage()).draw(0, 0);
         ofPopMatrix();
         transformedMask.end();
     }
