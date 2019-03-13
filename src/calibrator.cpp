@@ -38,7 +38,7 @@ calibrator::calibrator(cameraManager * camera, touchArea * touch, int _imageWidt
     exposureSlider.addListener(this, &calibrator::exposureChanged);
     
     guiThreshold.setup();
-    guiThreshold.add(thresholdSlider.setup("Threshold", touch->getThreshold(), 0, 1));
+    guiThreshold.add(thresholdSlider.setup("Threshold", touch->getThreshold(), 0.1, 1));
     thresholdSlider.addListener(this, &calibrator::thresholdChanged);
 }
 

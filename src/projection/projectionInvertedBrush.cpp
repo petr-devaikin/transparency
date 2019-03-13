@@ -208,7 +208,7 @@ void projectionInvertedBrush::drawLayers() {
         resultFbo.begin();
         
         shaderSaturationTuner.begin();
-        shaderSaturationTuner.setUniform1f("k", .5);
+        shaderSaturationTuner.setUniform1f("k", 1 / touch->getThreshold() / 3);
         shaderSaturationTuner.setUniformTexture("mask", transformedMask.getTexture(), 1);
         
         tempFbo.draw(0, 0);
