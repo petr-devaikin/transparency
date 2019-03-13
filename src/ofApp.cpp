@@ -6,8 +6,8 @@ void ofApp::setup() {
     camera = new cameraManager(CAMERA_WIDTH, CAMERA_HEIGHT);
     camera->findCamera();
     
-    calib = new calibrator(camera, IMAGE_WIDTH, IMAGE_HEIGHT);
     touch = new touchArea(camera); // init touch recogniser
+    calib = new calibrator(camera, touch, IMAGE_WIDTH, IMAGE_HEIGHT);
     
     // load settings from files
     loadSettings();
@@ -22,7 +22,7 @@ void ofApp::loadSettings() {
     // camera and touch detector settings
     calib->setExposure(projectionSettings.getValue("camera_exposure", 33000.f));
     //camera->setMaxDepth();
-    touch->setThreshold(projectionSettings.getValue("touch_threshold", .5));
+    calib->setThreshold(projectionSettings.getValue("touch_threshold", .5));
     
     // load projection polyline
     ofPolyline projectionPolyline;
@@ -111,9 +111,13 @@ void ofApp::update(){
     camera->update();
     
     if (calib->getState() == done) {
+        touch->update();
         proj->update();
     }
     else {
+        if (calib->getState() == thresholdSetup)
+            touch->update();
+        
         calib->update();
     }
 }
@@ -169,7 +173,9 @@ void ofApp::keyPressed(int key){
         // if camera polygon is set ore recognized correctly, confirm it
         else if (calib->getState() == showingRecognizedArea) {
             calib->confirmRecognizedArea();
-            
+        }
+        else if (calib->getState() == thresholdSetup) {
+            calib->confirmThreshold();
             initProjection();
             proj->start();
         }

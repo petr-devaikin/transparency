@@ -25,6 +25,9 @@ private:
 public:
     touchArea(cameraManager * _camera, float threshold = 0.5); // threshold to detect touch from 0 to 1
     
+    void update();
+    
+    ofxCvGrayscaleImage & getTouchImage();
     vector<ofPoint> detectTouch();
     
     void setThreshold(float threshold);

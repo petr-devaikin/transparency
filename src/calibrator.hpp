@@ -9,6 +9,7 @@
 #define calibrator_hpp
 
 #include "cameraManager.hpp"
+#include "touchArea.h"
 #include "ofMain.h"
 #include "ofxGui.h"
 
@@ -27,6 +28,7 @@ private:
     bool couldNotRecognize;
     
     cameraManager * camera;
+    touchArea * touch;
     
     int imageWidth;
     int imageHeight;
@@ -35,7 +37,6 @@ private:
     ofPolyline cameraPolyline;
     
     float maxDepth = .5;
-    float threshold = .5;
     
     void calculateTransformation();
     
@@ -43,14 +44,19 @@ private:
     float timer;
     float startTimerValue;
     
-    ofxPanel gui;
+    ofxPanel guiExposure;
     ofxFloatSlider exposureSlider;
-    
     void exposureChanged(float &newExposure);
+    
+    ofxPanel guiThreshold;
+    ofxFloatSlider thresholdSlider;
+    void thresholdChanged(float &newThreshold);
 public:
-    calibrator(cameraManager * _camera, int _imageWidth, int _imageHeight, float qrTimer = 0.1); // qr timer - for how long to show qr before recognizing
+    calibrator(cameraManager * camera, touchArea * touch, int _imageWidth, int _imageHeight, float qrTimer = 0.1); // qr timer - for how long to show qr before recognizing
+    
     void setProjectionArea(ofPolyline _preset);
     void setCameraArea(ofPolyline _preset);
+    
     void setMaxDepth(float maxDepth);
     void setThreshold(float threshold);
     void setExposure(float e);
@@ -61,6 +67,7 @@ public:
     
     void confirmExposure();
     void confirmRecognizedArea();
+    void confirmThreshold();
     void startAgain();
     
     CalibratorState getState();
@@ -71,9 +78,6 @@ public:
     ofPolyline getCameraPolyline();
     ofRectangle getProjectionBox();
     ofRectangle getCameraBox();
-    
-    float getMaxDepth();
-    float getThreshold();
     
     ofMatrix4x4 getCamera2ProjectionTransform();
     ofMatrix4x4 getImage2ProjectionTransform();

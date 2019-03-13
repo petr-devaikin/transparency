@@ -21,22 +21,31 @@ touchArea::touchArea(cameraManager * _camera, float threshold) {
     }
 }
 
+void touchArea::update() {
+    if (!camera->isCameraFound()) return;
+    
+    // calculate threshold
+    thresholdImage = camera->getSubstractedImage();
+    thresholdImage.threshold(255 * threshold);
+    
+    // find touches
+    contourFinder.findContours(thresholdImage, thresholdImage.getWidth() * thresholdImage.getHeight() / 36, thresholdImage.getWidth() * thresholdImage.getHeight() / 4, 4, false);
+}
+
 vector<ofPoint> touchArea::detectTouch() {
     vector<ofPoint> result;
     
     if (!camera->isCameraFound()) return result;
     
-    thresholdImage = camera->getSubstractedImage();
-    thresholdImage.threshold(255 * threshold);
-    
-    contourFinder.findContours(thresholdImage, thresholdImage.getWidth() * thresholdImage.getHeight() / 36, thresholdImage.getWidth() * thresholdImage.getHeight() / 4, 4, false);
-    
     for (int i = 0; i < contourFinder.nBlobs; i++) {
-        ofxCvBlob blob = contourFinder.blobs[i];
-        result.push_back(blob.centroid);
+        result.push_back(contourFinder.blobs[i].centroid);
     }
     
     return result;
+}
+
+ofxCvGrayscaleImage & touchArea::getTouchImage() {
+    return thresholdImage;
 }
 
 void touchArea::setThreshold(float threshold) {

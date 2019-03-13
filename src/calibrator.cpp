@@ -10,7 +10,7 @@
 
 using namespace cv;
 
-calibrator::calibrator(cameraManager * _camera, int _imageWidth, int _imageHeight, float qrTimer) {
+calibrator::calibrator(cameraManager * camera, touchArea * touch, int _imageWidth, int _imageHeight, float qrTimer) {
     currentState = exposureSetup;
     couldNotRecognize = false;
     
@@ -20,7 +20,8 @@ calibrator::calibrator(cameraManager * _camera, int _imageWidth, int _imageHeigh
     timer = 0;
     startTimerValue = qrTimer;
     
-    camera = _camera;
+    this->camera = camera;
+    this->touch = touch;
     
     // init projection polyline before it's preset
     projectionPolyline.addVertex(100, 100);
@@ -32,9 +33,13 @@ calibrator::calibrator(cameraManager * _camera, int _imageWidth, int _imageHeigh
     //cv::aruco
     
     // setup GUI
-    gui.setup();
-    gui.add(exposureSlider.setup("Exposure", camera->getExposure(), 20, 150000));
+    guiExposure.setup();
+    guiExposure.add(exposureSlider.setup("Exposure", camera->getExposure(), 20, 150000));
     exposureSlider.addListener(this, &calibrator::exposureChanged);
+    
+    guiThreshold.setup();
+    guiThreshold.add(thresholdSlider.setup("Threshold", touch->getThreshold(), 0, 1));
+    thresholdSlider.addListener(this, &calibrator::thresholdChanged);
 }
 
 void calibrator::setProjectionArea(ofPolyline _preset) {
@@ -93,6 +98,11 @@ void calibrator::confirmRecognizedArea() {
     cout << "Confirm recognition\n";
     camera->setRoi(cameraPolyline.getBoundingBox());
     camera->setZeroLevel();
+    currentState = thresholdSetup;
+}
+
+void calibrator::confirmThreshold() {
+    cout << "Confirm threshold\n";
     currentState = done;
 }
 
@@ -115,7 +125,7 @@ void calibrator::draw() {
         (camera->getDepthVisualizationImage()).draw(0, 0);
         ofDrawBitmapString("Camera: " + camera->getCameraName(), 10, 80);
         ofDrawBitmapString("Set exposure and press Space", 10, 110);
-        gui.draw();
+        guiExposure.draw();
     }
     else if (currentState == projectionSetup) {
         ofSetColor(255, 0, 0);
@@ -148,6 +158,14 @@ void calibrator::draw() {
         ofSetColor(255);
         ofDrawBitmapString("Move corners to cover the flag on the camera view and press Space", 10, 50);
         ofDrawBitmapString("Press R to start again.", 10, 70);
+    }
+    else if (currentState == thresholdSetup) {
+        ofSetColor(255);
+        (camera->getDepthVisualizationImage()).draw(0, 0);
+        (touch->getTouchImage()).draw(cameraPolyline.getBoundingBox());
+        
+        guiThreshold.draw();
+        ofDrawBitmapString("Turn on the fan. Set threshold and press Space", 10, 70);
     }
     // do nothing if done
 }
@@ -220,21 +238,17 @@ void calibrator::setMaxDepth(float maxDepth) {
 }
 
 void calibrator::setThreshold(float threshold) {
-    this->threshold = threshold;
+    thresholdSlider = threshold;
 }
 
 void calibrator::setExposure(float e) {
     exposureSlider = e;
 }
 
-float calibrator::getMaxDepth() {
-    return maxDepth;
-}
-
-float calibrator::getThreshold() {
-    return threshold;
-}
-
 void calibrator::exposureChanged(float &newExposure){
     camera->setExposure(newExposure);
+}
+
+void calibrator::thresholdChanged(float &newThreshold){
+    touch->setThreshold(newThreshold);
 }

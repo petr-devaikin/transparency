@@ -34,6 +34,11 @@ cameraManager::cameraManager(int cameraWidth, int cameraHeight, float maxDepth, 
     depthImage.setUseTexture(false);
     depthImage.allocate(cameraWidth, cameraHeight);
     
+    tmpImage.setUseTexture(false);
+    tmpImage.allocate(width, height);
+    
+    substractedImage.allocate(width, height);
+    
     zeroImage.setUseTexture(false);
     zeroImage.allocate(width, height);
     
@@ -58,7 +63,9 @@ bool cameraManager::findCamera(float laserPower) {
         profile = pipe.start(cfg);
         auto depth_sensor = profile.get_device().first<rs2::depth_sensor>();
         
-        cameraName = depth_sensor.get_info(RS2_CAMERA_INFO_USB_TYPE_DESCRIPTOR);
+        cameraName = depth_sensor.get_info(RS2_CAMERA_INFO_NAME);
+        cameraName += " USB";
+        cameraName += depth_sensor.get_info(RS2_CAMERA_INFO_USB_TYPE_DESCRIPTOR);
         
         // depth sensor settings
         depth_sensor.set_option(RS2_OPTION_VISUAL_PRESET, RS2_RS400_VISUAL_PRESET_DEFAULT);
@@ -163,7 +170,7 @@ void cameraManager::update() {
 void cameraManager::setZeroLevel() {
     zeroLevelSet = true;
     zeroImage.resetROI();
-    zeroImage = depthImage;
+    zeroImage.scaleIntoMe(depthImage);
     zeroImage.setROI(roi);
 }
 
@@ -171,8 +178,6 @@ void cameraManager::setRoi(ofRectangle roi) {
     this->roi = roi;
     zeroImage.setROI(roi);
     substractedImage.allocate(roi.width, roi.height);
-    
-    tmpImage.setUseTexture(false);
     tmpImage.allocate(roi.width, roi.height);
 }
 
