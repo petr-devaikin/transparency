@@ -96,7 +96,7 @@ void calibrator::confirmExposure() {
 
 void calibrator::confirmRecognizedArea() {
     cout << "Confirm recognition\n";
-    camera->setRoi(cameraPolyline.getBoundingBox());
+    camera->setMask(cameraPolyline);
     camera->setZeroLevel();
     currentState = thresholdSetup;
 }
@@ -164,6 +164,10 @@ void calibrator::draw() {
         (camera->getDepthVisualizationImage()).draw(0, 0);
         (touch->getTouchImage()).draw(cameraPolyline.getBoundingBox());
         
+        ofSetColor(0, 255, 0);
+        cameraPolyline.draw();
+        
+        ofSetColor(255);
         guiThreshold.draw();
         ofDrawBitmapString("Turn on the fan. Set threshold and press Space", 10, 70);
     }

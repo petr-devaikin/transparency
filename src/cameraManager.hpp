@@ -57,6 +57,8 @@ private:
     ofxCvShortImage lastImageReranged; // from 0 to 4 meters
     ofxCvGrayscaleImage depthVisualizationImage; // converted to grayscale
     bool depthVisualizationCalculated; // if already transformed after fetching
+    
+    //ofxCvGrayscaleImage maskImage; // to leave pixels only inside the polyline
 public:
     cameraManager(int cameraWidth = 1280, int cameraHeight = 720, float maxDepth = .5, float exposure = 33000, int downsampling = 2);
     ~cameraManager();
@@ -82,7 +84,7 @@ public:
     ofxCvGrayscaleImage & getDepthVisualizationImage();
     ofxCvGrayscaleImage & getSubstractedImage(); // return last - zero image in ROI; maxDepth in mm
     
-    void setRoi(ofRectangle roi);
+    void setMask(ofPolyline mask);
 };
 
 #endif /* cameraManager_hpp */

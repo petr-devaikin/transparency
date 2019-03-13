@@ -162,6 +162,7 @@ void cameraManager::update() {
         tmpImage -= lastImageReranged;
         tmpImage.convertToRange(0, rangeK);
         substractedImage = tmpImage; // convert to grayscale
+        //substractedImage *= maskImage;
         
         lastImageReranged.resetROI(); // substracted image calculated, reset roi (to calibrate exposure only)
     }
@@ -174,11 +175,31 @@ void cameraManager::setZeroLevel() {
     zeroImage.setROI(roi);
 }
 
-void cameraManager::setRoi(ofRectangle roi) {
-    this->roi = roi;
+void cameraManager::setMask(ofPolyline mask) {
+    roi = mask.getBoundingBox();
     zeroImage.setROI(roi);
     substractedImage.allocate(roi.width, roi.height);
     tmpImage.allocate(roi.width, roi.height);
+    
+    /*
+    // preparing mask
+    ofFbo tempFbo;
+    tempFbo.allocate(roi.width, roi.height, GL_UNSIGNED_BYTE);
+    tempFbo.begin();
+    ofSetColor(255);
+    ofBeginShape();
+    for(int i = 0; i < mask.getVertices().size(); i++) {
+        ofVertex(mask.getVertices().at(i).x - roi.getX(), mask.getVertices().at(i).y - roi.getY());
+    }
+    ofEndShape();
+    tempFbo.end();
+    
+    ofPixels pixels;
+    tempFbo.readToPixels(pixels);
+    
+    maskImage.allocate(roi.width, roi.height);
+    maskImage.setFromPixels(pixels);
+     */
 }
 
 ofxCvColorImage & cameraManager::getRGBImage() {
