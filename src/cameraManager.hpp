@@ -59,6 +59,8 @@ private:
     bool depthVisualizationCalculated; // if already transformed after fetching
     
     //ofxCvGrayscaleImage maskImage; // to leave pixels only inside the polyline
+    
+    bool applyFilters = false;
 public:
     cameraManager(int cameraWidth = 1280, int cameraHeight = 720, float maxDepth = .5, float exposure = 33000, int downsampling = 2);
     ~cameraManager();
@@ -66,6 +68,8 @@ public:
     bool findCamera(float laserPower = 150);
     void disconnectCamera();
     bool isCameraFound();
+    
+    void startApplyingFilters();
     
     void setExposure(float e);
     float getExposure();

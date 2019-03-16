@@ -132,20 +132,24 @@ void cameraManager::update() {
         frames = newFrames;
     
     // update rgb picture
+    /*
     rs2::frame rgbFrame = frames.get_color_frame();
     memcpy(rgbCameraImage.getPixels().getData(), rgbFrame.get_data(), cameraWidth * cameraHeight * 3);
     rgbCameraImage.flagImageChanged();
     rgbCameraImageResized.scaleIntoMe(rgbCameraImage);
+     */
     
     // update depth buffer
     rs2::depth_frame depthFrame = frames.get_depth_frame();
     
-    // apply filters
-    //depthFrame = depth_to_disparity.process(depthFrame);
-    //depthFrame = spat_filter.process(depthFrame);
-    depthFrame = temp_filter.process(depthFrame);
-    //depthFrame = disparity_to_depth.process(depthFrame);
-    depthFrame = hole_filter.process(depthFrame);
+    if (applyFilters) {
+        // apply filters
+        //depthFrame = depth_to_disparity.process(depthFrame);
+        //depthFrame = spat_filter.process(depthFrame);
+        depthFrame = temp_filter.process(depthFrame);
+        //depthFrame = disparity_to_depth.process(depthFrame);
+        depthFrame = hole_filter.process(depthFrame);
+    }
     
     // copy depth data
     memcpy((depthImage.getShortPixelsRef()).getData(), depthFrame.get_data(), cameraWidth * cameraHeight * 2);
@@ -225,4 +229,8 @@ int cameraManager::getWidth() {
 
 int cameraManager::getHeight() {
     return height;
+}
+
+void cameraManager::startApplyingFilters() {
+    applyFilters = true;
 }

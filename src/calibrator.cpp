@@ -91,6 +91,7 @@ void calibrator::recognize() {
 
 void calibrator::confirmExposure() {
     cout << "Confirm exposure\n";
+    camera->startApplyingFilters();
     currentState = projectionSetup;
 }
 
@@ -147,7 +148,7 @@ void calibrator::draw() {
     else if (currentState == showingRecognizedArea) {
         // draw camera image
         ofSetColor(255);
-        (camera->getRGBImage()).draw(0, 0);
+        (camera->getDepthVisualizationImage()).draw(0, 0);
         
         // draw recognized polyline on top
         ofNoFill();

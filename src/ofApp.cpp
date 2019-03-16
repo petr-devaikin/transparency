@@ -85,25 +85,13 @@ void ofApp::saveSettings() {
 void ofApp::initProjection() {
     // init proj
     proj = new projectionInvertedBrush(camera, touch, calib, PROJ_ANIMATE_DEPTH, PROJ_SPEED, PROJ_BLUR_RADIUS);
-    proj->addImage("surrender_jei_2018/surrender_001.png");
-    proj->addImage("surrender_jei_2018/surrender_002.png");
-    proj->addImage("surrender_jei_2018/surrender_003.png");
-    proj->addImage("surrender_jei_2018/surrender_004.png");
-    proj->addImage("surrender_jei_2018/surrender_005.png");
-    proj->addImage("surrender_jei_2018/surrender_006.png");
-    proj->addImage("surrender_jei_2018/surrender_007.png");
-    proj->addImage("surrender_jei_2018/surrender_008.png");
-    proj->addImage("surrender_jei_2018/surrender_009.png");
-    proj->addImage("surrender_jei_2018/surrender_010.png");
-    proj->addImage("surrender_jei_2018/surrender_011.png");
-    proj->addImage("surrender_jei_2018/surrender_012.png");
-    proj->addImage("surrender_jei_2018/surrender_013.png");
-    proj->addImage("surrender_jei_2018/surrender_014.png");
-    proj->addImage("surrender_jei_2018/surrender_015.png");
-    proj->addImage("surrender_jei_2018/surrender_016.png");
-    proj->addImage("surrender_jei_2018/surrender_017.png");
-    proj->addImage("surrender_jei_2018/surrender_018.png");
-    proj->addImage("surrender_jei_2018/surrender_019.png");
+    proj->addImage("test_04/test_0301.png");
+    //proj->addImage("test_04/test_0302.png");
+    proj->addImage("test_04/test_0303.png");
+    //proj->addImage("test_04/test_0304.png");
+    proj->addImage("test_04/test_0305.png");
+    //proj->addImage("test_04/test_0306.png");
+    proj->addImage("test_04/test_0307.png");
 }
 
 //--------------------------------------------------------------

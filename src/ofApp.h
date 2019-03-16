@@ -17,12 +17,12 @@ const string PROJ_SETTINGS_FILE = "projection_settings.xml";
 const int CAMERA_WIDTH = 1280;
 const int CAMERA_HEIGHT = 720;
 
-const int IMAGE_WIDTH = 1024; // projected image original size
-const int IMAGE_HEIGHT = 1024;
+const int IMAGE_WIDTH = 1000; // projected image original size
+const int IMAGE_HEIGHT = 1420;
 
-const int PROJ_SPEED = 50;
+const int PROJ_SPEED = 80;
 const int PROJ_BLUR_RADIUS = 50;
-const bool PROJ_ANIMATE_DEPTH = true;
+const bool PROJ_ANIMATE_DEPTH = false;
 
 class ofApp : public ofBaseApp{
 private:
